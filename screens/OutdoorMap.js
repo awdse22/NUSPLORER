@@ -65,7 +65,6 @@ export default function OutdoorMap() {
               <SearchBar />
               <Text>Insert map here</Text>
               <Button title='logout' onPress={() => navigation.navigate('Authentication')}/>
-              <UIBar />
           </View>
       </TouchableWithoutFeedback>
   );

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 
-export default function Settings() {
+export default function SettingsScreen() {
     return (
         <View style={styles}>
             <Text>Settings</Text>

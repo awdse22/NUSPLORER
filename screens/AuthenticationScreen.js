@@ -97,7 +97,7 @@ export default function AuthenticationScreen() {
     }
     
     if (loginSuccess) {
-      navigation.navigate('OutdoorMap');
+      navigation.navigate('MainInterface');
     } else {
       setStatusVisible(true);
     }
