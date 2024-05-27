@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import AuthenticationScreen from './screens/AuthenticationScreen';
+import LoginScreen from './screens/UnauthenticatedScreens/LoginScreen';
+import RegisterAccount from './screens/UnauthenticatedScreens/RegisterAccount';
 import OutdoorMap from "./screens/OutdoorMap";
 import NavigationScreen from './screens/NavigationScreen';
 import Bookmarks from './screens/Bookmarks';
@@ -10,6 +11,8 @@ import TimetableScreen from './screens/TimeTableScreen';
 import SettingsScreen from './screens/SettingsScreen';
 
 import { FontAwesome, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
+import ForgotPassword from './screens/UnauthenticatedScreens/ForgotPassword';
+import EmailConfirmation from './screens/UnauthenticatedScreens/EmailConfirmation';
 
 const Stack = createStackNavigator();
 const MainTab = createBottomTabNavigator();
@@ -66,9 +69,24 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='Authentication' screenOptions={{ headerShown: false }}>
-          <Stack.Screen name='Authentication' component={AuthenticationScreen} />
-          <Stack.Screen name='MainInterface' component={MainTabNavigator} />
+      <Stack.Navigator initialRouteName='Login'>
+          <Stack.Screen 
+            name='Login' 
+            component={LoginScreen}
+            options={{ headerShown: false }} />
+          <Stack.Screen 
+            name='Account Registration' 
+            component={RegisterAccount} />
+          <Stack.Screen 
+            name='Email Confirmation' 
+            component={EmailConfirmation} />
+          <Stack.Screen 
+            name='Reset Password' 
+            component={ForgotPassword} />
+          <Stack.Screen 
+            name='MainInterface' 
+            component={MainTabNavigator}
+            options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>   
   );
