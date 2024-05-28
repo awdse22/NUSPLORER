@@ -8,11 +8,11 @@ import OutdoorMap from "./screens/OutdoorMap";
 import NavigationScreen from './screens/NavigationScreen';
 import Bookmarks from './screens/Bookmarks';
 import TimetableScreen from './screens/TimeTableScreen';
-import SettingsScreen from './screens/SettingsScreen';
 
 import { FontAwesome, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import ForgotPassword from './screens/UnauthenticatedScreens/ForgotPassword';
 import EmailConfirmation from './screens/UnauthenticatedScreens/EmailConfirmation';
+import SettingsNavigator from './screens/Settings/SettingsNavigator';
 
 const Stack = createStackNavigator();
 const MainTab = createBottomTabNavigator();
@@ -55,10 +55,11 @@ function MainTabNavigator() {
           tabBarIcon: () => <FontAwesome name="calendar" size={40} color="black" />
         }} />
       <MainTab.Screen 
-        name='SettingsScreen' 
-        component={SettingsScreen}
+        name='SettingsScreen'
+        label='Settings' 
+        component={SettingsNavigator}
         options={{
-          tabBarIcon: () => <MaterialIcons name="settings" size={48} color="black" />
+          tabBarIcon: () => <MaterialIcons name="settings" size={48} color="black" />,
         }} />
     </MainTab.Navigator> 
   )
