@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View, TouchableWithoutFeedback, 
   Keyboard } from 'react-native';
 import { useForm } from 'react-hook-form';
@@ -8,8 +8,6 @@ import AuthScreenButton from '../../Components/AuthScreenButton';
 
 export default function LoginScreen() {
   const navigation = useNavigation();
-  const [statusVisible, setStatusVisible] = useState(false);
-  const [loginErrorMessage, setLoginErrorMessage] = useState('');
   const {control, handleSubmit, formState: {errors}} = useForm();
 
   // Component for NUSPLORER app name
