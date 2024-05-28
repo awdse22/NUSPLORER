@@ -1,5 +1,4 @@
-import { React, useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import React from 'react';
 import { StyleSheet, View, TouchableWithoutFeedback, 
   Keyboard } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
