@@ -1,19 +1,39 @@
-import React from 'react';
+import { React, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { StyleSheet, View, TouchableWithoutFeedback, 
-  Keyboard } from 'react-native';
+import { StyleSheet, View, TouchableWithoutFeedback, Keyboard, Text } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useForm } from 'react-hook-form';
 import AuthenticationInput from '../../Components/AuthenticationInput';
 import AuthScreenButton from '../../Components/AuthScreenButton';
 import validator from 'validator';
+import axios from 'axios';
 
 export default function RegisterAccount() {
     const navigation = useNavigation();
     const {control, handleSubmit, formState: {error}, watch} = useForm();
+    const [errorVisible, setErrorVisible] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
-    function registerAccount() {
-        navigation.navigate('Email Confirmation');
+    function registerAccount(credentials) {
+        console.log('--------------- FrontEnd posting: --------------------');
+        console.log(credentials);
+        const url = 'http://10.0.2.2:3000/register';
+        
+        axios.post(url, credentials).then((response) => {
+        console.log('Backend response:');
+        console.log(response.data);
+        if (response.data.success) {
+            setErrorVisible(false);
+            navigation.navigate('Email Confirmation');
+        } else {
+            setErrorMessage(response.data.message);
+            setErrorVisible(true);
+        }
+        }).catch(error => {
+        console.log(error);
+        })
+
+        // navigation.navigate('Email Confirmation');
     }
 
     return (
@@ -63,6 +83,7 @@ export default function RegisterAccount() {
                         }}
                         secureTextEntry={true} />
                     <AuthScreenButton buttonName='Register' onPress={handleSubmit(registerAccount)} />
+                    {errorVisible && <Text style={styles.errorMessage}>{errorMessage}</Text>}
                 </ScrollView>
             </View>
         </TouchableWithoutFeedback>
@@ -78,5 +99,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         padding: 20
     },
+    errorMessage: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: 'red',
+    }
 })
 
