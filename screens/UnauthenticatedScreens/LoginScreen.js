@@ -5,6 +5,7 @@ import { StyleSheet, Text, View, TouchableWithoutFeedback,
 import { useForm } from 'react-hook-form';
 import AuthenticationInput from '../../Components/AuthenticationInput';
 import AuthScreenButton from '../../Components/AuthScreenButton';
+import axios from 'axios';
 
 export default function LoginScreen() {
   const navigation = useNavigation();
@@ -19,9 +20,18 @@ export default function LoginScreen() {
     )
   }
 
-  function authenticate(data) {
-    console.log(data);
-    navigation.navigate('MainInterface');
+  function authenticate(credentials) {
+    console.log('------------FrontEnd posting:');
+    console.log(credentials);
+    const url = 'http://10.0.2.2:3000/login';
+    
+    axios.post(url, credentials).then((response) => {
+      console.log('Backend response:');
+      console.log(response.data);
+    }).catch(error => {
+      console.log(error);
+    })
+    // navigation.navigate('MainInterface');
   }
 
   return (
