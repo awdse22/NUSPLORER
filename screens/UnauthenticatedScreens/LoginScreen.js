@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
+import { React, useState } from 'react';
 import { StyleSheet, Text, View, TouchableWithoutFeedback, 
   Keyboard } from 'react-native';
 import { useForm } from 'react-hook-form';
@@ -10,6 +10,8 @@ import axios from 'axios';
 export default function LoginScreen() {
   const navigation = useNavigation();
   const {control, handleSubmit, formState: {errors}} = useForm();
+  const [errorVisible, setErrorVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Component for NUSPLORER app name
   const AppName = () => {
@@ -28,10 +30,16 @@ export default function LoginScreen() {
     axios.post(url, credentials).then((response) => {
       console.log('Backend response:');
       console.log(response.data);
+      if (response.data.success) {
+        setErrorVisible(false);
+        navigation.navigate('MainInterface');
+      } else {
+          setErrorMessage(response.data.message);
+          setErrorVisible(true);
+      }
     }).catch(error => {
       console.log(error);
     })
-    // navigation.navigate('MainInterface');
   }
 
   return (
@@ -41,10 +49,10 @@ export default function LoginScreen() {
             <AppName />
             
             <AuthenticationInput 
-              fieldName='username'
-              label='Username'
+              fieldName='email'
+              label='Email'
               control={control}
-              rules={{required: 'Please enter your user ID'}} />
+              rules={{required: 'Please enter your email'}} />
 
             <AuthenticationInput 
               fieldName='password'
@@ -52,7 +60,7 @@ export default function LoginScreen() {
               control={control}
               secureTextEntry={true}
               rules={{required: 'Please enter your password'}} />
-
+            {errorVisible && <Text style={styles.errorMessage}>{errorMessage}</Text>}
             <AuthScreenButton buttonName='Login' onPress={handleSubmit(authenticate)} />
             <AuthScreenButton 
               buttonName='Register an account' 
@@ -97,5 +105,10 @@ const styles = StyleSheet.create({
       color: 'red',
       fontWeight: 'bold',
       fontSize: 15
+    },
+    errorMessage: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: 'red',
     }
 });

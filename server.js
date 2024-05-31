@@ -2,25 +2,51 @@ const express = require('express');
 const app = express();
 const bcrypt = require('bcrypt');
 const pool = require('./dbConfig');
+const e = require('express');
 
 const PORT = 3000;
 
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    res.send("Hello aaaaaaaa");
+    res.send("testing");
 })
 
 app.post('/login', async (req, res) => {
-    res.json(req.body);
+    const { email, password } = req.body;
+    let response = {
+        success: false,
+    };
+    
+    if (!email || !password) {
+        response.message = 'Please fill in the email and password';
+        return res.json(response);
+    }
+    
+    const searchEmail = await pool.query(
+        `SELECT * FROM users WHERE email = $1`, [email]
+    );
+
+    const user = searchEmail.rows[0];
+    if (!user) {
+        response.message = 'Invalid email address';
+        return res.json(response);
+    } else {
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+            response.message = 'The password is incorrect';
+            return res.json(response);
+        } else {
+            response.success = true;
+            return res.json(response);
+        }
+    }
 })
 
 app.post('/register', async (req, res) => {
     const { username, email, password, confirmPassword } = req.body;
     let response = {
         success: false,
-        message: null,
-        email: null,
     };
 
     if (!username || !email || !password || !confirmPassword) {

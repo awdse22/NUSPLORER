@@ -24,7 +24,7 @@ export default function RegisterAccount() {
         console.log(response.data);
         if (response.data.success) {
             setErrorVisible(false);
-            navigation.navigate('Email Confirmation');
+            navigation.navigate('Account Created');
         } else {
             setErrorMessage(response.data.message);
             setErrorVisible(true);

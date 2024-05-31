@@ -13,6 +13,7 @@ import { FontAwesome, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import ForgotPassword from './screens/UnauthenticatedScreens/ForgotPassword';
 import EmailConfirmation from './screens/UnauthenticatedScreens/EmailConfirmation';
 import SettingsNavigator from './screens/Settings/SettingsNavigator';
+import AccountCreated from './screens/UnauthenticatedScreens/AccountCreated';
 
 const Stack = createStackNavigator();
 const MainTab = createBottomTabNavigator();
@@ -66,7 +67,6 @@ function MainTabNavigator() {
 }
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
     <NavigationContainer>
@@ -81,6 +81,9 @@ export default function App() {
           <Stack.Screen 
             name='Email Confirmation' 
             component={EmailConfirmation} />
+          <Stack.Screen 
+            name='Account Created' 
+            component={AccountCreated} />
           <Stack.Screen 
             name='Reset Password' 
             component={ForgotPassword} />
