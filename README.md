@@ -1,4 +1,71 @@
 # NUSPLORER
+
+## For Developers
+Make sure you have npm installed.
+Install dependencies for the project by running (in the directory)
+```
+npm install
+```
+
+### Setting up Android Studio 
+
+1. Download and install Android studio. You may leave the settings at default.
+
+2. After launching android studio, there should be a window 'Welcome to Android Studio' without any projects.
+Select `More Actions` > `Virtual Device Manager`.
+
+3. There should be a virtual device present, click the play button to run the emulator.
+Some time will be needed the first time you run the emulator, wait for it to show the Home Screen.
+
+If there is no virtual device present, you can create a virtual device by pressing the `+` button.
+Select `Pixel 3a`, then `Next`. Download the UpsideDownCake API level 34 system image and select it.
+Click `Next` > `Finish`.
+
+### Setting up PostgreSQL using pgadmin 
+
+1. Download and install pgadmin. If prompted to set up a password, you can set it up to any password you want. 
+(Or just set the password as `postgres`)
+
+2. After launching pgadmin, there should be a default server (e.g. "PostgreSQL 16").
+Login
+If there isn't a server, you can register a server by right-clicking `Servers` > `Register` > `Server`.
+Enter a name for the server. Under the connections tab, fill in "localhost" under Host name/address and the password set up when installing pgadmin. 
+
+3. Open up the server and there should be a default database called `postgres` (Alternatively you can create another database).
+Select the database and open up the Query Tool (`Alt+Shift+Q` by default, or click the icon beside 'Object Explorer').
+Create a table by entering the following query and executing it:
+```
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    user_name VARCHAR(16) NOT NULL CHECK (LENGTH(user_name) >= 3),
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL CHECK (LENGTH(password) >= 8)
+);
+```
+
+Note: In the `.env` file for the repository, you may need to change the name of the variables depending on the username, password and the name of database you're using.
+
+### Running the app
+
+Ensure that the android emulator is running.
+For BackEnd, run (in main directory)
+```
+npm start
+```
+
+For FrontEnd, run (in main directory)
+```
+npx expo start
+```
+You will be given a few options, press `a` to run the app on the android emulator.
+(The first time you run this, this will prompt the emulator to download expo go app)
+
+In a case where a few attempts of `npx expo start` fails to run the app, try `npx expo start -c`.
+
+If the map requires you to update google play services:
+1. Under 'More Actions' in Android Studio, select SDK Manager.
+2. Look for the SDK Tools tab, check the 'Google Play services' packages and click Apply to download the package.
+3. After downloading, select Finish > Apply > OK and restart the android emulator.
 ## Proposed Level of Achievement:
 Project Gemini
 ## Problem Motivation:
