@@ -92,17 +92,17 @@ To create a campus navigation system, for both indoor and outdoor use, to help p
 ### Scope of Project:
 The Android App provides a comprehensive campus navigation system at NUS, featuring both indoor and outdoor maps, real-time canteen crowd indicators, bookmarking capabilities (and integration with bus routes and real-life imagery).
 #### Features to be completed by milestone 2:
-1. Map section: Explore Campus with Ease
+#### 1. Map section: Explore Campus with Ease
 People can effortlessly locate buildings, classrooms, and more from a comprehensive view of campus facilities.
 For indoor maps, the basic template for implementation should be set up and data on floor plans for accessible buildings should be collected.
-2. Navigation section: Navigate with Precision
+#### 2. Navigation section: Navigate with Precision
 Users can easily find the fastest routes to their desired buildings within NUS.
 #### Features to be completed by milestone 3: 
-1.  Navigation section: Integration and navigation of both outdoor and indoor maps
+#### 1.  Navigation section: Integration and navigation of both outdoor and indoor maps
 Users can find routes for both outdoor and indoor linked together to reach their desired destinations.
-2. Timetable section: Plan Your Day Seamlessly
+#### 2. Timetable section: Plan Your Day Seamlessly
 Students can input their timetable and plan routes to various locations accordingly.
-3. Bookmark section: Personalise Your Campus Experience
+#### 3. Bookmark section: Personalise Your Campus Experience
 People can bookmark their frequently visited locations based on their schedules.
 ### Tech Stack
 1. React Native (FrontEnd)
