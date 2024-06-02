@@ -66,7 +66,7 @@ If the map requires you to update google play services:
 1. Under 'More Actions' in Android Studio, select SDK Manager.
 2. Look for the SDK Tools tab, check the 'Google Play services' packages and click Apply to download the package.
 3. After downloading, select Finish > Apply > OK and restart the android emulator.
-## Overview
+## Project Overview
 ### Proposed Level of Achievement:
 Project Gemini
 ### Problem Motivation:
