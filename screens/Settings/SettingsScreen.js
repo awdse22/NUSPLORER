@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SettingsButton = ({ name, onPress }) => {
     return (
@@ -17,12 +17,18 @@ const SettingsButton = ({ name, onPress }) => {
 export default function SettingsScreen() {
     const navigator = useNavigation();
 
+    function logout() {
+        AsyncStorage.removeItem('token');
+        navigator.navigate('Login');
+        console.log('token cleared');
+    }
+
     return (
         <View style={styles.container}>
             <SettingsButton name='User Details' onPress={() => navigator.navigate('User Details')} />
             <SettingsButton name='Change password' onPress={() => navigator.navigate('Change Password')} />
             <SettingsButton name='Manage user data' onPress={() => navigator.navigate('Manage User Data')} />
-            <SettingsButton name='Logout' onPress={() => navigator.navigate('Login')}/>
+            <SettingsButton name='Logout' onPress={logout}/>
         </View>
     )
 }

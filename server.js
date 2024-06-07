@@ -2,9 +2,10 @@ const express = require('express');
 const app = express();
 const bcrypt = require('bcrypt');
 const pool = require('./dbConfig');
-const e = require('express');
+const jwt = require('jsonwebtoken');
 
 const PORT = 3000;
+const JWT_SECRET = '!Qk@#9ZpP$#XcX0wZq%wA2*eX&ZkUz9B*J7!Rk&ZnLk$Yx7T4*Mp%U9K!NqP2&#';
 
 app.use(express.json());
 
@@ -12,16 +13,28 @@ app.get('/', (req, res) => {
     res.send("testing");
 })
 
+/*
+const authenticateToken = (req, res, next) => {
+    const token = req.header('Authorization');
+    if (!token) {
+        return res.status(401).json({error: 'No token provided'});
+    }
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        req.user = decoded.user;
+        next();
+    } catch (err) {
+        res.status(401).json({error: 'Invalid token'});
+    }
+}
+*/
+
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
     let response = {
         success: false,
     };
-    
-    if (!email || !password) {
-        response.message = 'Please fill in the email and password';
-        return res.json(response);
-    }
     
     const searchEmail = await pool.query(
         `SELECT * FROM users WHERE email = $1`, [email]
@@ -37,8 +50,16 @@ app.post('/login', async (req, res) => {
             response.message = 'The password is incorrect';
             return res.json(response);
         } else {
-            response.success = true;
-            return res.json(response);
+            const token = jwt.sign({ email: user.email, username: user.username}, JWT_SECRET);
+
+            if (res.status(201)) {
+                response.success = true;
+                response.token = token;
+                return res.json(response);
+            } else {
+                response.message = 'Error signing token';
+                return res.json(response);
+            }
         }
     }
 })
@@ -87,6 +108,40 @@ app.post('/register', async (req, res) => {
         response.success = true;
         response.message = 'Registration success';
         response.info = req.body;
+        return res.json(response);
+    }
+})
+
+app.post("/userdetails", async (req, res) => {
+    const { token } = req.body;
+    let response = {
+        success: true
+    };
+
+    if (!token) {
+        response.success = false;
+        response.message = 'No token found';
+        return res.json(response);
+    }
+    
+    try {
+        const user = jwt.verify(token, JWT_SECRET)
+        const userData = await pool.query(
+            `SELECT * FROM users WHERE email = $1`, [user.email]
+        );
+
+        if (userData.rows[0]) {
+            response.userData = userData.rows[0];
+            return res.json(response);
+        } else {
+            response.success = false;
+            response.message = 'No data found';
+            return res.json(response);
+        }
+    } catch (err) {
+        console.error('Token verification failed', err);
+        response.message = 'Token verification failed';
+        response.success = false;
         return res.json(response);
     }
 })
