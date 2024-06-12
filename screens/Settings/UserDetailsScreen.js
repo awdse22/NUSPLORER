@@ -1,25 +1,50 @@
 import {React, useState, useEffect} from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import { View, Text, StyleSheet, Button, Alert } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 export default function UserDetailsScreen() {
+    const navigator = useNavigation();
     const [username, setUsername] = useState('No data');
     const [email, setEmail] = useState('No data');
     const [errorVisible, setErrorVisible] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    function logout() {
+        AsyncStorage.removeItem('token');
+        navigator.navigate('Login');
+        console.log('token cleared');
+    }
 
     async function getUserDetails() {
         const url = 'http://10.0.2.2:3000/userdetails';
         const token = await AsyncStorage.getItem('token');
 
-        axios.post(url, {token: token}).then((response) => {
-            const result = response.data;
-            if (result.success) {
-                setEmail(result.userData.email);
-                setUsername(result.userData.username)
-            } else {
+        axios.get(url, { 
+            headers: {
+                'Authorization': token ? `Bearer ${token}` : null
+            }
+        }).then((response) => {
+            const userData = response.data.userData;
+            setEmail(userData.email);
+            setUsername(userData.username);
+            setErrorVisible(false);
+            setErrorMessage('');
+        }).catch((error) => {
+            const errorStatus = error.response.status;
+            if (errorStatus == 401 || errorStatus == 403) {
+                Alert.alert(error.response.data.message, 'Please login again!', [
+                    {
+                        text: 'OK',
+                        onPress: () => logout()
+                    }
+                ])
+            } else if (errorStatus == 404 || errorStatus == 500) {
+                setErrorMessage(error.response.data.message);
                 setErrorVisible(true);
-                console.log(result.message)
+            } else {
+                console.error('Error in backend', error);
             }
         });
     }
@@ -39,8 +64,7 @@ export default function UserDetailsScreen() {
 
     return (
         <View style={styles.container}>
-            {errorVisible && <Text>No data found!</Text>}
-            <Button title='Get user details' onPress={getUserDetails} />
+            {errorVisible && <Text>{errorMessage}</Text>}
             <InfoDisplay info={username} label='Username' />
             <InfoDisplay info={email} label='Email' />
         </View>

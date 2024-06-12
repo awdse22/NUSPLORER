@@ -25,23 +25,20 @@ export default function LoginScreen() {
 
   function authenticate(credentials) {
     const url = 'http://10.0.2.2:3000/login';
-    navigation.navigate('MainInterface');
 
     axios.post(url, credentials).then((response) => {
-      console.log('Backend response:');
-      console.log(response.data.token);
+      console.log('Login success with token ' + response.data.token);
 
-      if (response.data.success) {
-        setErrorVisible(false);
-        AsyncStorage.setItem('token', response.data.token);
-        navigation.navigate('MainInterface');
-        console.log(response.data);
-      } else {
-          setErrorMessage(response.data.message);
-          setErrorVisible(true);
-      }
+      setErrorVisible(false);
+      AsyncStorage.setItem('token', response.data.token);
+      navigation.navigate('MainInterface');
     }).catch(error => {
-      console.error('Error authenticating: ', error);
+      setErrorMessage(error.response.data.message);
+      setErrorVisible(true);
+      const errorStatus = error.response.status;
+      if (errorStatus != 400 && (errorStatus != 401 && errorStatus != 500)) {
+        console.error('Error in backend: ', error);
+      }
     })
   }
 
