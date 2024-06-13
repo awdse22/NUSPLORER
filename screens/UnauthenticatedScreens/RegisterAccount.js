@@ -20,8 +20,7 @@ export default function RegisterAccount() {
         const url = 'http://10.0.2.2:3000/register';
         
         axios.post(url, credentials).then((response) => {
-            console.log('Backend response:');
-            console.log(response);
+            console.log('Account creation success');
             navigation.navigate('Account Created');
         }).catch(error => {
             setErrorMessage(error.response.data.message);
