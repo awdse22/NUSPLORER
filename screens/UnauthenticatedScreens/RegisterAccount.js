@@ -20,20 +20,16 @@ export default function RegisterAccount() {
         const url = 'http://10.0.2.2:3000/register';
         
         axios.post(url, credentials).then((response) => {
-        console.log('Backend response:');
-        console.log(response.data);
-        if (response.data.success) {
-            setErrorVisible(false);
+            console.log('Account creation success');
             navigation.navigate('Account Created');
-        } else {
-            setErrorMessage(response.data.message);
-            setErrorVisible(true);
-        }
         }).catch(error => {
-        console.log(error);
+            setErrorMessage(error.response.data.message);
+            setErrorVisible(true);
+            const errorStatus = error.response.status;
+            if (errorStatus != 400 && (errorStatus != 401 && errorStatus != 500)) {
+                console.error('Error in backend: ', error);
+            }
         })
-
-        // navigation.navigate('Email Confirmation');
     }
 
     return (

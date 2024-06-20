@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import AuthenticationInput from '../../Components/AuthenticationInput';
 import AuthScreenButton from '../../Components/AuthScreenButton';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen() {
   const navigation = useNavigation();
@@ -23,22 +24,21 @@ export default function LoginScreen() {
   }
 
   function authenticate(credentials) {
-    console.log('------------FrontEnd posting:');
-    console.log(credentials);
     const url = 'http://10.0.2.2:3000/login';
-    
+
     axios.post(url, credentials).then((response) => {
-      console.log('Backend response:');
-      console.log(response.data);
-      if (response.data.success) {
-        setErrorVisible(false);
-        navigation.navigate('MainInterface');
-      } else {
-          setErrorMessage(response.data.message);
-          setErrorVisible(true);
-      }
+      console.log('Login success with token ' + response.data.token);
+
+      setErrorVisible(false);
+      AsyncStorage.setItem('token', response.data.token);
+      navigation.navigate('MainInterface');
     }).catch(error => {
-      console.log(error);
+      setErrorMessage(error.response.data.message);
+      setErrorVisible(true);
+      const errorStatus = error.response.status;
+      if (errorStatus != 400 && (errorStatus != 401 && errorStatus != 500)) {
+        console.error('Error in backend: ', error);
+      }
     })
   }
 
