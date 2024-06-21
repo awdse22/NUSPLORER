@@ -49,6 +49,7 @@ export default function NavigationScreen() {
     const [locationInput, setLocationInput] = useState(location?.currLocation)
     const [modalOpen, setModalOpen] = useState(false)
     const isStartingLocation = index == 0
+    const isEndingLocation = index == locationList.length - 1
 
     async function searchLocation() {
       if (locationInput.length === 0) {
@@ -119,20 +120,23 @@ export default function NavigationScreen() {
 
     return (
       <View style={styles.locationInfo.container}>
-        {/* Arrows pointing to destination locations */}
-        {!isStartingLocation && (
-          <View style={styles.locationInfo.path}>
-            <AntDesign name="arrowdown" size={36} color="black" />
-            <AntDesign name="arrowdown" size={36} color="black" />
-          </View>
-        )}
-
-        <View style={styles.locationInfo.userInterface}>
-          {isStartingLocation ? (
-            <Feather name="navigation" size={36} color="black" />
-          ) : (
-            <Ionicons name="location-sharp" size={36} color="black" />
-          )}
+        <Feather
+          style={{ marginRight: 10 }}
+          name={
+            isStartingLocation
+              ? 'chevron-right'
+              : isEndingLocation
+              ? 'check'
+              : 'chevrons-down'
+          }
+          size={23}
+          color="#232323"
+        />
+        <View
+          style={[
+            styles.locationInfo.userInterface,
+            !location.locationChosen && { backgroundColor: '#f2f2f3' },
+          ]}>
           {location.locationChosen ? (
             <View style={styles.locationInfo.locationChosen}>
               <Text
@@ -142,11 +146,12 @@ export default function NavigationScreen() {
                 {locationInput}
               </Text>
               <TouchableOpacity
+                style={{ marginRight: 5 }}
                 onPress={() => {
                   location.locationChosen = false
                   setLocationList([...locationList])
                 }}>
-                <MaterialIcons name="edit" size={24} color="black" />
+                <MaterialIcons name="edit" size={18} color="#232323" />
               </TouchableOpacity>
             </View>
           ) : (
@@ -164,8 +169,10 @@ export default function NavigationScreen() {
                     : 'Choose destination'
                 }
               />
-              <TouchableOpacity onPress={searchLocation}>
-                <Ionicons name="search" size={24} color="black" />
+              <TouchableOpacity
+                onPress={searchLocation}
+                style={{ marginRight: 5 }}>
+                <Ionicons name="search" size={18} color="#232323" />
               </TouchableOpacity>
             </View>
           )}
@@ -173,7 +180,7 @@ export default function NavigationScreen() {
             <TouchableOpacity
               onPress={() => setModalOpen(true)}
               style={{ paddingHorizontal: 10 }}>
-              <FontAwesome name="ellipsis-v" size={24} color="black" />
+              <FontAwesome name="ellipsis-v" size={18} color="#232323" />
             </TouchableOpacity>
             {renderModal()}
           </View>
@@ -192,10 +199,15 @@ export default function NavigationScreen() {
         </ScrollView>
         <TouchableOpacity
           style={{
+            marginTop: 10,
+            alignSelf: 'center',
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: 15,
+            padding: 10,
+            borderRadius: 20,
+            borderWidth: 2,
+            borderColor: '#94abdb',
           }}
           onPress={() => {
             if (locationList.length < 2) {
@@ -204,8 +216,13 @@ export default function NavigationScreen() {
             }
             navigator.jumpTo('Map', { locationList: [...locationList] })
           }}>
-          <Ionicons name="navigate" size={30} color="black" />
-          <Text>Navigate</Text>
+          <Ionicons
+            style={{ marginRight: 10 }}
+            name="navigate"
+            size={19}
+            color="#4872d1"
+          />
+          <Text style={{ fontSize: 14, color: '#4872d1' }}>Start Navigate</Text>
         </TouchableOpacity>
       </SafeAreaView>
     </TouchableWithoutFeedback>
@@ -216,7 +233,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 15,
     paddingBottom: 70,
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
   },
   locationList: {
     width: '100%',
@@ -224,8 +241,9 @@ const styles = StyleSheet.create({
   },
   locationInfo: {
     container: {
-      flexDirection: 'column',
+      flexDirection: 'row',
       alignItems: 'center',
+      backgroundColor: '#fff',
       justifyContent: 'center',
     },
     path: {
@@ -236,27 +254,25 @@ const styles = StyleSheet.create({
       padding: 10,
     },
     userInterface: {
-      width: '100%',
+      flex: 1,
       flexDirection: 'row',
+      marginBottom: 8,
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: 10,
-      borderWidth: 1,
-      borderRadius: 5,
-      backgroundColor: '#f2f2f2',
+      padding: 8,
+      borderRadius: 10,
+      backgroundColor: '#f6f7fb',
     },
     locationNotChosen: {
-      width: '75%',
+      flex: 1,
       height: 32,
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      borderWidth: 1,
-      borderColor: 'grey',
-      backgroundColor: 'white',
+      backgroundColor: '#f2f2f3',
     },
     locationChosen: {
-      width: '75%',
+      flex: 1,
       height: 32,
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -264,8 +280,8 @@ const styles = StyleSheet.create({
     },
     inputBox: {
       flex: 1,
-      fontSize: 18,
-      padding: 0,
+      fontSize: 15,
+      paddingHorizontal: 10,
     },
   },
   modal: {
