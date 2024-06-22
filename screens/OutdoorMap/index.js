@@ -188,7 +188,7 @@ export default function OutdoorMap() {
                 <MapViewDirections
                   origin={locations[0].coordinate}
                   destination={locations[locations.length - 1].coordinate}
-                  // waypoints={locations.slice(1, -1).map((e) => e.coordinate)}
+                  waypoints={locations.slice(1, -1).map((e) => e.coordinate)}
                   apikey={apiKey}
                   region="America"
                   mode={mode}
