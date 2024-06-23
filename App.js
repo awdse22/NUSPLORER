@@ -83,7 +83,8 @@ export default function App() {
             component={EmailConfirmation} />
           <Stack.Screen 
             name='Account Created' 
-            component={AccountCreated} />
+            component={AccountCreated}
+            options={{ headerLeft: null }} />
           <Stack.Screen 
             name='Reset Password' 
             component={ForgotPassword} />
