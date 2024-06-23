@@ -10,7 +10,7 @@ import {
   FlatList,
 } from "react-native";
 
-import { fetchSuggestions } from "../../../../services/map";
+import { fetchSuggestions } from "../../services/map";
 
 const SearchBar = (props) => {
   const { onSearch } = props;

@@ -64,7 +64,7 @@ export default function NavigationScreen() {
           coordinate: await getPosition(locationInput),
         };
       } catch (e) {
-        const res = VenueData[locationInput];
+        const res = VenueData[locationInput.toUpperCase()];
         if (!res) {
           Alert.alert("Error", e.message);
         } else {

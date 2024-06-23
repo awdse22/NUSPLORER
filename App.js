@@ -4,7 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import LoginScreen from "./screens/UnauthenticatedScreens/LoginScreen";
 import RegisterAccount from "./screens/UnauthenticatedScreens/RegisterAccount";
-import OutdoorMap from "./screens/OutdoorMap";
+import OutdoorMap from "./screens/OutdoorMap/Map";
 import NavigationScreen from "./screens/NavigationScreen";
 import Bookmarks from "./screens/Bookmarks";
 import TimetableScreen from "./screens/TimeTableScreen";
@@ -75,7 +75,7 @@ function MainTabNavigator() {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="MainInterface">
+      <Stack.Navigator initialRouteName="Login">
         <Stack.Screen
           name="Login"
           component={LoginScreen}

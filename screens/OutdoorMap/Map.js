@@ -18,7 +18,7 @@ import {
 import MapView, { Marker } from "react-native-maps";
 import { FontAwesome5 } from "@expo/vector-icons";
 import axios from "axios";
-import SearchBar from "./components/SearchBar";
+import SearchBar from "./SearchBar";
 
 const apiKey = "AIzaSyBYYtYwdIsgeOtEKmVA1wdKe1DI98Q8-z4";
 export default function OutdoorMap() {
