@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
-const pool = require('./dbConfig'); // pgadmin
 const jwt = require('jsonwebtoken');
 const User = require('./models/user');
 const usersRouter = require('./routes/users');
@@ -35,10 +34,6 @@ function authenticateToken(req, res, next) {
 app.get("/userdetails", authenticateToken, async (req, res) => {
     try {
         const userData = await User.findOne({ email: req.user.email})
-        /*
-        const userData = await pool.query(
-            `SELECT * FROM users WHERE email = $1`, [req.user.email]
-        ); */
 
         if (userData) {
             return res.status(200).json({ userData: userData });
