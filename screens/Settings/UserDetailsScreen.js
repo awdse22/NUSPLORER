@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Button, Alert } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { jwtDecode } from 'jwt-decode';
 
 export default function UserDetailsScreen() {
     const navigator = useNavigation();
@@ -18,8 +19,10 @@ export default function UserDetailsScreen() {
     }
 
     async function getUserDetails() {
-        const url = 'http://10.0.2.2:3000/userdetails';
         const token = await AsyncStorage.getItem('token');
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.userId;
+        const url = `http://10.0.2.2:3000/${userId}/userDetails`;
 
         axios.get(url, { 
             headers: {
