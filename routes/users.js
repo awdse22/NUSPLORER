@@ -71,7 +71,7 @@ router.post('/login', async (req, res) => {
     }
 
     try {
-        const token = jwt.sign({ email: user.email, username: user.username}, process.env.JWT_SECRET);
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
         res.status(200).json({ token: token });
     } catch (error) {
         console.error('Error signing token: ', error);
