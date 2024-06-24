@@ -1,0 +1,58 @@
+[
+    {
+      "_id": "60d0fe4f5311236168a109ca",
+      "roomCode": "LT17",
+      "buildingName": "LT17",
+      "floorNumber": "1",
+      "roomAliases": ["Lecture Theatre 17"],
+      "floorPlan": null,
+      "entrancePhoto": "https://fastly.4sqi.net/img/general/600x600/25113286_znB-Z4yAZQY-f5-AvIxaavkIWljSm3Dk_ZrHq1RC_XA.jpg",
+      "posts": null,
+      "creatorUserId": "66784a0cce1c8987b5f5c955"
+    },
+    {
+        "_id": "60d0fe4f5311236168a109cb",
+        "roomCode": "COM1-0201",
+        "buildingName": "COM1",
+        "floorNumber": "2",
+        "roomAliases": ["Seminar Room 5", "Active Learning Room"],
+        "floorPlan": null,
+        "entrancePhoto": null,
+        "posts": null,
+        "creatorUserId": "66784a0cce1c8987b5f5c955"
+    },
+    {
+        "_id": "60d0fe4f5311236168a109cc",
+        "roomCode": "LT13",
+        "buildingName": "LT13",
+        "floorNumber": "1",
+        "roomAliases": ["Lecture Theatre 13"],
+        "floorPlan": null,
+        "entrancePhoto": "https://mapio.net/images-p/42457829.jpg",
+        "posts": null,
+        "creatorUserId": "66784a0cce1c8987b5f5c955"
+    },
+    {
+        "_id": "60d0fe4f5311236168a109cd",
+        "roomCode": "COM1-B109",
+        "buildingName": "COM1",
+        "floorNumber": "B1",
+        "roomAliases": ["Programming Lab 2"],
+        "floorPlan": "https://www.comp.nus.edu.sg/~tanwk/cprog/images//com1_basement_floorplan.jpg",
+        "entrancePhoto": null,
+        "posts": null,
+        "creatorUserId": "66784a0cce1c8987b5f5c955"
+    },
+    {
+        "_id": "60d0fe4f5311236168a109ce",
+        "roomCode": "COM3-0121",
+        "buildingName": "COM3",
+        "floorNumber": "1",
+        "roomAliases": ["Seminar Room 12"],
+        "floorPlan": null,
+        "photoEntrance": null,
+        "posts": null,
+        "creatorUserId": "66784a0cce1c8987b5f5c955"
+    }
+  ]
+  

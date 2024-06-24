@@ -7,13 +7,13 @@ import RegisterAccount from "./screens/UnauthenticatedScreens/RegisterAccount";
 import OutdoorMap from "./screens/OutdoorMap/Map";
 import NavigationScreen from "./screens/NavigationScreen";
 import Bookmarks from "./screens/Bookmarks";
-import TimetableScreen from "./screens/TimeTableScreen";
 
-import { FontAwesome, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome, FontAwesome5, FontAwesome6 ,MaterialIcons } from "@expo/vector-icons";
 import ForgotPassword from "./screens/UnauthenticatedScreens/ForgotPassword";
 import EmailConfirmation from "./screens/UnauthenticatedScreens/EmailConfirmation";
 import SettingsNavigator from "./screens/Settings/SettingsNavigator";
 import AccountCreated from "./screens/UnauthenticatedScreens/AccountCreated";
+import IndoorForumNavigator from "./screens/IndoorForum/IndoorForumNavigator";
 
 const Stack = createStackNavigator();
 const MainTab = createBottomTabNavigator();
@@ -47,17 +47,17 @@ function MainTabNavigator() {
         }}
       />
       <MainTab.Screen
+        name="Indoor"
+        component={IndoorForumNavigator}
+        options={{
+          tabBarIcon: (props) => <FontAwesome6 name="building-user" {...props} />,
+        }}
+      />
+      <MainTab.Screen
         name="Bookmarks"
         component={Bookmarks}
         options={{
           tabBarIcon: (props) => <FontAwesome name="bookmark" {...props} />,
-        }}
-      />
-      <MainTab.Screen
-        name="Timetable"
-        component={TimetableScreen}
-        options={{
-          tabBarIcon: (props) => <FontAwesome name="calendar" {...props} />,
         }}
       />
       <MainTab.Screen
