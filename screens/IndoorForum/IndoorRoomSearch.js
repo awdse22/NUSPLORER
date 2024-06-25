@@ -45,9 +45,11 @@ export default function IndoorRoomSearch() {
             <IndoorSearchBar label='Search rooms' onChange={setQuery} />
             <CreateRoomDataButton />
             <ScrollView>
-                {filteredRoomList.map((room) => (
-                    <RoomDisplay key={room._id} roomData={room} />
-                ))}
+                <View style={styles.roomDisplayWrapper}>
+                    {filteredRoomList.map((room) => (
+                        <RoomDisplay key={room._id} roomData={room} />
+                    ))}
+                </View>
             </ScrollView>
         </SafeAreaView>
     )
@@ -60,6 +62,12 @@ const styles = StyleSheet.create({
         paddingTop: 20,
         justifyContent: 'left',
         flexDirection: 'column',
+        backgroundColor: '#ffeded',
+    },
+    roomDisplayWrapper: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
     },
     createRoomContainer: {
         height: 60,

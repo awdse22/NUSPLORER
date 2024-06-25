@@ -6,7 +6,7 @@
       "floorNumber": "1",
       "roomAliases": ["Lecture Theatre 17"],
       "floorPlan": null,
-      "entrancePhoto": "https://fastly.4sqi.net/img/general/600x600/25113286_znB-Z4yAZQY-f5-AvIxaavkIWljSm3Dk_ZrHq1RC_XA.jpg",
+      "entrancePhoto": ["https://fastly.4sqi.net/img/general/600x600/25113286_znB-Z4yAZQY-f5-AvIxaavkIWljSm3Dk_ZrHq1RC_XA.jpg"],
       "posts": null,
       "creatorUserId": "66784a0cce1c8987b5f5c955"
     },
@@ -28,7 +28,7 @@
         "floorNumber": "1",
         "roomAliases": ["Lecture Theatre 13"],
         "floorPlan": null,
-        "entrancePhoto": "https://mapio.net/images-p/42457829.jpg",
+        "entrancePhoto": ["https://mapio.net/images-p/42457829.jpg"],
         "posts": null,
         "creatorUserId": "66784a0cce1c8987b5f5c955"
     },
@@ -38,7 +38,12 @@
         "buildingName": "COM1",
         "floorNumber": "B1",
         "roomAliases": ["Programming Lab 2"],
-        "floorPlan": "https://www.comp.nus.edu.sg/~tanwk/cprog/images//com1_basement_floorplan.jpg",
+        "floorPlan": [
+            "https://www.comp.nus.edu.sg/~tanwk/cprog/images//com1_basement_floorplan.jpg",
+            "https://upload.wikimedia.org/wikipedia/commons/a/a8/NUS_SoC_COM1.jpg",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQV1KfBnspuECg5ccGniF-1O3BXjip1bYXCNQ&s",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJOyM0keaUtkygokwIWNPF9EuGeCXBts11Pw&s"
+        ],
         "entrancePhoto": null,
         "posts": null,
         "creatorUserId": "66784a0cce1c8987b5f5c955"
