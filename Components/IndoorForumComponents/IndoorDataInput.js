@@ -1,9 +1,10 @@
-import { React } from 'react';
+import { React, useState } from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { Controller } from 'react-hook-form'
 
 export default function IndoorDataInput({ fieldName, label, info, 
-    control, rules }) {
+    control, rules, type }) {
+
     return (
         <View style={styles.container}>
             <Text style={styles.labelText}>{label}: </Text>
@@ -12,15 +13,23 @@ export default function IndoorDataInput({ fieldName, label, info,
                 control={control}
                 name={fieldName}
                 rules={rules}
+                defaultValue=""
                 render={({field: {value, onChange, onBlur}, fieldState: {error}}) => (
-                <View style={styles.inputBoxContainer}>
+                <View>
                     <TextInput 
                     value={value} 
                     onChangeText={onChange} 
                     onBlur={onBlur}
-                    style={[styles.inputBox, error ? {borderColor: 'red'} : {borderColor: '#e8e8e8'}]}
-                    />
-                    {error && <Text style={styles.errorMessage}>{error.message}</Text>}
+                    multiline={type == 'post'}
+                    style={[
+                        styles.inputBox, 
+                        { fontSize: type == 'data' ? 20 : 15},
+                        error ? {borderColor: 'red'} : {borderColor: '#e8e8e8'}
+                    ]} />
+                    {type == "post" && <Text style={styles.characterCount}>{value.length} / 500 characters</Text>}
+                    <View style={styles.errorMessageContainer}>
+                        {error && <Text style={styles.errorMessage}>{error.message}</Text>}
+                    </View>
                 </View>
                 )}      
             />
@@ -44,24 +53,29 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#858585',
     },
-    inputBoxContainer: {
-        height: 80,
-        width: '100%',
-    },
     inputBox: {
         textAlign: 'left',
-        fontSize: 20,
         backgroundColor: '#f2f2f2',
         borderWidth: 2,
         borderRadius: 8,
         width: '95%',
-        height: 40,
         padding: 5,
         marginTop: 5,
+    },
+    dataInputText: {
+        fontSize: 20
+    },
+    errorMessageContainer: {
+        height: 25
     },
     errorMessage: {
         marginLeft: 3,
         color: 'red',
         fontSize: 16
+    },
+    characterCount: {
+        marginLeft: 3,
+        fontSize: 12,
+        color: 'grey'
     }
 })

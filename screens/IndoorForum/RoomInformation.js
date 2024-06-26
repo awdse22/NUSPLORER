@@ -25,7 +25,7 @@ export default function RoomInformation({ route }) {
                     <View style={{ flexDirection: 'row' }}>
                         <Text style={styles.images.titleText}>{label}</Text>
                         <TouchableOpacity onPress={() => console.log(`Navigate to upload ${label}`)}>
-                            <AntDesign name="pluscircle" size={20} color="#6684e8" style={{ paddingTop: 6, paddingLeft: 8 }} />
+                            <AntDesign name="pluscircle" size={20} color="#2164cf" style={{ paddingTop: 6, paddingLeft: 8 }} />
                         </TouchableOpacity>  
                     </View>
                     <TouchableOpacity onPress={() => console.log(`Navigate to ${label}`)} >
@@ -79,7 +79,7 @@ export default function RoomInformation({ route }) {
                 </View>
                 <ImageDisplay label='Photos' data={entrancePhoto} />
                 <ImageDisplay label='Floor Plans/Maps' data={floorPlan} />
-                <TouchableOpacity onPress={() => navigation.navigate('Information Posts Page', { posts: posts })}>
+                <TouchableOpacity onPress={() => navigation.navigate('Information Posts Page', { roomCode: roomCode, posts: posts })}>
                     <View style={styles.infoPosts.viewInfoButton}>
                         <Text style={styles.infoPosts.viewInfoButtonText}>View information posts/directions</Text>
                     </View>
@@ -91,7 +91,7 @@ export default function RoomInformation({ route }) {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#ffeded',
+        backgroundColor: '#d1fdff',
         width: '100%',
         height: '100%',
         flexDirection: 'column',
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
             paddingLeft: 10,
         },
         viewMoreText: {
-            color: '#6684e8',
+            color: '#2164cf',
             fontSize: 20,
             fontWeight: 'bold',
             paddingTop: 2,
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
         },
         viewInfoButtonText: {
             fontSize: 18,
-            color: '#6684e8',
+            color: '#2164cf',
             textAlign: 'center',
         }
     }

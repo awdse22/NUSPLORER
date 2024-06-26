@@ -4,6 +4,7 @@ import IndoorRoomSearch from './IndoorRoomSearch';
 import CreateRoomData from './CreateRoomData';
 import RoomInformation from './RoomInformation';
 import InformationPostsPage from './InformationPostsPage';
+import CreatePost from './CreatePost';
 
 const IndoorForumStack = createStackNavigator();
 
@@ -26,6 +27,9 @@ export default function IndoorForumNavigator() {
             <IndoorForumStack.Screen 
                 name='Information Posts Page'
                 component={InformationPostsPage} />
+            <IndoorForumStack.Screen 
+                name='Create Post'
+                component={CreatePost} />
         </IndoorForumStack.Navigator>
     )
 }

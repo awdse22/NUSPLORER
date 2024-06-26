@@ -1,0 +1,24 @@
+[
+    {
+        "_id": "61a53d7c37f93f7c3ea97633",
+        "room": "60d0fe4f5311236168a109ca",
+        "creator": {
+            "_id": "66784a0cce1c8987b5f5c955",
+            "username": "testUser123"
+        },
+        "createTime": "2024-06-27T10:15:00.000Z",
+        "modifyTime": null,
+        "content": "Here is some content eeee"
+    },
+    {
+        "_id": "61a53d7c37f93f7c3ea97634",
+        "room": "60d0fe4f5311236168a109cb",
+        "creator": {
+            "_id": "66784a0cce1c8987b5f5c956",
+            "username": "testUser124"
+        },
+        "createTime": "2024-06-29T10:15:00.000Z",
+        "modifyTime": "2024-07-12T15:30:00.000Z",
+        "content": "Here is more content, I really don't know what to write so i'll just put in anything for now"
+    }
+]
