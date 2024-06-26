@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons, AntDesign } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 const screenWidth = Dimensions.get("window").width;
 
 export default function RoomInformation({ route }) {
+    const navigation = useNavigation();
     const { _id, roomCode, buildingName, floorNumber, roomAliases, floorPlan, entrancePhoto, posts } = route.params;
 
     const RoomDetail = ({icon, text}) => {
@@ -77,7 +79,7 @@ export default function RoomInformation({ route }) {
                 </View>
                 <ImageDisplay label='Photos' data={entrancePhoto} />
                 <ImageDisplay label='Floor Plans/Maps' data={floorPlan} />
-                <TouchableOpacity onPress={() => 'Navigate to posts'}>
+                <TouchableOpacity onPress={() => navigation.navigate('Information Posts Page', { posts: posts })}>
                     <View style={styles.infoPosts.viewInfoButton}>
                         <Text style={styles.infoPosts.viewInfoButtonText}>View information posts/directions</Text>
                     </View>

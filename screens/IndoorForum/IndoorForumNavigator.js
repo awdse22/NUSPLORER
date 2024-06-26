@@ -2,7 +2,8 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import IndoorRoomSearch from './IndoorRoomSearch';
 import CreateRoomData from './CreateRoomData';
-import RoomInformation from '../../Components/IndoorForumComponents/RoomInformation';
+import RoomInformation from './RoomInformation';
+import InformationPostsPage from './InformationPostsPage';
 
 const IndoorForumStack = createStackNavigator();
 
@@ -22,6 +23,9 @@ export default function IndoorForumNavigator() {
                 name='Room Information'
                 component={RoomInformation}
                 options={({ route }) => ({ title: route.params.roomCode })} />
+            <IndoorForumStack.Screen 
+                name='Information Posts Page'
+                component={InformationPostsPage} />
         </IndoorForumStack.Navigator>
     )
 }
