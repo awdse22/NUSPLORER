@@ -4,12 +4,13 @@ const authenticateToken = require("../tokenAuthMiddleware");
 const Room = require("../models/room");
 
 router.post("/createRoom", authenticateToken, async (req, res) => {
-  const { roomCode, buildingName, floorNumber } = req.body;
+  const { roomCode, roomName, buildingName, floorNumber } = req.body;
   const { userId } = req.user;
 
   try {
     const newRoom = await Room.create({
       roomCode,
+      roomName,
       buildingName,
       floorNumber,
       creator: userId,
@@ -24,13 +25,14 @@ router.post("/createRoom", authenticateToken, async (req, res) => {
 });
 
 router.post("/updateRoom", authenticateToken, async (req, res) => {
-  const { _id, roomCode, buildingName, floorNumber } = req.body;
+  const { _id, roomCode, roomName, buildingName, floorNumber } = req.body;
   const { userId } = req.user;
 
   Room.findOneAndUpdate(
     { _id: mongoose.Types.ObjectId(_id) },
     {
       roomCode,
+      roomName,
       buildingName,
       floorNumber,
       modifier: userId,
@@ -52,9 +54,15 @@ router.post("/updateRoom", authenticateToken, async (req, res) => {
 router.post("/getRooms", authenticateToken, async (req, res) => {
   const page = Number.parseInt(req.body.page) || 1;
   const pageSize = Number.parseInt(req.body.pageSize) || 10;
-  const searchQuery = req.body.roomCode
-    ? { roomCode: { $regex: new RegExp(req.body.roomCode, "i") } }
-    : {};
+
+  const { roomCode, roomName } = req.body;
+
+  const searchQuery = {
+    $and: [
+      roomCode ? { roomCode: { $regex: new RegExp(roomCode, "i") } } : {},
+      roomName ? { roomName: { $regex: new RegExp(roomName, "i") } } : {},
+    ],
+  };
 
   try {
     const totalRooms = await Room.countDocuments(searchQuery);
