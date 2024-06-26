@@ -5,15 +5,15 @@ const Room = require("../models/room");
 
 router.post("/createRoom", authenticateToken, async (req, res) => {
   const { roomCode, buildingName, floorNumber } = req.body;
-  const { username } = req.user;
+  const { userId } = req.user;
 
   try {
     const newRoom = await Room.create({
       roomCode,
       buildingName,
       floorNumber,
-      creator: username,
-      modifier: username,
+      creator: userId,
+      modifier: userId,
       createTime: new Date(),
       modifyTime: new Date(),
     });
@@ -25,7 +25,7 @@ router.post("/createRoom", authenticateToken, async (req, res) => {
 
 router.post("/updateRoom", authenticateToken, async (req, res) => {
   const { _id, roomCode, buildingName, floorNumber } = req.body;
-  const { username } = req.user;
+  const { userId } = req.user;
 
   Room.findOneAndUpdate(
     { _id: mongoose.Types.ObjectId(_id) },
@@ -33,7 +33,7 @@ router.post("/updateRoom", authenticateToken, async (req, res) => {
       roomCode,
       buildingName,
       floorNumber,
-      modifier: username,
+      modifier: userId,
       modifyTime: new Date(),
     },
     { new: true }
