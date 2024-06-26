@@ -9,6 +9,12 @@ const roomSchema = new Schema({
     unique: true,
     minLength: 3,
   },
+  roomName: {
+    type: String,
+    required: true,
+    unique: true,
+    minLength: 3,
+  },
   buildingName: {
     type: String,
     required: true,
