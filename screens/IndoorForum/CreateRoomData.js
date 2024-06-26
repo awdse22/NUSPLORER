@@ -12,13 +12,13 @@ export default function CreateRoomData() {
         console.log(info);
         // send request to backend to create room
         const url = 'INSERT BACKEND URL HERE'
-
+        
         navigation.navigate('Indoor Room Search');
     }
 
     return (
-        <View style={styles.container}>
-            <ScrollView>
+        <ScrollView>
+            <View style={styles.container}>
                 <IndoorDataInput 
                     label='Room Code' 
                     fieldName='roomCode'
@@ -43,6 +43,12 @@ export default function CreateRoomData() {
                             message: 'Invalid floor number',
                         } 
                     }} />
+                <IndoorDataInput 
+                    label='Room name' 
+                    fieldName='roomName'
+                    info='e.g. Lecture Theatre 17, Seminar Room 5, Programming Lab 2'
+                    control={control}
+                    rules={{ required: 'Please enter a room name' }} />
 
                 <View style={styles.submitContainer}>
                     <TouchableOpacity onPress={handleSubmit(createRoom)}>
@@ -51,8 +57,8 @@ export default function CreateRoomData() {
                         </View>
                     </TouchableOpacity>
                 </View>
-            </ScrollView>
-        </View>
+            </View>
+        </ScrollView>
     )
 }
 
