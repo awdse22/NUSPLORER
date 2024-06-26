@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import IndoorSearchBar from '../../Components/IndoorForumComponents/IndoorSearchBar';
 import RoomDisplay from '../../Components/IndoorForumComponents/RoomDisplay';
+import PageSelector from '../../Components/IndoorForumComponents/PageSelector';
 import sampleRoomData from '../../assets/sampleRoomData.json';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
@@ -11,7 +12,10 @@ export default function IndoorRoomSearch() {
     const navigation = useNavigation();
     const [roomList, setRoomList] = useState([]);
     const [query, setQuery] = useState('');
+    const [pageNumber, setPageNumber] = useState(1);
+    const [totalPages, setTotalPages] = useState(10);
 
+    // MAY NEED TO REMOVE THIS WHEN INTEGRATING BACKEND
     const filteredRoomList = roomList.filter((room) => {
         return room.roomCode.toLowerCase().includes(query.toLowerCase());
     })
@@ -44,6 +48,10 @@ export default function IndoorRoomSearch() {
         <SafeAreaView style={styles.container}>
             <IndoorSearchBar label='Search rooms' onChange={setQuery} />
             <CreateRoomDataButton />
+            <PageSelector totalPages={totalPages} pageNumber={pageNumber} onPageChange={setPageNumber} />
+            {roomList.length == 0 && (
+                <Text>No data found</Text>
+            )}
             <ScrollView>
                 <View style={styles.roomDisplayWrapper}>
                     {filteredRoomList.map((room) => (
