@@ -8,7 +8,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 export default function InformationPostsPage({ route }) {
     const navigation = useNavigation();
-    const { roomCode } = route.params;
+    const { roomId, roomCode } = route.params;
     const [posts, setPosts] = useState([]);
     const [pageNumber, setPageNumber] = useState(1);
     const [totalPages, setTotalPages] = useState(10);
@@ -28,7 +28,7 @@ export default function InformationPostsPage({ route }) {
         <SafeAreaView style={styles.container}>
             <Text style={styles.titleText}>{roomCode} info</Text>
             <View style={styles.createPostContainer}>
-                <AddDataButton label='Create post' onPress={() => navigation.navigate('Create Post', { roomCode: roomCode })} />
+                <AddDataButton label='Create post' onPress={() => navigation.navigate('Create Post', { roomId: roomId })} />
             </View>
             <PageSelector totalPages={totalPages} pageNumber={pageNumber} onPageChange={setPageNumber} />   
             <ScrollView>

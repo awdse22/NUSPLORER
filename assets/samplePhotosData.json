@@ -1,0 +1,22 @@
+[
+    {
+        "_id": "60ad7c4f1d1f2e001c3b6b10",
+        "room": "60d0fe4f5311236168a109ca",
+        "image": "https://fastly.4sqi.net/img/general/600x600/25113286_znB-Z4yAZQY-f5-AvIxaavkIWljSm3Dk_ZrHq1RC_XA.jpg",
+        "creator": {
+            "_id": "66784a0cce1c8987b5f5c955",
+            "username": "testUser123"
+        },
+        "createTime": "2024-07-12T15:30:00.000Z"
+    },
+    {
+        "_id": "60ad7c4f1d1f2e001c3b6b11",
+        "room": "60d0fe4f5311236168a109cc",
+        "image": "https://mapio.net/images-p/42457829.jpg",
+        "creator": {
+            "_id": "66784a0cce1c8987b5f5c956",
+            "username": "testUser124"
+        },
+        "createTime": "2023-12-12T18:32:00.000Z"
+    }
+]

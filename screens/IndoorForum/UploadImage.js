@@ -4,12 +4,12 @@ import IndoorDataInput from '../../Components/IndoorForumComponents/IndoorDataIn
 import { useForm } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
 
-export default function CreatePost({ route }) {
+export default function UploadImage({ route }) {
     const navigation = useNavigation();
-    const { roomId } = route.params;
+    const { roomId, dataType } = route.params;
     const {control, handleSubmit, formState: {errors}} = useForm();
 
-    function createPost(info) {
+    function uploadImage(info) {
         console.log(info);
         // send request to backend to create room
         const url = 'INSERT BACKEND URL HERE'
@@ -22,8 +22,8 @@ export default function CreatePost({ route }) {
             <ScrollView>
                 <IndoorDataInput 
                     type='post'
-                    label='Create a post' 
-                    fieldName='content'
+                    label='Upload Image' 
+                    fieldName='image'
                     info='Write about things to look out for when finding the room, or general directions!'
                     control={control}
                     rules={{ 
@@ -36,9 +36,9 @@ export default function CreatePost({ route }) {
                 />
 
                 <View style={styles.submitContainer}>
-                    <TouchableOpacity onPress={handleSubmit(createPost)}>
+                    <TouchableOpacity onPress={handleSubmit(uploadImage)}>
                         <View style={styles.submitButton}>
-                            <Text style={styles.submitButtonText}> Create </Text>
+                            <Text style={styles.submitButtonText}> Upload </Text>
                         </View>
                     </TouchableOpacity>
                 </View>

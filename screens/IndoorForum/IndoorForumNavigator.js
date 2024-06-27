@@ -5,6 +5,8 @@ import CreateRoomData from './CreateRoomData';
 import RoomInformation from './RoomInformation';
 import InformationPostsPage from './InformationPostsPage';
 import CreatePost from './CreatePost';
+import ImagesPage from './ImagesPage';
+import UploadImage from './UploadImage';
 
 const IndoorForumStack = createStackNavigator();
 
@@ -28,8 +30,15 @@ export default function IndoorForumNavigator() {
                 name='Information Posts Page'
                 component={InformationPostsPage} />
             <IndoorForumStack.Screen 
+                name='Images Page'
+                component={ImagesPage}
+                options={({ route }) => ({ title: route.params.dataType })} />
+            <IndoorForumStack.Screen 
                 name='Create Post'
                 component={CreatePost} />
+            <IndoorForumStack.Screen 
+                name='Upload Image'
+                component={UploadImage} />
         </IndoorForumStack.Navigator>
     )
 }
