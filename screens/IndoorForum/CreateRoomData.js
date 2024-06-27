@@ -20,18 +20,21 @@ export default function CreateRoomData() {
         <ScrollView>
             <View style={styles.container}>
                 <IndoorDataInput 
+                    type='data'
                     label='Room Code' 
                     fieldName='roomCode'
                     info='e.g. LT17, COM1-0201'
                     control={control}
                     rules={{ required: 'Please enter the room code' }} />
                 <IndoorDataInput 
+                    type='data'
                     label='Building name' 
                     fieldName='buildingName'
                     info='e.g. LT17, COM1, AS3'
                     control={control}
                     rules={{ required: 'Please enter the building name' }} />
                 <IndoorDataInput 
+                    type='data'
                     label='Floor number' 
                     fieldName='floorNumber'
                     info='Input floor number. For basement floors, use B1, B2, etc.'
@@ -44,6 +47,7 @@ export default function CreateRoomData() {
                         } 
                     }} />
                 <IndoorDataInput 
+                    type='data'
                     label='Room name' 
                     fieldName='roomName'
                     info='e.g. Lecture Theatre 17, Seminar Room 5, Programming Lab 2'
@@ -67,7 +71,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         flexDirection: 'column',
-        backgroundColor: '#ffeded',
+        backgroundColor: '#d1fdff',
         padding: 8,
     },
     submitContainer: {
@@ -78,13 +82,14 @@ const styles = StyleSheet.create({
     },
     submitButton: {
         borderRadius: 6,
-        backgroundColor: '#75bcff',
+        backgroundColor: '#2164cf',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 8,
     },
     submitButtonText: {
         fontWeight: 'bold',
-        fontSize: 20, 
+        fontSize: 20,
+        color: 'white'
     }
 })

@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image } from 'react-native';
-import { MaterialCommunityIcons, MaterialIcons, AntDesign } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
 const screenWidth = Dimensions.get("window").width;
 
 export default function RoomInformation({ route }) {
     const navigation = useNavigation();
-    const { _id, roomCode, buildingName, floorNumber, roomAliases, floorPlan, entrancePhoto, posts } = route.params;
+    const { _id, roomCode, buildingName, floorNumber, roomAliases } = route.params;
 
     const RoomDetail = ({icon, text}) => {
         return (
@@ -18,39 +18,19 @@ export default function RoomInformation({ route }) {
         )
     }
 
-    const ImageDisplay = ({label, data}) => {
+    const InfoNavigation = ({label, page}) => {
         return (
-            <View style={styles.images.imagesContainer}>
-                <View style={styles.images.titleContainer}>
-                    <View style={{ flexDirection: 'row' }}>
-                        <Text style={styles.images.titleText}>{label}</Text>
-                        <TouchableOpacity onPress={() => console.log(`Navigate to upload ${label}`)}>
-                            <AntDesign name="pluscircle" size={20} color="#6684e8" style={{ paddingTop: 6, paddingLeft: 8 }} />
-                        </TouchableOpacity>  
-                    </View>
-                    <TouchableOpacity onPress={() => console.log(`Navigate to ${label}`)} >
-                        <Text style={styles.images.viewMoreText}>View {'>>'}</Text>
-                    </TouchableOpacity>
+            <View style={styles.otherInfo.titleContainer}>
+                <View style={{ flexDirection: 'row' }}>
+                    <Text style={styles.otherInfo.titleText}>{label}</Text>
                 </View>
-                {data == null ? (
-                    <Text style={styles.images.noDataText}>
-                            There is no data currently, but you may upload and contribute data!
-                    </Text>
-                ) : (
-                    <ScrollView 
-                        horizontal
-                        snapToInterval={screenWidth} 
-                        decelerationRate='fast'
-                        showsHorizontalScrollIndicator={false}
-                        style={styles.images.imagesDisplayContainer}
-                    >
-                        {data.map((imageUri, index) => (
-                            <View key={index} style={styles.images.imagesDisplay}>
-                                <Image source={{ uri: imageUri }} style={styles.images.image} />
-                            </View>
-                        ))}
-                    </ScrollView>
-                )}
+                <TouchableOpacity onPress={() => navigation.navigate(page, { 
+                    roomId: _id, 
+                    roomCode: roomCode, 
+                    dataType: label 
+                })}>
+                    <Text style={styles.otherInfo.viewMoreText}>View {'>>'}</Text>
+                </TouchableOpacity>
             </View>
         )
     }
@@ -77,13 +57,11 @@ export default function RoomInformation({ route }) {
                             text={`Room name${roomAliases.length > 1 ? 's' : ''}: ${roomAliases.join(', ')}`}
                         />
                 </View>
-                <ImageDisplay label='Photos' data={entrancePhoto} />
-                <ImageDisplay label='Floor Plans/Maps' data={floorPlan} />
-                <TouchableOpacity onPress={() => navigation.navigate('Information Posts Page', { posts: posts })}>
-                    <View style={styles.infoPosts.viewInfoButton}>
-                        <Text style={styles.infoPosts.viewInfoButtonText}>View information posts/directions</Text>
-                    </View>
-                </TouchableOpacity>
+                <View style={styles.otherInfo.container}>
+                    <InfoNavigation label='Entrance Photos' page='Images Page' />
+                    <InfoNavigation label='Floor Plans/Maps' page='Images Page' />
+                    <InfoNavigation label='Info/Directions' page='Information Posts Page' />
+                </View>
             </ScrollView>
         </View>
     )
@@ -91,7 +69,7 @@ export default function RoomInformation({ route }) {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#ffeded',
+        backgroundColor: '#d1fdff',
         width: '100%',
         height: '100%',
         flexDirection: 'column',
@@ -126,8 +104,8 @@ const styles = StyleSheet.create({
             marginLeft: 2,
         }
     },
-    images: {
-        imagesContainer: {
+    otherInfo: {
+        container: {
             backgroundColor: 'white',
             width: '100%',
             borderRadius: 10,
@@ -136,6 +114,7 @@ const styles = StyleSheet.create({
         },
         titleContainer: {
             padding: 5,
+            paddingVertical: 8,
             borderBottomWidth: 1,
             borderColor: '#e6e6e6',
             flexDirection: 'row',
@@ -147,44 +126,12 @@ const styles = StyleSheet.create({
             paddingLeft: 10,
         },
         viewMoreText: {
-            color: '#6684e8',
+            color: '#2164cf',
             fontSize: 20,
             fontWeight: 'bold',
             paddingTop: 2,
             paddingRight: 4,
             justifyContent: 'center'
         },
-        imagesDisplayContainer: {
-            flexDirection: 'row',
-            padding: 5,
-        },
-        imagesDisplay: {
-            margin: 3,
-        },
-        image: {
-            resizeMode: 'cover',
-            height: 130,
-            width: 130,
-        },
-        noDataText: {
-            fontSize: 16,
-            padding: 10,
-        }
-    },
-    infoPosts: {
-        viewInfoButton: {
-            backgroundColor: 'white',
-            borderRadius: 10,
-            borderWidth: 1,
-            borderColor: 'grey',
-            padding: 10,
-            marginTop: 5,
-            alignItems: 'center',
-        },
-        viewInfoButtonText: {
-            fontSize: 18,
-            color: '#6684e8',
-            textAlign: 'center',
-        }
     }
 })

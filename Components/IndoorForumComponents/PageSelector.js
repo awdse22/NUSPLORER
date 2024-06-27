@@ -92,7 +92,8 @@ const styles=StyleSheet.create({
         flexDirection: 'row',
         alignContent: 'center',
         justifyContent: 'center',
-        padding: 10,
+        padding: 8,
+        paddingTop: 0,
     },
     button: {
         width: 35,
@@ -100,7 +101,7 @@ const styles=StyleSheet.create({
         padding: 5,
         borderWidth: 1,
         borderRadius: 8,
-        backgroundColor: '#75bcff',
+        backgroundColor: '#2164cf',
         margin: 2,
     },
     buttonText: {
@@ -113,7 +114,7 @@ const styles=StyleSheet.create({
         width: 35,
         height: 35,
         padding: 5,
-        borderWidth: 1,
+        borderWidth: 2,
         borderRadius: 8,
         backgroundColor: 'white',
         margin: 2,

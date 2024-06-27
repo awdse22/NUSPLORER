@@ -1,0 +1,42 @@
+[
+    {
+        "_id": "60ad7c4f1d1f2e001c3b6b12",
+        "room": "60d0fe4f5311236168a109cd",
+        "image": "https://www.comp.nus.edu.sg/~tanwk/cprog/images//com1_basement_floorplan.jpg",
+        "creator": {
+            "_id": "66784a0cce1c8987b5f5c955",
+            "username": "testUser123"
+        },
+        "createTime": "2024-06-27T10:15:00.000Z"
+    },
+    {
+        "_id": "60ad7c4f1d1f2e001c3b6b13",
+        "room": "60d0fe4f5311236168a109cd",
+        "image": "https://upload.wikimedia.org/wikipedia/commons/a/a8/NUS_SoC_COM1.jpg",
+        "creator": {
+            "_id": "66784a0cce1c8987b5f5c956",
+            "username": "testUser124"
+        },
+        "createTime": "2024-06-29T10:15:00.000Z"
+    },
+    {
+        "_id": "60ad7c4f1d1f2e001c3b6b14",
+        "room": "60d0fe4f5311236168a109cd",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQV1KfBnspuECg5ccGniF-1O3BXjip1bYXCNQ&s",
+        "creator": {
+            "_id": "66784a0cce1c8987b5f5c955",
+            "username": "testUser123"
+        },
+        "createTime": "2024-06-27T10:15:00.000Z"
+    },
+    {
+        "_id": "60ad7c4f1d1f2e001c3b6b15",
+        "room": "60d0fe4f5311236168a109cd",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJOyM0keaUtkygokwIWNPF9EuGeCXBts11Pw&s",
+        "creator": {
+            "_id": "66784a0cce1c8987b5f5c956",
+            "username": "testUser124"
+        },
+        "createTime": "2024-06-29T10:15:00.000Z"
+    }
+]
