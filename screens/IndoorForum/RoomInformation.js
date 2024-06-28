@@ -1,9 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-
-const screenWidth = Dimensions.get("window").width;
 
 export default function RoomInformation({ route }) {
     const navigation = useNavigation();

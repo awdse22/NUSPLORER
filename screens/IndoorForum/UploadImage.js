@@ -7,10 +7,10 @@ import { useNavigation } from '@react-navigation/native';
 export default function UploadImage({ route }) {
     const navigation = useNavigation();
     const { roomId, dataType } = route.params;
-    const {control, handleSubmit, formState: {errors}} = useForm();
+    const {control, handleSubmit, formState: {errors} } = useForm();
 
-    function uploadImage(info) {
-        console.log(info);
+    function uploadImage(data) {
+        console.log(data);
         // send request to backend to create room
         const url = 'INSERT BACKEND URL HERE'
         
@@ -21,20 +21,15 @@ export default function UploadImage({ route }) {
         <View style={styles.container}>
             <ScrollView>
                 <IndoorDataInput 
-                    type='post'
+                    type='image'
                     label='Upload Image' 
-                    fieldName='image'
-                    info='Write about things to look out for when finding the room, or general directions!'
+                    fieldName='imageUri'
+                    info={`Upload ${dataType.toLowerCase()} to help guide other users to the locations`}
                     control={control}
                     rules={{ 
-                        required: 'You need to put in content',
-                        maxLength: {
-                            value: 500,
-                            message: 'The content is too long!'
-                        }
+                        required: 'You need to upload an image',
                     }} 
                 />
-
                 <View style={styles.submitContainer}>
                     <TouchableOpacity onPress={handleSubmit(uploadImage)}>
                         <View style={styles.submitButton}>
