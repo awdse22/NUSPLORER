@@ -1,29 +1,36 @@
-require("dotenv").config();
-const express = require("express");
+require('dotenv').config();
+const express = require('express');
 const app = express();
-const mongoose = require("mongoose");
-const usersRouter = require("./routes/users");
-const roomRouter = require("./routes/room");
-const userPagesRouter = require("./routes/userPages");
+const mongoose = require('mongoose');
+const usersRouter = require('./routes/users');
+const roomRouter = require('./routes/room');
+const imageRouter = require('./routes/image');
+const photoRouter = require('./routes/photo');
+const postRouter = require('./routes/post');
+const userPagesRouter = require('./routes/userPages');
 
 const PORT = 3000;
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
-    console.log("db connected");
+    console.log('db connected');
   })
   .catch((error) => console.log(error.message));
 
+app.use(express.json({ limit: '100mb' }));
 app.use(express.json());
 app.use(usersRouter);
 app.use(roomRouter);
+app.use(imageRouter);
+app.use(photoRouter);
+app.use(postRouter);
 app.use(
-  "/:userId",
+  '/:userId',
   (req, res, next) => {
     req.userId = req.params.userId;
     next();
   },
-  userPagesRouter
+  userPagesRouter,
 );
 
 app.listen(PORT, () => {
