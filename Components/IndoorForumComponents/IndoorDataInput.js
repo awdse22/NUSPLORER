@@ -4,6 +4,7 @@ import { Controller } from 'react-hook-form';
 import ImageNotUploaded from '../../assets/ImageNotUploaded.png';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 
 export default function IndoorDataInput({ fieldName, label, info, 
     control, rules, type }) {
@@ -28,7 +29,14 @@ export default function IndoorDataInput({ fieldName, label, info,
                 const uploadedImage = result.assets[0].uri;
                 setSelectedImage(uploadedImage);
                 fixImageDisplaySize(uploadedImage);
-                onChange(uploadedImage);
+                const imageType = result.assets[0].type;
+
+                const base64Image = await FileSystem.readAsStringAsync(uploadedImage, {
+                    encoding: FileSystem.EncodingType.Base64
+                });
+
+                const imageData = `data:${imageType};base64,${base64Image}`
+                onChange(imageData);
             }
         } catch (error) {
             alert("Error uploading image: " + error.message);

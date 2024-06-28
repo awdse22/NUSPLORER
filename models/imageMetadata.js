@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const { Schema, model } = mongoose;
 
-const photoSchema = new Schema({
+const imageMetadataSchema = new Schema({
   roomId: {
     type: Schema.Types.ObjectId,
     ref: 'Room',
@@ -33,6 +33,6 @@ const photoSchema = new Schema({
   },
 });
 
-const Photo = model('Photo', photoSchema);
+const ImageMetadata = model('ImageMetadata', imageMetadataSchema);
 
-module.exports = Photo;
+module.exports = ImageMetadata;

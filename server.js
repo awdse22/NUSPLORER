@@ -4,7 +4,7 @@ const app = express();
 const mongoose = require('mongoose');
 const usersRouter = require('./routes/users');
 const roomRouter = require('./routes/room');
-const imageRouter = require('./routes/image');
+// const imageRouter = require('./routes/image');
 
 const userPagesRouter = require('./routes/userPages');
 
@@ -19,7 +19,6 @@ mongoose
 app.use(express.json({ limit: '100mb' }));
 app.use(usersRouter);
 app.use('/rooms', roomRouter);
-app.use(imageRouter);
 app.use(
   '/:userId',
   (req, res, next) => {

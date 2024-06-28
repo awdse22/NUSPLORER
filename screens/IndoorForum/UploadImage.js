@@ -10,7 +10,6 @@ export default function UploadImage({ route }) {
     const {control, handleSubmit, formState: {errors} } = useForm();
 
     function uploadImage(data) {
-        console.log(data);
         // send request to backend to create room
         const url = 'INSERT BACKEND URL HERE'
         

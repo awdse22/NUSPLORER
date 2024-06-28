@@ -1,58 +1,78 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
-const Photo = require('../models/photo');
+const ImageMetadata = require('../models/imageMetadata');
+const Image = require('../models/image');
 const authenticateToken = require('../tokenAuthMiddleware');
 
-router.use(authenticateToken);
-
-router.post('/', async (req, res) => {
-  const { description, dataType, imageId } = req.body;
+router.post('/', authenticateToken, async (req, res) => {
+  const { description, dataType, imageData } = req.body;
   const { userId } = req.user;
   const roomId = req.roomId;
 
-  const photo = new Photo({
-    description,
-    dataType,
-    imageId,
-    roomId,
-    creator: userId,
-    createTime: new Date(),
-  });
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    await photo.save();
-    res.status(201).send(photo);
+    const base64Data = imageData.replace(/^data:image\/\w+;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
+
+    const newImage = new Image({
+      data: buffer.toString('base64'),
+    });
+
+    const savedImage = await newImage.save({ session });
+    const imageId = savedImage._id;
+
+    const imageMetadata = new ImageMetadata({
+      description,
+      dataType,
+      imageId,
+      roomId,
+      creator: userId,
+      createTime: new Date(),
+    });
+    await imageMetadata.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(201).send(imageMetadata);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    await session.abortTransaction();
+    session.endSession();
+
+    console.log(error);
+
+    res.status(500).json({ error: 'Failed to upload image' });
   }
 });
 
 router.get('/', async (req, res) => {
-  const { dataType, page, pageSize, description } = req.query;
+  const { dataType } = req.query;
   const roomId = req.roomId;
-  const pageNumber = Number.parseInt(page) || 1;
-  const limitNumber = Number.parseInt(pageSize) || 10;
 
   const searchQuery = { roomId: roomId };
 
   if (dataType) {
     searchQuery.dataType = dataType;
   }
-
+  
+  /*
   if (description) {
     searchQuery.description = { $regex: new RegExp(description, 'i') };
   }
+    */
 
   try {
-    const total = await Photo.countDocuments(searchQuery);
-    const list = await Photo.find(searchQuery)
+    const list = await ImageMetadata.find(searchQuery)
       .populate('creator', 'username')
+      .populate('imageId', 'data')
       .sort({ createTime: -1 })
-      .skip((pageNumber - 1) * limitNumber)
-      .limit(limitNumber);
 
-    res.status(200).json({ total, list });
+    res.status(200).send(list);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
