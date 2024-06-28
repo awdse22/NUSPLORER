@@ -5,7 +5,7 @@ const Room = require('../models/room');
 
 router.use(authenticateToken);
 
-router.post('/createRoom', async (req, res) => {
+router.post('/rooms', async (req, res) => {
   const { roomCode, roomName, buildingName, floorNumber } = req.body;
   const { userId } = req.user;
 
@@ -26,13 +26,14 @@ router.post('/createRoom', async (req, res) => {
   }
 });
 
-router.post('/updateRoom', async (req, res) => {
-  const { _id, roomCode, roomName, buildingName, floorNumber } = req.body;
+router.put('/rooms/:id', async (req, res) => {
+  const { id } = req.params;
+  const { roomCode, roomName, buildingName, floorNumber } = req.body;
   const { userId } = req.user;
 
   try {
     const room = await Room.findOneAndUpdate(
-      { _id },
+      { _id: id },
       {
         roomCode,
         roomName,
@@ -54,8 +55,8 @@ router.post('/updateRoom', async (req, res) => {
   }
 });
 
-router.post('/getRooms', authenticateToken, async (req, res) => {
-  const { page, pageSize, keyword } = req.body;
+router.get('/rooms', authenticateToken, async (req, res) => {
+  const { page, pageSize, keyword } = req.query;
 
   const pageNumber = Number.parseInt(page) || 1;
   const limitNumber = Number.parseInt(pageSize) || 10;
@@ -82,12 +83,12 @@ router.post('/getRooms', authenticateToken, async (req, res) => {
   }
 });
 
-router.post('/deleteRoom', async (req, res) => {
-  const { _id } = req.body;
+router.delete('/rooms/:id', async (req, res) => {
+  const { id } = req.params;
   const { userId } = req.user;
 
   try {
-    const room = await Room.findOneAndDelete({ _id, creator: userId });
+    const room = await Room.findOneAndDelete({ _id: id, creator: userId });
     if (!room) {
       return res.status(404).json({ error: 'Room not found' });
     }
