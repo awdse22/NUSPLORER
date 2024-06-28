@@ -5,7 +5,7 @@ const authenticateToken = require('../tokenAuthMiddleware');
 
 router.use(authenticateToken);
 
-router.post('/savePost', async (req, res) => {
+router.post('/posts', async (req, res) => {
   const { title, content } = req.body;
   const { userId } = req.user;
 
@@ -24,13 +24,14 @@ router.post('/savePost', async (req, res) => {
   }
 });
 
-router.post('/updatePost', async (req, res) => {
-  const { _id, title, content } = req.body;
+router.put('/posts/:id', async (req, res) => {
+  const { id } = req.params;
+  const { title, content } = req.body;
   const { userId } = req.user;
 
   try {
     const post = await Post.findOneAndUpdate(
-      { _id },
+      { _id: id },
       {
         title,
         content,
@@ -50,8 +51,8 @@ router.post('/updatePost', async (req, res) => {
   }
 });
 
-router.post('/getPosts', async (req, res) => {
-  const { page, pageSize, keyword } = req.body;
+router.get('/posts', async (req, res) => {
+  const { page, pageSize, keyword } = req.query;
 
   const pageNumber = Number.parseInt(page) || 1;
   const limitNumber = Number.parseInt(pageSize) || 10;
@@ -78,12 +79,12 @@ router.post('/getPosts', async (req, res) => {
   }
 });
 
-router.post('/deletePost', async (req, res) => {
-  const { _id } = req.body;
+router.delete('/posts/:id', async (req, res) => {
+  const { id } = req.params;
   const { userId } = req.user;
 
   try {
-    const post = await Post.findOneAndDelete({ _id, creator: userId });
+    const post = await Post.findOneAndDelete({ _id: id, creator: userId });
     if (!post) {
       return res.status(404).json({ error: 'Post not found' });
     }

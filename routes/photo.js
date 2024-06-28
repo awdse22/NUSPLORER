@@ -5,7 +5,7 @@ const authenticateToken = require('../tokenAuthMiddleware');
 
 router.use(authenticateToken);
 
-router.post('/savePhoto', async (req, res) => {
+router.post('/photos', async (req, res) => {
   const { description, dataType, imageId, roomId } = req.body;
   const { userId } = req.user;
   const photo = new Photo({
@@ -24,8 +24,8 @@ router.post('/savePhoto', async (req, res) => {
   }
 });
 
-router.post('/getPhotos', async (req, res) => {
-  const { roomId, dataType, page, pageSize, description } = req.body;
+router.get('/photos', async (req, res) => {
+  const { roomId, dataType, page, pageSize, description } = req.query;
   const pageNumber = Number.parseInt(page) || 1;
   const limitNumber = Number.parseInt(pageSize) || 10;
 
@@ -53,12 +53,12 @@ router.post('/getPhotos', async (req, res) => {
   }
 });
 
-router.post('/deletePhoto', async (req, res) => {
-  const { _id } = req.body;
+router.delete('/photos/:id', async (req, res) => {
+  const { id } = req.params;
   const { userId } = req.user;
 
   try {
-    const photo = await Photo.findOneAndDelete({ _id, creator: userId });
+    const photo = await Photo.findOneAndDelete({ _id: id, creator: userId });
     if (!photo) {
       return res.status(404).json({ error: 'Photo not found' });
     }
