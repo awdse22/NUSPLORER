@@ -1,60 +1,56 @@
 const express = require('express');
 const router = express.Router();
+const Post = require('../models/post');
 const authenticateToken = require('../tokenAuthMiddleware');
-const Room = require('../models/room');
 
 router.use(authenticateToken);
 
-router.post('/createRoom', async (req, res) => {
-  const { roomCode, roomName, buildingName, floorNumber } = req.body;
+router.post('/savePost', async (req, res) => {
+  const { title, content } = req.body;
   const { userId } = req.user;
 
   try {
-    const newRoom = await Room.create({
-      roomCode,
-      roomName,
-      buildingName,
-      floorNumber,
+    const newPost = await Post.create({
+      title,
+      content,
       creator: userId,
       modifier: userId,
       createTime: new Date(),
       modifyTime: new Date(),
     });
-    res.status(201).json(newRoom);
+    res.status(201).json(newPost);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.post('/updateRoom', async (req, res) => {
-  const { _id, roomCode, roomName, buildingName, floorNumber } = req.body;
+router.post('/updatePost', async (req, res) => {
+  const { _id, title, content } = req.body;
   const { userId } = req.user;
 
   try {
-    const room = await Room.findOneAndUpdate(
+    const post = await Post.findOneAndUpdate(
       { _id },
       {
-        roomCode,
-        roomName,
-        buildingName,
-        floorNumber,
+        title,
+        content,
         modifier: userId,
         modifyTime: new Date(),
       },
       { new: true },
     );
 
-    if (!room) {
-      return res.status(404).json({ error: 'Room not found' });
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
     }
 
-    res.status(200).json(room);
+    res.status(200).json(post);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-router.post('/getRooms', authenticateToken, async (req, res) => {
+router.post('/getPosts', async (req, res) => {
   const { page, pageSize, keyword } = req.body;
 
   const pageNumber = Number.parseInt(page) || 1;
@@ -62,17 +58,17 @@ router.post('/getRooms', authenticateToken, async (req, res) => {
 
   const searchQuery = {
     $or: [
-      { roomCode: { $regex: keyword || '', $options: 'i' } },
-      { roomName: { $regex: keyword || '', $options: 'i' } },
+      { title: { $regex: keyword || '', $options: 'i' } },
+      { content: { $regex: keyword || '', $options: 'i' } },
     ],
   };
 
   try {
-    const total = await Room.countDocuments(searchQuery);
-    const list = await Room.find(searchQuery)
+    const total = await Post.countDocuments(searchQuery);
+    const list = await Post.find(searchQuery)
       .populate('creator', 'username')
       .populate('modifier', 'username')
-      .sort({ roomCode: 1 })
+      .sort({ modifyTime: -1 })
       .skip((pageNumber - 1) * limitNumber)
       .limit(limitNumber);
 
@@ -82,16 +78,16 @@ router.post('/getRooms', authenticateToken, async (req, res) => {
   }
 });
 
-router.post('/deleteRoom', async (req, res) => {
+router.post('/deletePost', async (req, res) => {
   const { _id } = req.body;
   const { userId } = req.user;
 
   try {
-    const room = await Room.findOneAndDelete({ _id, creator: userId });
-    if (!room) {
-      return res.status(404).json({ error: 'Room not found' });
+    const post = await Post.findOneAndDelete({ _id, creator: userId });
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
     }
-    res.status(200).json(room);
+    res.status(200).json(post);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

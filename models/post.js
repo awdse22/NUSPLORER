@@ -2,28 +2,14 @@ const mongoose = require('mongoose');
 
 const { Schema, model } = mongoose;
 
-const roomSchema = new Schema({
-  roomCode: {
+const postSchema = new Schema({
+  title: {
     type: String,
     required: true,
-    unique: true,
-    minLength: 3,
   },
-  roomName: {
+  content: {
     type: String,
     required: true,
-    unique: true,
-    minLength: 3,
-  },
-  buildingName: {
-    type: String,
-    required: true,
-    minLength: 3,
-  },
-  floorNumber: {
-    type: Number,
-    required: true,
-    min: 1,
   },
   creator: {
     type: Schema.Types.ObjectId,
@@ -37,13 +23,12 @@ const roomSchema = new Schema({
   modifier: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
   },
   modifyTime: {
     type: Date,
   },
 });
 
-const Room = model('Room', roomSchema);
+const Post = model('Post', postSchema);
 
-module.exports = Room;
+module.exports = Post;
