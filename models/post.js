@@ -3,6 +3,11 @@ const mongoose = require('mongoose');
 const { Schema, model } = mongoose;
 
 const postSchema = new Schema({
+  roomId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Room',
+    required: true,
+  },
   title: {
     type: String,
     required: true,
@@ -19,10 +24,6 @@ const postSchema = new Schema({
   createTime: {
     type: Date,
     default: Date.now,
-  },
-  modifier: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
   },
   modifyTime: {
     type: Date,

@@ -5,9 +5,11 @@ const authenticateToken = require('../tokenAuthMiddleware');
 
 router.use(authenticateToken);
 
-router.post('/photos', async (req, res) => {
-  const { description, dataType, imageId, roomId } = req.body;
+router.post('/', async (req, res) => {
+  const { description, dataType, imageId } = req.body;
   const { userId } = req.user;
+  const roomId = req.roomId;
+
   const photo = new Photo({
     description,
     dataType,
@@ -24,12 +26,13 @@ router.post('/photos', async (req, res) => {
   }
 });
 
-router.get('/photos', async (req, res) => {
-  const { roomId, dataType, page, pageSize, description } = req.query;
+router.get('/', async (req, res) => {
+  const { dataType, page, pageSize, description } = req.query;
+  const roomId = req.roomId;
   const pageNumber = Number.parseInt(page) || 1;
   const limitNumber = Number.parseInt(pageSize) || 10;
 
-  const searchQuery = { roomId };
+  const searchQuery = { roomId: roomId };
 
   if (dataType) {
     searchQuery.dataType = dataType;
@@ -43,7 +46,7 @@ router.get('/photos', async (req, res) => {
     const total = await Photo.countDocuments(searchQuery);
     const list = await Photo.find(searchQuery)
       .populate('creator', 'username')
-      .sort({ modifyTime: -1 })
+      .sort({ createTime: -1 })
       .skip((pageNumber - 1) * limitNumber)
       .limit(limitNumber);
 
@@ -53,7 +56,7 @@ router.get('/photos', async (req, res) => {
   }
 });
 
-router.delete('/photos/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   const { userId } = req.user;
 

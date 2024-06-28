@@ -3,18 +3,18 @@ const router = express.Router();
 const Post = require('../models/post');
 const authenticateToken = require('../tokenAuthMiddleware');
 
-router.use(authenticateToken);
-
-router.post('/posts', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   const { title, content } = req.body;
   const { userId } = req.user;
+  const roomId = req.roomId;
+  console.log(roomId);
 
   try {
     const newPost = await Post.create({
+      roomId,
       title,
       content,
       creator: userId,
-      modifier: userId,
       createTime: new Date(),
       modifyTime: new Date(),
     });
@@ -24,7 +24,7 @@ router.post('/posts', async (req, res) => {
   }
 });
 
-router.put('/posts/:id', async (req, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   const { title, content } = req.body;
   const { userId } = req.user;
@@ -51,16 +51,18 @@ router.put('/posts/:id', async (req, res) => {
   }
 });
 
-router.get('/posts', async (req, res) => {
+router.get('/', async (req, res) => {
   const { page, pageSize, keyword } = req.query;
+  const roomId = req.roomId;
 
   const pageNumber = Number.parseInt(page) || 1;
   const limitNumber = Number.parseInt(pageSize) || 10;
 
   const searchQuery = {
+    roomId: roomId,
     $or: [
       { title: { $regex: keyword || '', $options: 'i' } },
-      { content: { $regex: keyword || '', $options: 'i' } },
+      // { content: { $regex: keyword || '', $options: 'i' } },
     ],
   };
 
@@ -68,7 +70,6 @@ router.get('/posts', async (req, res) => {
     const total = await Post.countDocuments(searchQuery);
     const list = await Post.find(searchQuery)
       .populate('creator', 'username')
-      .populate('modifier', 'username')
       .sort({ modifyTime: -1 })
       .skip((pageNumber - 1) * limitNumber)
       .limit(limitNumber);
@@ -79,7 +80,7 @@ router.get('/posts', async (req, res) => {
   }
 });
 
-router.delete('/posts/:id', async (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   const { userId } = req.user;
 

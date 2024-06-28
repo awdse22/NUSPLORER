@@ -2,10 +2,19 @@ const express = require('express');
 const router = express.Router();
 const authenticateToken = require('../tokenAuthMiddleware');
 const Room = require('../models/room');
+const postRouter = require('./post');
+const photoRouter = require('./photo');
 
-router.use(authenticateToken);
+router.use('/:roomId/posts', (req, res, next) => {
+  req.roomId = req.params.roomId;
+  next();
+}, postRouter);
+router.use('/:roomId/photos', (req, res, next) => {
+  req.roomId = req.params.roomId;
+  next();
+}, photoRouter);
 
-router.post('/rooms', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   const { roomCode, roomName, buildingName, floorNumber } = req.body;
   const { userId } = req.user;
 
@@ -22,11 +31,14 @@ router.post('/rooms', async (req, res) => {
     });
     res.status(201).json(newRoom);
   } catch (error) {
+    if (error.code == 11000) {
+      return res.status(400).json({ error: 'A room with this room code already exists'})
+    }
     res.status(500).json({ error: error.message });
   }
 });
 
-router.put('/rooms/:id', async (req, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   const { roomCode, roomName, buildingName, floorNumber } = req.body;
   const { userId } = req.user;
@@ -55,7 +67,7 @@ router.put('/rooms/:id', async (req, res) => {
   }
 });
 
-router.get('/rooms', authenticateToken, async (req, res) => {
+router.get('/', async (req, res) => {
   const { page, pageSize, keyword } = req.query;
 
   const pageNumber = Number.parseInt(page) || 1;
@@ -83,7 +95,7 @@ router.get('/rooms', authenticateToken, async (req, res) => {
   }
 });
 
-router.delete('/rooms/:id', async (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   const { userId } = req.user;
 
