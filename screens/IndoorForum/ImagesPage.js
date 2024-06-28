@@ -123,7 +123,10 @@ export default function ImagesPage({ route }) {
         <SafeAreaView style={styles.container}>
             <Text style={styles.titleText}>{roomCode} {dataType}</Text>
             <View style={styles.uploadPhotoContainer}>
-                <AddDataButton label='Upload Photo' onPress={() => navigation.navigate('Upload Image', { roomId: roomId })} />
+                <AddDataButton 
+                    label='Upload Photo' 
+                    onPress={() => navigation.navigate('Upload Image', { roomId: roomId, dataType: dataType })} 
+                />
             </View>
             <ScrollView>
                 <View style={styles.imageDisplayWrapper}>
