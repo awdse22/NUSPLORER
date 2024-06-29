@@ -29,13 +29,13 @@ export default function IndoorDataInput({ fieldName, label, info,
                 const uploadedImage = result.assets[0].uri;
                 setSelectedImage(uploadedImage);
                 fixImageDisplaySize(uploadedImage);
-                const imageType = result.assets[0].type;
+                const imageType = result.assets[0].mimeType;
 
                 const base64Image = await FileSystem.readAsStringAsync(uploadedImage, {
                     encoding: FileSystem.EncodingType.Base64
                 });
 
-                const imageData = `data:${imageType};base64,${base64Image}`
+                const imageData = `data:${imageType};base64,${base64Image}`;
                 onChange(imageData);
             }
         } catch (error) {

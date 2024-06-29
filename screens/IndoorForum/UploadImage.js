@@ -1,19 +1,42 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import IndoorDataInput from '../../Components/IndoorForumComponents/IndoorDataInput';
 import { useForm } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 export default function UploadImage({ route }) {
     const navigation = useNavigation();
     const { roomId, dataType } = route.params;
     const {control, handleSubmit, formState: {errors} } = useForm();
 
-    function uploadImage(data) {
-        // send request to backend to create room
-        const url = 'INSERT BACKEND URL HERE'
-        
-        navigation.goBack();
+    async function uploadImage(userResponse) {
+        const data = {
+            description: '',
+            dataType: dataType,
+            imageData: userResponse.imageData
+        }
+        const token = await AsyncStorage.getItem('token');
+        const url = `http://10.0.2.2:3000/rooms/${roomId}/photos`;
+
+        axios.post(url, data , { 
+            headers: {
+                'Authorization': token ? `Bearer ${token}` : null
+            }
+        }).then((response) => {
+            console.log('Image uploaded');
+            navigation.goBack();
+        }).catch((error) => {
+            const errorStatus = error.response.status;
+            const errorMessage = error.response.data.error;
+            if (errorStatus == 400) {
+                Alert.alert(errorMessage);
+            } else if (errorStatus == 500) {
+                Alert.alert("Failed to upload image");
+                console.log("Error uploading image: ", errorMessage);
+            }
+        })
     }
 
     return (
@@ -22,7 +45,7 @@ export default function UploadImage({ route }) {
                 <IndoorDataInput 
                     type='image'
                     label='Upload Image' 
-                    fieldName='imageUri'
+                    fieldName='imageData'
                     info={`Upload ${dataType.toLowerCase()} to help guide other users to the locations`}
                     control={control}
                     rules={{ 

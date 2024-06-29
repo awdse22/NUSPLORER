@@ -10,7 +10,6 @@ const imageMetadataSchema = new Schema({
   },
   description: {
     type: String,
-    required: true,
   },
   dataType: {
     type: String,

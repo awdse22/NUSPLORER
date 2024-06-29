@@ -14,21 +14,27 @@ router.post('/', authenticateToken, async (req, res) => {
   session.startTransaction();
 
   try {
-    const base64Data = imageData.replace(/^data:image\/\w+;base64,/, '');
+    const matches = imageData.match(/^data:(image\/\w+);base64,(.+)$/);
+    if (!matches) {
+      throw new Error('Invalid base64 image string');
+    }
+    const imageType = matches[1];    
+    const base64Data = matches[2];
     const buffer = Buffer.from(base64Data, 'base64');
 
     const newImage = new Image({
       data: buffer.toString('base64'),
+      imageType: imageType
     });
 
     const savedImage = await newImage.save({ session });
     const imageId = savedImage._id;
 
     const imageMetadata = new ImageMetadata({
+      roomId,
       description,
       dataType,
       imageId,
-      roomId,
       creator: userId,
       createTime: new Date(),
     });
@@ -67,7 +73,10 @@ router.get('/', async (req, res) => {
   try {
     const list = await ImageMetadata.find(searchQuery)
       .populate('creator', 'username')
-      .populate('imageId', 'data')
+      .populate({
+        path: 'imageId',
+        select: 'imageType data',
+      })
       .sort({ createTime: -1 })
 
     res.status(200).send(list);

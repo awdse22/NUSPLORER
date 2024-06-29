@@ -1,12 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { StyleSheet, SafeAreaView, View, Text, ScrollView, Image, TouchableOpacity, Modal, Dimensions } from 'react-native';
-import samplePhotosData from '../../assets/samplePhotosData.json';
-import sampleFloorPlanData from '../../assets/sampleFloorPlanData.json';
 import AddDataButton from '../../Components/IndoorForumComponents/AddDataButton';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle } from 'react-native-reanimated';
+import axios from 'axios';
 
 const { width, height } = Dimensions.get('screen');
 
@@ -60,16 +59,17 @@ export default function ImagesPage({ route }) {
 
     useFocusEffect(
         React.useCallback(() => {
-            const fetchImages = async (dataType) => {
-                // insert logic to request from backend here
-                if (dataType == "Entrance Photos") {
-                    setImages(samplePhotosData);
-                } else {
-                    setImages(sampleFloorPlanData);
-                }
+            const fetchImages = async () => {
+                const url = `http://10.0.2.2:3000/rooms/${roomId}/photos?dataType=${dataType}`;
+                axios.get(url).then((response) => {
+                    setImages(response.data);
+                }).catch((error) => {
+                    const errorStatus = error.response.status;
+                    console.error('Error fetching data: ', error.message);
+                })
             }
             console.log(`Fetching ${dataType} of room ${roomCode}`);
-            fetchImages(dataType);
+            fetchImages();
         }, [])
     );
 
@@ -86,14 +86,14 @@ export default function ImagesPage({ route }) {
     function renderModal() {
         if (!selectedImage) return null;
 
-        const uploadDate = new Date(selectedImage.createTime).toLocaleDateString();
-        const uploadTime = new Date(selectedImage.createTime).toLocaleTimeString();
+        const uploadDate = new Date(selectedImage.uploadTime).toLocaleDateString();
+        const uploadTime = new Date(selectedImage.uploadTime).toLocaleTimeString();
 
         return (
             <Modal visible={viewingImage} animationType='fade' transparent={true}>
                 <CloseModalButton />
                 <View style={styles.modal.detailsContainer}>
-                    <Text style={styles.modal.usernameText}>Uploaded by {selectedImage.creator.username}</Text>
+                    <Text style={styles.modal.usernameText}>Uploaded by {selectedImage.user}</Text>
                     <Text style={styles.modal.createTimeText}>on {uploadDate} {uploadTime}</Text>
                 </View>
                 <GestureHandlerRootView style={styles.modal.container}>
@@ -103,7 +103,7 @@ export default function ImagesPage({ route }) {
                                 styles.modal.image,
                                 imageAnimatedStyle
                             ]}
-                            source={{ uri: selectedImage.image }}
+                            source={{ uri: selectedImage.uri }}
                         />
                     </GestureDetector>
                 </GestureHandlerRootView>
@@ -130,17 +130,28 @@ export default function ImagesPage({ route }) {
             </View>
             <ScrollView>
                 <View style={styles.imageDisplayWrapper}>
-                    {images.map((image) => (
-                        <View style={styles.imageContainer} key={image.image}>
-                            <TouchableOpacity onPress={() => openModal(image)}>
-                                <Image 
-                                    key={image.image}
-                                    source={{ uri: image.image }}
-                                    style={styles.image}
-                                />
-                            </TouchableOpacity>
-                        </View>
-                    ))}
+                    {images.length == 0 && (
+                        <Text style={styles.noInformation}>
+                            There are no images of {dataType}
+                        </Text>
+                    )}
+                    {images.map((image) => {
+                        const imageData = { 
+                            uri: `data:image/${image.imageId.imageType};base64,${image.imageId.data}`,
+                            user: image.creator.username,
+                            uploadTime: image.createTime
+                        }
+                        return (
+                            <View style={styles.imageContainer} key={image.imageId._id}>
+                                <TouchableOpacity onPress={() => openModal(imageData)}>
+                                    <Image 
+                                        source={{ uri: imageData.uri }}
+                                        style={styles.image}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        );
+                    })}
                 </View>
             </ScrollView>
             {renderModal()}
