@@ -1,19 +1,39 @@
-import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import IndoorDataInput from '../../Components/IndoorForumComponents/IndoorDataInput';
 import { useForm } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function CreateRoomData() {
     const navigation = useNavigation();
     const {control, handleSubmit, formState: {errors}} = useForm();
+    const [errorMessageVisible, setErrorMessageVisible] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
-    function createRoom(info) {
+    async function createRoom(info) {
         console.log(info);
-        // send request to backend to create room
-        const url = 'INSERT BACKEND URL HERE'
-        
-        navigation.navigate('Indoor Room Search');
+        const token = await AsyncStorage.getItem('token');
+        const url = `http://10.0.2.2:3000/rooms`;
+
+        axios.post(url, info, { 
+            headers: {
+                'Authorization': token ? `Bearer ${token}` : null
+            }
+        }).then((response) => {
+            console.log('Room data creation success');
+            navigation.goBack();
+        }).catch((error) => {
+            const errorStatus = error.response.status;
+            const errorMessage = error.response.data.error;
+            if (errorStatus == 400) {
+                Alert.alert(errorMessage);
+            } else if (errorStatus == 500) {
+                Alert.alert("An error occurred while creating room");
+                console.log("Error creating room: ", errorMessage);
+            }
+        })
     }
 
     return (
@@ -25,14 +45,26 @@ export default function CreateRoomData() {
                     fieldName='roomCode'
                     info='e.g. LT17, COM1-0201'
                     control={control}
-                    rules={{ required: 'Please enter the room code' }} />
+                    rules={{ 
+                        required: 'Please enter the room code',
+                        minLength: {
+                            value: 3,
+                            message: 'Room code should be at least 3 characters long'
+                        }
+                    }} />
                 <IndoorDataInput 
                     type='data'
                     label='Building name' 
                     fieldName='buildingName'
                     info='e.g. LT17, COM1, AS3'
                     control={control}
-                    rules={{ required: 'Please enter the building name' }} />
+                    rules={{ 
+                        required: 'Please enter the building name',
+                        minLength: {
+                            value: 3,
+                            message: 'Building name should be at least 3 characters long'
+                        }
+                    }} />
                 <IndoorDataInput 
                     type='data'
                     label='Floor number' 
@@ -52,7 +84,13 @@ export default function CreateRoomData() {
                     fieldName='roomName'
                     info='e.g. Lecture Theatre 17, Seminar Room 5, Programming Lab 2'
                     control={control}
-                    rules={{ required: 'Please enter a room name' }} />
+                    rules={{ 
+                        required: 'Please enter the room name',
+                        minLength: {
+                            value: 3,
+                            message: 'Room name should be at least 3 characters long'
+                        }
+                    }} />
 
                 <View style={styles.submitContainer}>
                     <TouchableOpacity onPress={handleSubmit(createRoom)}>

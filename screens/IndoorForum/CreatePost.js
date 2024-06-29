@@ -3,18 +3,37 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-nati
 import IndoorDataInput from '../../Components/IndoorForumComponents/IndoorDataInput';
 import { useForm } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 export default function CreatePost({ route }) {
     const navigation = useNavigation();
     const { roomId } = route.params;
     const {control, handleSubmit, formState: {errors}} = useForm();
 
-    function createPost(info) {
-        console.log(info);
+    async function createPost(post) {
+        console.log(post);
         // send request to backend to create room
-        const url = 'INSERT BACKEND URL HERE'
+        const token = await AsyncStorage.getItem('token');
+        const url = `http://10.0.2.2:3000/rooms/${roomId}/posts`;
         
-        navigation.goBack();
+        axios.post(url, post, { 
+            headers: {
+                'Authorization': token ? `Bearer ${token}` : null
+            }
+        }).then((response) => {
+            console.log('Post created');
+            navigation.goBack();
+        }).catch((error) => {
+            const errorStatus = error.response.status;
+            const errorMessage = error.response.data.error;
+            if (errorStatus == 400) {
+                Alert.alert(errorMessage);
+            } else if (errorStatus == 500) {
+                Alert.alert("An error occurred while creating post");
+                console.log("Error creating post: ", errorMessage);
+            }
+        })
     }
 
     return (
@@ -22,7 +41,21 @@ export default function CreatePost({ route }) {
             <ScrollView>
                 <IndoorDataInput 
                     type='post'
-                    label='Create a post' 
+                    label='Title' 
+                    fieldName='title'
+                    info='What your post is about'
+                    control={control}
+                    rules={{ 
+                        required: 'You need a title',
+                        maxLength: {
+                            value: 50,
+                            message: 'The title is too long!'
+                        }
+                    }} 
+                />
+                <IndoorDataInput 
+                    type='post'
+                    label='Content' 
                     fieldName='content'
                     info='Write about things to look out for when finding the room, or general directions!'
                     control={control}

@@ -90,7 +90,9 @@ export default function IndoorDataInput({ fieldName, label, info,
                                 error ? {borderColor: 'red'} : {borderColor: '#e8e8e8'}
                             ]}
                         />
-                        {type == 'post' && <Text style={styles.characterCount}>{value.length} / 500 characters</Text>}
+                        {type == 'post' && <Text style={styles.characterCount}>
+                            {value.length} / {rules.maxLength.value} characters
+                        </Text>}
                         <View style={styles.errorMessageContainer}>
                             {error && <Text style={styles.errorMessage}>{error.message}</Text>}
                         </View>

@@ -9,12 +9,17 @@ export default function InfoPost({ postDetails }) {
     return (
         <View style={styles.container}>
             <View style={styles.postDetails.container}>
-                <Text style={styles.postDetails.usernameText}>{postDetails.creator.username}</Text>
-                <Text style={styles.postDetails.dateText}>
-                    {postIsModified ? `Last modified at ${postLastModifiedAt}`
-                        : `Created at ${postCreatedAt}`
-                    }
-                </Text>
+                <Text style={styles.postDetails.titleText}>{postDetails.title}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Text style={styles.postDetails.usernameText}>
+                        by {postDetails.creator.username}
+                    </Text>
+                    <Text style={styles.postDetails.dateText}>
+                        {postIsModified ? `Last modified at ${postLastModifiedAt}`
+                            : `Created at ${postCreatedAt}`
+                        }
+                    </Text>
+                </View>
             </View>
             <Text style={styles.postContent}>{postDetails.content}</Text>
         </View>
@@ -32,19 +37,25 @@ const styles=StyleSheet.create({
     postDetails: {
         container: {
             flexDirection: 'column',
-            padding: 10,
+            paddingLeft: 10,
+            paddingTop: 8,
+            paddingBottom: 0
+        },
+        titleText: {
+            fontWeight: 'bold',
+            fontSize: 19,
         },
         usernameText: {
-            fontWeight: 'bold',
-            fontSize: 20,
+            fontSize: 16
         },
         dateText: {
             fontSize: 13,
-            color: 'grey'
+            color: 'grey',
+            marginLeft: 8,
         }
     },
     postContent: {
-        fontSize: 16,
+        fontSize: 15,
         padding: 10
     }
 })

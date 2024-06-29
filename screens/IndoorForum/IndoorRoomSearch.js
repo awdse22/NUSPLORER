@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { SafeAreaView, View, Text, ScrollView, StyleSheet } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import axios from 'axios';
 
 import IndoorSearchBar from '../../Components/IndoorForumComponents/IndoorSearchBar';
 import RoomDisplay from '../../Components/IndoorForumComponents/RoomDisplay';
 import PageSelector from '../../Components/IndoorForumComponents/PageSelector';
 import AddDataButton from '../../Components/IndoorForumComponents/AddDataButton';
-import sampleRoomData from '../../assets/sampleRoomData.json';
 
 export default function IndoorRoomSearch() {
     const navigation = useNavigation();
@@ -15,22 +15,19 @@ export default function IndoorRoomSearch() {
     const [pageNumber, setPageNumber] = useState(1);
     const [totalPages, setTotalPages] = useState(10);
 
-    // MAY NEED TO REMOVE THIS WHEN INTEGRATING BACKEND
-    const filteredRoomList = roomList.filter((room) => {
-        return room.roomCode.toLowerCase().includes(query.toLowerCase());
-    })
-
-    useEffect(() => {
+    useFocusEffect(React.useCallback(() => {
         const fetchRooms = async () => {
-            // insert backend query here with axios.get
-            // Format for each room should be in json format based on mongodb schema
-            // and use setRoomList to update the state
-            console.log('Fetching room data');
-            setRoomList(sampleRoomData)
+            const url = `http://10.0.2.2:3000/rooms?page=${pageNumber}&pageSize=10&keyword=${query}`;
+            axios.get(url).then((response) => {
+                setTotalPages(response.data.numberOfPages);
+                setRoomList(response.data.list);
+            }).catch((error) => {
+                const errorStatus = error.response.status;
+                console.log('Error fetching data: ', error.message);
+            })
         }
-
         fetchRooms();
-    }, [])
+    }, [query, pageNumber]));
 
     return (
         <SafeAreaView style={styles.container}>
@@ -40,11 +37,11 @@ export default function IndoorRoomSearch() {
             </View>
             <PageSelector totalPages={totalPages} pageNumber={pageNumber} onPageChange={setPageNumber} />
             {roomList.length == 0 && (
-                <Text>No data found</Text>
+                <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: 'bold' }}>No data found</Text>
             )}
             <ScrollView>
                 <View style={styles.roomDisplayWrapper}>
-                    {filteredRoomList.map((room) => (
+                    {roomList.map((room) => (
                         <RoomDisplay key={room._id} roomData={room} />
                     ))}
                 </View>

@@ -22,7 +22,6 @@ const roomSchema = new Schema({
   floorNumber: {
     type: Number,
     required: true,
-    min: 1,
   },
   creator: {
     type: Schema.Types.ObjectId,

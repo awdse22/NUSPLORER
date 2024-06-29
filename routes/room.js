@@ -34,6 +34,7 @@ router.post('/', authenticateToken, async (req, res) => {
     if (error.code == 11000) {
       return res.status(400).json({ error: 'A room with this room code already exists'})
     }
+    console.log(error.message);
     res.status(500).json({ error: error.message });
   }
 });
@@ -81,15 +82,17 @@ router.get('/', async (req, res) => {
   };
 
   try {
-    const total = await Room.countDocuments(searchQuery);
+    const numberOfRooms = await Room.countDocuments(searchQuery);
     const list = await Room.find(searchQuery)
       .populate('creator', 'username')
       .populate('modifier', 'username')
       .sort({ roomCode: 1 })
       .skip((pageNumber - 1) * limitNumber)
       .limit(limitNumber);
+    
+    const numberOfPages = Math.ceil(numberOfRooms / limitNumber);
 
-    res.status(200).json({ total, list });
+    res.status(200).json({ numberOfPages, list });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

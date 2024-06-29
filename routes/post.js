@@ -7,7 +7,6 @@ router.post('/', authenticateToken, async (req, res) => {
   const { title, content } = req.body;
   const { userId } = req.user;
   const roomId = req.roomId;
-  console.log(roomId);
 
   try {
     const newPost = await Post.create({
@@ -16,7 +15,7 @@ router.post('/', authenticateToken, async (req, res) => {
       content,
       creator: userId,
       createTime: new Date(),
-      modifyTime: new Date(),
+      modifyTime: null,
     });
     res.status(201).json(newPost);
   } catch (error) {
@@ -67,15 +66,16 @@ router.get('/', async (req, res) => {
   };
 
   try {
-    const total = await Post.countDocuments(searchQuery);
+    const numberOfPosts = await Post.countDocuments(searchQuery);
     const list = await Post.find(searchQuery)
       .populate('creator', 'username')
       .sort({ modifyTime: -1 })
       .skip((pageNumber - 1) * limitNumber)
       .limit(limitNumber);
-
-    res.status(200).json({ total, list });
+    const numberOfPages = Math.ceil(numberOfPosts / limitNumber);
+    res.status(200).json({ numberOfPages, list });
   } catch (error) {
+    console.log(error.message);
     res.status(500).json({ error: error.message });
   }
 });

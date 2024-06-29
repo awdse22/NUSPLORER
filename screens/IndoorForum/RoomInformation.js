@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 
 export default function RoomInformation({ route }) {
     const navigation = useNavigation();
-    const { _id, roomCode, buildingName, floorNumber, roomAliases } = route.params;
+    const { _id, roomCode, buildingName, floorNumber, roomName } = route.params;
 
     const RoomDetail = ({icon, text}) => {
         return (
@@ -52,7 +52,7 @@ export default function RoomInformation({ route }) {
                         />
                         <RoomDetail 
                             icon=<MaterialIcons name="label" size={36} color="black" />
-                            text={`Room name${roomAliases.length > 1 ? 's' : ''}: ${roomAliases.join(', ')}`}
+                            text={`Room name: ${roomName}`}
                         />
                 </View>
                 <View style={styles.otherInfo.container}>
