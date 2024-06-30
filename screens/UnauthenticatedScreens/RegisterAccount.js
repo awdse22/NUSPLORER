@@ -3,8 +3,8 @@ import { useNavigation } from '@react-navigation/native';
 import { StyleSheet, View, TouchableWithoutFeedback, Keyboard, Text } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useForm } from 'react-hook-form';
-import AuthenticationInput from '../../Components/AuthenticationInput';
-import AuthScreenButton from '../../Components/AuthScreenButton';
+import UserInput from '../../Components/UserInput';
+import UserSubmitButton from '../../Components/UserSubmitButton';
 import validator from 'validator';
 import axios from 'axios';
 
@@ -36,9 +36,10 @@ export default function RegisterAccount() {
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
             <View style={styles.container}>
                 <ScrollView>
-                    <AuthenticationInput 
+                    <UserInput 
                         fieldName='username'
                         label='Username'
+                        info='Must be 3 - 16 characters long'
                         control={control}
                         rules={{
                             required: 'Please enter a username', 
@@ -50,7 +51,7 @@ export default function RegisterAccount() {
                                 value: 16,
                                 message: 'Your username should be at most 16 characters long'
                             }}} />
-                    <AuthenticationInput 
+                    <UserInput 
                         fieldName='email'
                         label='Email'
                         control={control}
@@ -58,27 +59,28 @@ export default function RegisterAccount() {
                             required: 'Please enter your email',
                             validate: v => validator.isEmail(v) || 'Please enter a valid email'
                         }} />
-                    <AuthenticationInput 
+                    <UserInput 
                         fieldName='password'
                         label='Password'
+                        info='Should be at least 8 characters long'
+                        secureTextEntry={true}
                         control={control}
                         rules={{
                             required: 'Please enter your password', 
                             minLength: {
                                 value: 8,
                                 message: 'Your password should be at least 8 characters long',
-                            }}}
-                        secureTextEntry={true} />
-                    <AuthenticationInput 
+                            }}} />
+                    <UserInput 
                         fieldName='confirmPassword'
                         label='Confirm Password'
                         control={control}
+                        secureTextEntry={true}
                         rules={{
                             required: 'Please enter your password again', 
                             validate: v => watch('password') == v || 'The passwords do not match'
-                        }}
-                        secureTextEntry={true} />
-                    <AuthScreenButton buttonName='Register' onPress={handleSubmit(registerAccount)} />
+                        }} />
+                    <UserSubmitButton buttonName='Register' onPress={handleSubmit(registerAccount)} />
                     {errorVisible && <Text style={styles.errorMessage}>{errorMessage}</Text>}
                 </ScrollView>
             </View>
@@ -91,9 +93,9 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         height: '100%',
-        backgroundColor: 'pink',
-        justifyContent: 'center',
-        padding: 20
+        flexDirection: 'column',
+        backgroundColor: '#d1fdff',
+        padding: 8,
     },
     errorMessage: {
         fontSize: 16,

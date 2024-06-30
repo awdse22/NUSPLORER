@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import IndoorDataInput from '../../Components/IndoorForumComponents/IndoorDataInput';
+import UserInput from '../../Components/UserInput';
+import UserSubmitButton from '../../Components/UserSubmitButton';
 import { useForm } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
@@ -39,7 +40,7 @@ export default function CreateRoomData() {
     return (
         <ScrollView>
             <View style={styles.container}>
-                <IndoorDataInput 
+                <UserInput 
                     type='data'
                     label='Room Code' 
                     fieldName='roomCode'
@@ -52,7 +53,7 @@ export default function CreateRoomData() {
                             message: 'Room code should be at least 3 characters long'
                         }
                     }} />
-                <IndoorDataInput 
+                <UserInput 
                     type='data'
                     label='Building name' 
                     fieldName='buildingName'
@@ -65,7 +66,7 @@ export default function CreateRoomData() {
                             message: 'Building name should be at least 3 characters long'
                         }
                     }} />
-                <IndoorDataInput 
+                <UserInput 
                     type='data'
                     label='Floor number' 
                     fieldName='floorNumber'
@@ -78,7 +79,7 @@ export default function CreateRoomData() {
                             message: 'Invalid floor number',
                         } 
                     }} />
-                <IndoorDataInput 
+                <UserInput 
                     type='data'
                     label='Room name' 
                     fieldName='roomName'
@@ -91,14 +92,7 @@ export default function CreateRoomData() {
                             message: 'Room name should be at least 3 characters long'
                         }
                     }} />
-
-                <View style={styles.submitContainer}>
-                    <TouchableOpacity onPress={handleSubmit(createRoom)}>
-                        <View style={styles.submitButton}>
-                            <Text style={styles.submitButtonText}> Create </Text>
-                        </View>
-                    </TouchableOpacity>
-                </View>
+                <UserSubmitButton buttonName='Create' onPress={handleSubmit(createRoom)} />
             </View>
         </ScrollView>
     )
@@ -112,22 +106,4 @@ const styles = StyleSheet.create({
         backgroundColor: '#d1fdff',
         padding: 8,
     },
-    submitContainer: {
-        height: 60,
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    submitButton: {
-        borderRadius: 6,
-        backgroundColor: '#2164cf',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 8,
-    },
-    submitButtonText: {
-        fontWeight: 'bold',
-        fontSize: 20,
-        color: 'white'
-    }
 })

@@ -18,8 +18,7 @@ const styles = StyleSheet.create({
     },
     button: {
         alignItems: 'center',
-        backgroundColor: '#5084d9',
-        borderWidth: 2,
+        backgroundColor: '#2164cf',
         borderRadius: 12,
         width: 225,
         padding: 10,
@@ -27,7 +26,8 @@ const styles = StyleSheet.create({
     },
     text: {
         color: 'white',
-        fontSize: 16,
-        fontWeight: 'bold'
+        fontSize: 18,
+        fontWeight: 'bold',
+        textAlign: 'center'
     }
 })

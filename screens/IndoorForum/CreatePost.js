@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import IndoorDataInput from '../../Components/IndoorForumComponents/IndoorDataInput';
+import UserInput from '../../Components/UserInput';
+import UserSubmitButton from '../../Components/UserSubmitButton';
 import { useForm } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -39,7 +40,7 @@ export default function CreatePost({ route }) {
     return (
         <View style={styles.container}>
             <ScrollView>
-                <IndoorDataInput 
+                <UserInput 
                     type='post'
                     label='Title' 
                     fieldName='title'
@@ -53,7 +54,7 @@ export default function CreatePost({ route }) {
                         }
                     }} 
                 />
-                <IndoorDataInput 
+                <UserInput 
                     type='post'
                     label='Content' 
                     fieldName='content'
@@ -67,14 +68,7 @@ export default function CreatePost({ route }) {
                         }
                     }} 
                 />
-
-                <View style={styles.submitContainer}>
-                    <TouchableOpacity onPress={handleSubmit(createPost)}>
-                        <View style={styles.submitButton}>
-                            <Text style={styles.submitButtonText}> Create </Text>
-                        </View>
-                    </TouchableOpacity>
-                </View>
+                <UserSubmitButton buttonName='Create' onPress={handleSubmit(createPost)} />
             </ScrollView>
         </View>
     )
@@ -88,22 +82,4 @@ const styles = StyleSheet.create({
         backgroundColor: '#d1fdff',
         padding: 8,
     },
-    submitContainer: {
-        height: 60,
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    submitButton: {
-        borderRadius: 6,
-        backgroundColor: '#2164cf',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 8,
-    },
-    submitButtonText: {
-        fontWeight: 'bold',
-        fontSize: 20,
-        color: 'white'
-    }
 })

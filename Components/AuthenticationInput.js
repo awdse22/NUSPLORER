@@ -40,6 +40,7 @@ const styles = StyleSheet.create({
     headerText: {
         fontWeight: 'bold',
         fontSize: 15,
+        paddingLeft: 5,
     },
     inputBox: {
         textAlign: 'left',

@@ -18,8 +18,9 @@ const styles = StyleSheet.create({
     container: {
         width: '100%',
         height: '100%',
-        backgroundColor: 'pink',
+        backgroundColor: '#d1fdff',
         justifyContent: 'center',
+        alignItems: 'center',
         padding: 20
     },
     displayText: {

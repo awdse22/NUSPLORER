@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import IndoorDataInput from '../../Components/IndoorForumComponents/IndoorDataInput';
+import UserInput from '../../Components/UserInput';
+import UserSubmitButton from '../../Components/UserSubmitButton';
 import { useForm } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -42,7 +43,7 @@ export default function UploadImage({ route }) {
     return (
         <View style={styles.container}>
             <ScrollView>
-                <IndoorDataInput 
+                <UserInput 
                     type='image'
                     label='Upload Image' 
                     fieldName='imageData'
@@ -52,13 +53,7 @@ export default function UploadImage({ route }) {
                         required: 'You need to upload an image',
                     }} 
                 />
-                <View style={styles.submitContainer}>
-                    <TouchableOpacity onPress={handleSubmit(uploadImage)}>
-                        <View style={styles.submitButton}>
-                            <Text style={styles.submitButtonText}> Upload </Text>
-                        </View>
-                    </TouchableOpacity>
-                </View>
+                <UserSubmitButton buttonName='Upload' onPress={handleSubmit(uploadImage)} />
             </ScrollView>
         </View>
     )
@@ -72,22 +67,4 @@ const styles = StyleSheet.create({
         backgroundColor: '#d1fdff',
         padding: 8,
     },
-    submitContainer: {
-        height: 60,
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    submitButton: {
-        borderRadius: 6,
-        backgroundColor: '#2164cf',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 8,
-    },
-    submitButtonText: {
-        fontWeight: 'bold',
-        fontSize: 20,
-        color: 'white'
-    }
 })

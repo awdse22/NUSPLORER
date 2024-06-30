@@ -15,19 +15,21 @@ export default function IndoorRoomSearch() {
     const [pageNumber, setPageNumber] = useState(1);
     const [totalPages, setTotalPages] = useState(10);
 
-    useFocusEffect(React.useCallback(() => {
-        const fetchRooms = async () => {
-            const url = `http://10.0.2.2:3000/rooms?page=${pageNumber}&pageSize=10&keyword=${query}`;
-            axios.get(url).then((response) => {
-                setTotalPages(response.data.numberOfPages);
-                setRoomList(response.data.list);
-            }).catch((error) => {
-                const errorStatus = error.response.status;
-                console.log('Error fetching data: ', error.message);
-            })
-        }
-        fetchRooms();
-    }, [query, pageNumber]));
+    useFocusEffect(
+        React.useCallback(() => {
+            const fetchRooms = async () => {
+                const url = `http://10.0.2.2:3000/rooms?page=${pageNumber}&pageSize=10&keyword=${query}`;
+                axios.get(url).then((response) => {
+                    setTotalPages(response.data.numberOfPages);
+                    setRoomList(response.data.list);
+                }).catch((error) => {
+                    const errorStatus = error.response.status;
+                    console.log('Error fetching data: ', error.message);
+                })
+            }
+            fetchRooms();
+        }, [query, pageNumber])
+    );
 
     return (
         <SafeAreaView style={styles.container}>

@@ -1,13 +1,13 @@
 import { React, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Image } from 'react-native';
 import { Controller } from 'react-hook-form';
-import ImageNotUploaded from '../../assets/ImageNotUploaded.png';
+import ImageNotUploaded from '../assets/ImageNotUploaded.png';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 
-export default function IndoorDataInput({ fieldName, label, info, 
-    control, rules, type }) {
+export default function UserInput({ fieldName, label, info = null, 
+    control, rules, type = 'data', secureTextEntry = false }) {
     const [selectedImage, setSelectedImage] = useState(null);
     const [imageWidth, setImageWidth] = useState(250);
     const [imageHeight, setImageHeight] = useState(400);
@@ -83,6 +83,7 @@ export default function IndoorDataInput({ fieldName, label, info,
                             onChangeText={onChange} 
                             onBlur={onBlur}
                             multiline={type == 'post'}
+                            secureTextEntry={secureTextEntry}
                             style={[
                                 styles.inputBox, 
                                 { fontSize: type == 'data' ? 20 : 15},
