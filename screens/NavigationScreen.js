@@ -11,21 +11,22 @@ import {
   ScrollView,
   Button,
   Alert,
+  FlatList,
 } from "react-native";
 import axios from "axios";
 import { SafeAreaView } from "react-native-safe-area-context";
+import AutocompleteInput from "react-native-autocomplete-input";
 
 import {
   Feather,
   Ionicons,
-  AntDesign,
   MaterialIcons,
   FontAwesome,
 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import VenueData from "../assets/venue.json";
 
-async function getPosition(address) {
+async function getCoordinates(address) {
   const apiKey = "AIzaSyBYYtYwdIsgeOtEKmVA1wdKe1DI98Q8-z4";
   const res = await axios.get(
     `https://maps.google.com/maps/api/geocode/json?address=${encodeURI(
@@ -34,7 +35,7 @@ async function getPosition(address) {
   );
   const data = res.data;
   if (data.status !== "OK" && data.results.length == 0) {
-    throw new Error(`${address} not found`);
+    throw new Error(`Location "${address}" not found`);
   }
   const location = data.results[0].geometry.location;
   return {
@@ -42,13 +43,14 @@ async function getPosition(address) {
     longitude: location.lng,
   };
 }
+
 export default function NavigationScreen() {
   const [locationList, setLocationList] = useState([{}, {}]);
   const navigator = useNavigation();
 
   const Location = ({ index, location }) => {
-    // index does not matter for now, will be used to implement drag to sort function
     const [locationInput, setLocationInput] = useState(location?.currLocation);
+    const [locationSuggestions, setLocationSuggestions] = useState([]);
     const [modalOpen, setModalOpen] = useState(false);
     const isStartingLocation = index == 0;
     const isEndingLocation = index == locationList.length - 1;
@@ -58,16 +60,8 @@ export default function NavigationScreen() {
         return;
       }
       try {
-        locationList[index] = {
-          currLocation: locationInput,
-          locationChosen: true,
-          coordinate: await getPosition(locationInput),
-        };
-      } catch (e) {
         const res = VenueData[locationInput.toUpperCase()];
-        if (!res) {
-          Alert.alert("Error", e.message);
-        } else {
+        if (res) {
           const { x, y } = res.location;
           locationList[index] = {
             currLocation: locationInput,
@@ -77,10 +71,17 @@ export default function NavigationScreen() {
               longitude: x,
             },
           };
+        } else {
+          locationList[index] = {
+            currLocation: locationInput,
+            locationChosen: true,
+            coordinate: await getCoordinates(locationInput),
+          };
         }
-        return;
+        setLocationList([...locationList]);
+      } catch (error) {
+        Alert.alert("Error", error.message);
       }
-      setLocationList([...locationList]);
     }
 
     function renderModal() {
@@ -136,8 +137,43 @@ export default function NavigationScreen() {
       setModalOpen(false);
     }
 
+    function searchQuery(text) {
+      setLocationInput(text);
+      location.currLocation = text;
+      if (text) {
+        const results = Object.keys(VenueData).filter((key) => 
+          key.toLowerCase().includes(text.toLowerCase())
+        );
+        setLocationSuggestions(results.slice(0, 5));
+      } else {
+        setLocationSuggestions([]);
+      }
+    }
+
+    function selectQuery(venue) {
+      setLocationInput(venue);
+      location.currLocation = venue;
+      setLocationSuggestions([]);
+    }
+
+    const SuggestionList = (props) => {
+      return (
+        <View>
+          <FlatList 
+            {...props}
+            style={{ borderWidth: 1, backgroundColor: 'white' }}
+            renderItem={({ item }) => (
+              <TouchableOpacity onPress={() => selectQuery(item)} style={{ borderWidth: 0.5 }}>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', paddingLeft: 5 }}>{item}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      )
+    }
+
     return (
-      <View style={styles.locationInfo.container}>
+      <View style={[styles.locationInfo.container, { top: 30 + index * 60, zIndex: -index }]}>
         <Feather
           style={{ marginRight: 10 }}
           name={
@@ -153,18 +189,36 @@ export default function NavigationScreen() {
         <View
           style={[
             styles.locationInfo.userInterface,
-            !location.locationChosen && { backgroundColor: "#f2f2f3" },
+            location.locationChosen && { backgroundColor: "#dbdbdb" },
           ]}
         >
           {location.locationChosen ? (
-            <View style={styles.locationInfo.locationChosen}>
+            <View style={styles.locationInfo.searchBar}>
               <Text
-                style={styles.locationInfo.inputBox}
+                style={styles.locationInfo.inputBoxText}
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
                 {locationInput}
               </Text>
+            </View>
+          ) : (
+            <AutocompleteInput
+              style={{ height: '100%', backgroundColor: 'rgb(0,0,0,0)' }}
+              containerStyle={[styles.locationInfo.searchBar]}
+              inputContainerStyle={styles.locationInfo.inputBox}
+              listContainerStyle={styles.locationInfo.listStyle}
+              data={locationSuggestions}
+              defaultValue={locationInput}
+              onChangeText={searchQuery}
+              flatListProps={{ keyExtractor: (item, index) => `key-${index}` }}
+              renderResultList={SuggestionList}
+              placeholder={isStartingLocation ? "Choose starting location" : "Choose destination"}
+            />
+          )}
+          <View>
+          <View style={styles.locationInfo.iconContainer}>
+            {location.locationChosen ? (
               <TouchableOpacity
                 style={{ marginRight: 5 }}
                 onPress={() => {
@@ -172,39 +226,23 @@ export default function NavigationScreen() {
                   setLocationList([...locationList]);
                 }}
               >
-                <MaterialIcons name="edit" size={18} color="#232323" />
+                <MaterialIcons name="edit" size={20} color="#232323" />
               </TouchableOpacity>
-            </View>
-          ) : (
-            <View style={styles.locationInfo.locationNotChosen}>
-              <TextInput
-                style={styles.locationInfo.inputBox}
-                onChangeText={(text) => {
-                  setLocationInput(text);
-                  location.currLocation = text;
-                }}
-                value={locationInput}
-                placeholder={
-                  isStartingLocation
-                    ? "Choose starting location"
-                    : "Choose destination"
-                }
-              />
+            ) : (
               <TouchableOpacity
                 onPress={searchLocation}
                 style={{ marginRight: 5 }}
               >
-                <Ionicons name="search" size={18} color="#232323" />
+                <Ionicons name="search" size={20} color="#232323" />
               </TouchableOpacity>
-            </View>
-          )}
-          <View>
+            )}
             <TouchableOpacity
               onPress={() => setModalOpen(true)}
               style={{ paddingHorizontal: 10 }}
             >
-              <FontAwesome name="ellipsis-v" size={18} color="#232323" />
+              <FontAwesome name="ellipsis-v" size={20} color="#232323" />
             </TouchableOpacity>
+          </View>
             {renderModal()}
           </View>
         </View>
@@ -212,41 +250,39 @@ export default function NavigationScreen() {
     );
   };
 
+  function navigate() {
+    if (locationList.length < 2) {
+      Alert.alert("Invalid input","You need a starting point and a destination");
+    } else if (locationList[0]?.locationChosen != true) {
+      Alert.alert("Invalid input", "You need to choose a starting point");
+    } else if (locationList.slice(1).some(i => i?.locationChosen != true)) {
+      Alert.alert("Invalid input", "All destinations need to be valid");
+    } else {
+      navigator.jumpTo("Map", { locationList: [...locationList] });
+    }
+  }
+
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <SafeAreaView style={styles.container}>
-        <ScrollView style={styles.locationList}>
-          {locationList.map((location, i) => (
-            <Location key={`position${i}`} index={i} location={location} />
-          ))}
-        </ScrollView>
+        {locationList.map((location, i) => (
+          <Location 
+            key={`position${i}`} 
+            index={i} 
+            location={location} 
+          />
+        ))}
         <TouchableOpacity
-          style={{
-            marginTop: 10,
-            alignSelf: "center",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 10,
-            borderRadius: 20,
-            borderWidth: 2,
-            borderColor: "#94abdb",
-          }}
-          onPress={() => {
-            if (locationList.length < 2) {
-              Alert.alert("Warning", "Please set two place at least.");
-              return;
-            }
-            navigator.jumpTo("Map", { locationList: [...locationList] });
-          }}
+          style={styles.navigateButton}
+          onPress={navigate}
         >
           <Ionicons
             style={{ marginRight: 10 }}
             name="navigate"
             size={19}
-            color="#4872d1"
+            color="white"
           />
-          <Text style={{ fontSize: 14, color: "#4872d1" }}>Start Navigate</Text>
+          <Text style={{ fontSize: 16, color: "white", fontWeight: 'bold' }}>Navigate</Text>
         </TouchableOpacity>
       </SafeAreaView>
     </TouchableWithoutFeedback>
@@ -257,7 +293,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 15,
     paddingBottom: 70,
-    backgroundColor: "#fff",
+    height: '100%',
   },
   locationList: {
     width: "100%",
@@ -265,17 +301,12 @@ const styles = StyleSheet.create({
   },
   locationInfo: {
     container: {
+      position: 'absolute',
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: "#fff",
       justifyContent: "center",
-    },
-    path: {
-      width: "100%",
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: 10,
+      width: '100%',
+      left: 15
     },
     userInterface: {
       flex: 1,
@@ -286,27 +317,38 @@ const styles = StyleSheet.create({
       padding: 8,
       borderRadius: 10,
       backgroundColor: "#f6f7fb",
+      borderWidth: 1,
     },
-    locationNotChosen: {
+    searchBar: {
       flex: 1,
       height: 32,
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      backgroundColor: "#f2f2f3",
     },
-    locationChosen: {
-      flex: 1,
-      height: 32,
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
+    iconContainer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems:'center',
+      marginLeft: 4
     },
     inputBox: {
       flex: 1,
-      fontSize: 15,
+      height: 32,
+      paddingHorizontal: 10,
+      borderWidth: 0,
+    },
+    inputBoxText: {
+      fontSize: 16,
       paddingHorizontal: 10,
     },
+    listStyle: {
+      position: 'absolute',
+      top: '100%',
+      left: 0,
+      right: 0,
+      marginTop: 9,
+    }
   },
   modal: {
     container: {
@@ -331,5 +373,19 @@ const styles = StyleSheet.create({
       fontSize: 18,
     },
   },
+  navigateButton: {
+    position: 'absolute',
+    left: '50%',
+    bottom: 20,
+    transform: [{ translateX: -40 }],
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 10,
+    borderRadius: 20,
+    backgroundColor: "#4872d1",
+    zIndex: 1000,
+  }
 });
 
