@@ -70,25 +70,30 @@ If the map requires you to update google play services:
 ### Proposed Level of Achievement:
 Project Gemini
 ### Problem Motivation:
-To assist people in navigating the campus more effectively, as first-time students often find themselves lost. Although platforms like NUS Mods provide maps to certain locations, many areas remain unmapped and direct routes, including bus routes and walking paths, are not clearly provided.
+To assist people in navigating the campus more effectively, as first-time students often find themselves lost. Although platforms like NUS Mods provide maps to certain locations, many areas remain unmapped and direct routes, including how to get certain rooms within buildings and walking paths on campus, are not clearly provided.
 ### Target Audience:
 Students, visitors…
 ### Aim:
-To create a campus navigation system, for both indoor and outdoor use, to help people reach specific destinations efficiently, including newly opened areas.
+To create a campus navigation system for outdoor use and forum for indoor locations, to help people reach specific destinations efficiently, including newly opened areas.
 ### User Stories:
 1. As a user I want to be able to easily access a map of the campus.
 2. As a user I want to be able to find my destination and be given a fast route from my location to my destination.
-3. As a student needing to keep track of my class locations, I want to bookmark these places.
-4. As a student having various classes on certain days, I want to be able to find a route between each location and get their travel times.
-5. As a user I want to have my bookmarks, timetable and data saved and be able to access it through my devices.
+3. As a student having various classes on certain days, I want to be able to find and get data of the rooms of my class. 
+4. As a student looking for the classrooms for the first time, I want to be able to know what the locations or entrances to those rooms look like and if possible, find maps to those rooms.
+5. As a user, I want to share relevant information and my experience finding a newly opened area so that more people can benefit from it.
+6. As a user, I want to help contribute to the student community by upvoting accurate data and reporting bad/inaccurate data so other students can easily find the data they need for their destinations.
+7. As a student needing to keep track of my class locations, I want to bookmark these places.
+8. As a user I want to have my bookmarks and data saved and be able to access it through my devices.
+9. As a user, I want to retrieve the most updated information about each room and their respective areas or help to maintain them.
 ### Features
-1. Feature 1 (core): A map with available buildings, faculties, and facilities.
-2. Feature 2 (core): An accurate and updated navigation system for the entire campus, providing routes to various destinations (e.g., faculties).
-3. Feature 3 (core): An indoor wayfinding system containing all relevant room locations, including lifts and staircases.
-4. Feature 4 (extension): A feature allowing users to bookmark locations for their various activities or based on their schedules/timetables.
-5. Feature 5 (extension): Timetable feature which allows users to input their timetable and have the app create a route to class locations for the day.
-6. Feature 6 (extension): I want to have my data such as bookmarked locations and timetable saved so I can access them through different mobile devices.
-7. Feature 7 (optional extension): A map integrated with real-life pictures to make it more visually appealing and efficient. 
+Feature 1 (core): A map with available buildings, faculties, and facilities.
+Feature 2 (core): A user authentication system so users can have their bookmarks or data saved and upload data.
+Feature 2 (core): An accurate and updated navigation system for the inside and outside the entire campus, providing routes to various destinations (e.g., faculties, rooms available under nusmods-venues).
+Feature 3 (core): An indoor wayfinding forum that provides a comprehensive and up-to-date resource for navigating indoor areas. Users can create and read posts through this community-driven approach.
+Feature 4 (core): A page for users to find maps or photos of their indoor destinations, or upload them to help other future users.
+Feature 5 (extension): A feature associated with the forum feature that allows users to upvote, downvote posts, and report bad data.
+Feature 6 (extension): A feature allowing users to bookmark locations for their various activities or based on their schedules/timetables. 
+Feature 7 (extension): Improved user account management experience with a feature for users wanting to change password, for if they forget password and email verification for users creating accounts.
 ### Scope of Project:
 The Android App provides a comprehensive campus navigation system at NUS, featuring both indoor and outdoor maps, real-time canteen crowd indicators, bookmarking capabilities (and integration with bus routes and real-life imagery).
 #### Features to be completed by milestone 2:
