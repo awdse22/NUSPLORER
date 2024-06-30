@@ -19,7 +19,7 @@ export default function UploadImage({ route }) {
             imageData: userResponse.imageData
         }
         const token = await AsyncStorage.getItem('token');
-        const url = `http://10.0.2.2:3000/rooms/${roomId}/photos`;
+        const url = `https://nusplorer.onrender.com/rooms/${roomId}/photos`;
 
         axios.post(url, data , { 
             headers: {

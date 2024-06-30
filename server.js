@@ -4,7 +4,6 @@ const app = express();
 const mongoose = require('mongoose');
 const usersRouter = require('./routes/users');
 const roomRouter = require('./routes/room');
-const serverless = require('serverless-http');
 
 const userPagesRouter = require('./routes/userPages');
 
@@ -30,19 +29,15 @@ app.use(
 
 app.get('/', (req, res) => {
   res.json('api is running');
-})
+}); // for debugging purposes
 
 app.get('/test', (req, res) => {
   res.send({ message: 'Server is running'});
-});
+}); // for debugging purposes
 
-if (process.env.ENVIRONMENT == 'LAMBDA') {
-  module.exports.handler = serverless(app);
-} else {
-  app.listen(PORT, () => {
-    console.log(`Server running on port http://localhost:${PORT}`);
-  });
-}
+app.listen(PORT, () => {
+  console.log(`Server running on port http://localhost:${PORT}`);
+});
 
 
 
