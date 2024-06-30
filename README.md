@@ -132,7 +132,7 @@ Instead of just posting information about a room, users may add “Directions”
 ### Diagram
 
 ### Timeline
-[current progress]
+#### [current progress]
 1) 3rd week of May: Read up on relevant materials (e.g. React Native, Google maps API)
 2) 4th week of May: Implement basic FrontEnd and UI
 3) 5th week of May: Integrate basic features (e.g. basic authentication, account registration and map API) and connect FrontEnd to BackEnd and PostgreSQL)
@@ -140,7 +140,7 @@ Instead of just posting information about a room, users may add “Directions”
 5) 2nd week of June: Implement Navigation UI and integrate the outdoor navigation system. 
 6) 3rd week of June: Data collection for indoor maps, creating sample floor plans and trying to develop an indoor navigation system.
 7) 4th week of June: Switch to indoor navigation forum and implement this feature.
-[proposed]
+#### [proposed]
 9) 1st week of July: Implement extension features of the forum.
 10) 2nd week of July: Finish up overall navigation UI and integrate both outdoor and indoor systems.
 11) 3rd week of July: Implement bookmark section.
@@ -148,5 +148,24 @@ Instead of just posting information about a room, users may add “Directions”
 ### Design (UI may be improved):
 #### Login page
 ![image](https://github.com/awdse22/NUSPLORER/assets/169813987/9c8aa351-08a3-4b9e-90f2-1fbb84b6c3fe)
+#### Map section
+![image](https://github.com/awdse22/NUSPLORER/assets/169813987/e340662e-4a17-4e41-a3f8-89345ec03498)
+Users can enter the location they want to find in the search bar, which features predictive text input to assist users in finding their desired location. Upon clicking "search," the map will automatically navigate to the searched location. Users can also zoom in and out to adjust the size.
+#### Navigation section
+![image](https://github.com/awdse22/NUSPLORER/assets/169813987/cdd1eeb0-1228-4c6a-8f0b-907dbcc99429)
+![image](https://github.com/awdse22/NUSPLORER/assets/169813987/29dfac24-0807-47df-a47d-224068712c41)
+Users can input their current location and desired destination in the navigation feature. By integrating coordinate information from NUSMods-Venues about room locations, users can input not only locations existing in Google Maps (such as Biz2, Kent Ridge MRT), but also can directly enter room numbers (like AS1-0201, S17-0405) for navigation. For two waypoints, users can choose between driving, bicycling, transit, and walking to find the best route. After selecting driving, bicycling, or walking, the map interface will simulate the specific route planning. Clicking the "Next" button allows users to view the next navigation step. If "Next" is clicked accidentally, users can click "Prev" to return to the previous navigation step.For transit, due to limited free resources provided by Google Maps API, clicking transit will automatically open the Google Maps web interface in the browser for public transit suggestions. 
 
-![1717335463733](https://github.com/awdse22/NUSPLORER/assets/169813987/94d77f85-1f7c-4087-8d4f-470529c89bbe)
+Additionally, the outdoor navigation system developed here supports multiple waypoints for route planning. Specifically, users can add waypoints using "add destination below" and remove waypoints as needed. However, for transit, Google Maps itself does not support providing public transit routes with multiple waypoints, which will display a warning. For other modes of transportation, route planning can proceed as normal.
+#### Indoor section
+!! Note that the data is NOT meant to reflect actual data of our campus, all room data, posts and photos were created specifically for testing !!
+![image](https://github.com/awdse22/NUSPLORER/assets/169813987/1beef191-ddbd-4d38-91ec-8c9591975980)
+![image](https://github.com/awdse22/NUSPLORER/assets/169813987/79010c2c-36ca-4931-9257-bc5bcf5ecf9b)
+The indoor navigation forum allows users to share and access information related to classroom locations. Specifically, users can create a room by providing a room code, building name, floor number, and room name. Once a room is created, users can click into it to view detailed information, including uploaded entrance photos, floor plans/maps, and textual information or directions.
+
+Clicking "View" allows users to see relevant photos and information uploaded by other users, and they can also contribute by uploading photos or creating posts within the community.
+
+Other extended features will be developed by milestone 3.
+
+
+
