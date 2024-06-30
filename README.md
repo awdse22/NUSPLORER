@@ -86,48 +86,67 @@ To create a campus navigation system for outdoor use and forum for indoor locati
 8. As a user I want to have my bookmarks and data saved and be able to access it through my devices.
 9. As a user, I want to retrieve the most updated information about each room and their respective areas or help to maintain them.
 ### Features
-Feature 1 (core): A map with available buildings, faculties, and facilities.
-Feature 2 (core): A user authentication system so users can have their bookmarks or data saved and upload data.
-Feature 2 (core): An accurate and updated navigation system for the inside and outside the entire campus, providing routes to various destinations (e.g., faculties, rooms available under nusmods-venues).
-Feature 3 (core): An indoor wayfinding forum that provides a comprehensive and up-to-date resource for navigating indoor areas. Users can create and read posts through this community-driven approach.
-Feature 4 (core): A page for users to find maps or photos of their indoor destinations, or upload them to help other future users.
-Feature 5 (extension): A feature associated with the forum feature that allows users to upvote, downvote posts, and report bad data.
-Feature 6 (extension): A feature allowing users to bookmark locations for their various activities or based on their schedules/timetables. 
-Feature 7 (extension): Improved user account management experience with a feature for users wanting to change password, for if they forget password and email verification for users creating accounts.
+1. Feature 1 (core): A map with available buildings, faculties, and facilities.
+2. Feature 2 (core): A user authentication system so users can have their bookmarks or data saved and upload data.
+3. Feature 3 (core): An accurate and updated navigation system for the inside and outside the entire campus, providing routes to various destinations (e.g., faculties, rooms available under nusmods-venues).
+4. Feature 4 (core): An indoor wayfinding forum that provides a comprehensive and up-to-date resource for navigating indoor areas. Users can create and read posts through this community-driven approach.
+5. Feature 5 (core): A page for users to find maps or photos of their indoor destinations, or upload them to help other future users.
+6. Feature 6 (extension): A feature associated with the forum feature that allows users to upvote, downvote posts, and report bad data.
+7. Feature 7 (extension): A feature allowing users to bookmark locations for their various activities or based on their schedules/timetables. 
+8. Feature 8 (extension): Improved user account management experience with a feature for users wanting to change password, for if they forget password and email verification for users creating accounts.
 ### Scope of Project:
-The Android App provides a comprehensive campus navigation system at NUS, featuring both indoor and outdoor maps, real-time canteen crowd indicators, bookmarking capabilities (and integration with bus routes and real-life imagery).
-#### Features to be completed by milestone 2:
-#### 1. Map section: Explore Campus with Ease
-People can effortlessly locate buildings, classrooms, and more from a comprehensive view of campus facilities.
-For indoor maps, the basic template for implementation should be set up and data on floor plans for accessible buildings should be collected.
-#### 2. Navigation section: Navigate with Precision
-Users can easily find the fastest routes to their desired buildings within NUS.
-#### Features to be completed by milestone 3: 
-#### 1.  Navigation section: Integration and navigation of both outdoor and indoor maps
-Users can find routes for both outdoor and indoor linked together to reach their desired destinations.
-#### 2. Timetable section: Plan Your Day Seamlessly
-Students can input their timetable and plan routes to various locations accordingly.
-#### 3. Bookmark section: Personalise Your Campus Experience
-People can bookmark their frequently visited locations based on their schedules.
+The Android App provides a comprehensive campus navigation system at NUS, featuring outdoor maps, outdoor navigation system, indoor navigation forum, and bookmarking capabilities.
+#### Core features developed by milestone 2
+1. Map section
+After integrating google map api, users are able to view an accurate map displayed under the map section. They can enter the desired place in the search bar, and zoom in to effortlessly locate buildings, classrooms, and more from a comprehensive view of campus facilities.
+2. Outdoor navigation system
+After integrating google (map) routes api and venue information available on nusmods, the app can compute routes (support walking, bicycling, driving, and transit with public transportation) for users to get their desired locations (including those rooms that are not internally stored in google map, for example, AS1-0201). It also supports “add stops”, in which users are able to get optimal route planning when they tend to go to multiple destinations.
+3. Indoor navigation forum
+This platform allows users to read, collaborate and share relevant information and maps/photos about indoor navigation, providing a comprehensive solution through collective intelligence gradually. This is the basic structure for this feature, extended features (like upvote, downvote…) will be implemented by the next milestone.
+#### Problems encountered
+1. For the outdoor navigation function, fully implementing the real-time navigation process is challenging due to its reliance on an emulator and the limitations of available free resources online. Therefore, we have modified this feature to focus on route planning, which can display a simulated route in written form. This allows users to use it as a reference.
+2. For the outdoor navigation function, given the limitations of available free resources online, the "add stops" function is not supported for public transportation and cannot be properly displayed in the app. Therefore, we have modified this feature to include a link that opens "maps" on the phone when users tap “transit”, where more details are provided.
+3. Previously, we planned to develop an indoor navigation system using official floor plans and have maps displayed along with pathfinding for users. However, due to the complicated process of obtaining floor plans from school and the immature indoor navigation tools available online, we have decided to take a more community-driven approach and switched this feature to a forum-based on indoor navigation. This forum allows users to share and read relevant information about different rooms to navigate more efficiently.
+a. Some advantages include less requirement for overall maintenance as indoor maps or floor plans of various buildings may change over time. Having a community-driven approach lets users update real-time information without the need to re-map areas which would have been required of the old approach. It is also not very feasible for us to map the indoor areas of the entire campus within such a short time.
+b. However, this new approach would require users to contribute data for the application to be useful to a wider audience.
+4. Previously, we used PgAdmin4 for backend development. However, upon deciding to implement a forum feature, we found that MongoDB would be more suitable as it allows us to scale more horizontally and more easily implement new features as we need. As a result, we switched our database to MongoDB.
+#### Plan for milestone 3
+1. Extension feature of indoor navigation forum
+Including upvote, downvote, and report bad data. This will be what we plan to have our application use in order to determine more accurate or “good” data. Data that has been highly upvoted will be displayed first to ensure users find accurate data easily. On the other hand, data that is reported a large amount of times may be subjected to removal. This ensures that the data stays updated and accurate based on the community’s input.
+2. Email verification, forget/change password and bookmark feature to personalise your campus experience
+People can bookmark their frequently visited locations based on their schedules. Users may bookmark rooms or certain posts.
+3. Improve content of posts, user settings and other quality of life features.
+Instead of just posting information about a room, users may add “Directions” info where they specify a starting point and they may write a navigation/procedure to go to certain rooms from the starting point using landmarks and photos. We’re planning to go for this design since there are many possible ways to go to a specific room with many possible starting points. Users may be able to search for a starting point and if directions to the room have been uploaded by other users, they may easily navigate to their desired destination.
 ### Tech Stack
 1. React Native (FrontEnd)
 2. NodeJS (BackEnd)
 3. Google Maps API (Map API)
-4. PostgreSQL (Database for user information)
+4. MongoDB (Database for user information)
 ### How are we different from similar platforms?
 1. Nusmods: The application lacks location information for all classrooms, particularly the newly constructed ones. Additionally, it does not have a mapping function to help students navigate to specific places.
 2. Google map: The application only guides students to specific buildings or faculties but does not provide information on the classrooms and how to reach them.
-### Plan and Design
+### SWE Practices:
+1. Version Control and Collaboration: practice pull and push requests, make use of multiple branches and commit proper messages via github.
+2. Security Practices: use tokens for authentication to keep the database secure.
+3. API Integration: leverage existing, well-tested functionalities.
+### Diagram
+
+### Timeline
+[current progress]
 1) 3rd week of May: Read up on relevant materials (e.g. React Native, Google maps API)
 2) 4th week of May: Implement basic FrontEnd and UI
 3) 5th week of May: Integrate basic features (e.g. basic authentication, account registration and map API) and connect FrontEnd to BackEnd and PostgreSQL)
 4) 1st week of June: Update and improve user authentication to keep track of user session and implement the forget password feature/email verification feature. Improve map UI and search function.
 5) 2nd week of June: Implement Navigation UI and integrate the outdoor navigation system. 
-6) 3rd week of June: Data collection for indoor maps, creating sample floor plans and implementing indoor map UI.
-7) 4th week of June: Develop the indoor wayfinding system.
-8) 1st week of July: Finish up overall navigation UI and integrate both outdoor and indoor systems.
-9) 2nd week of July: Implement bookmark section.
-10) 3rd week of July: Develop timetable section that can let students input their timetable and find ways to different locations accordingly.
-11) 4th week of July: Overall testing and refinements.
+6) 3rd week of June: Data collection for indoor maps, creating sample floor plans and trying to develop an indoor navigation system.
+7) 4th week of June: Switch to indoor navigation forum and implement this feature.
+[proposed]
+9) 1st week of July: Implement extension features of the forum.
+10) 2nd week of July: Finish up overall navigation UI and integrate both outdoor and indoor systems.
+11) 3rd week of July: Implement bookmark section.
+12) 4th week of July: Overall testing and refinements.
+### Design (UI may be improved):
+#### Login page
+![image](https://github.com/awdse22/NUSPLORER/assets/169813987/9c8aa351-08a3-4b9e-90f2-1fbb84b6c3fe)
 
 ![1717335463733](https://github.com/awdse22/NUSPLORER/assets/169813987/94d77f85-1f7c-4087-8d4f-470529c89bbe)
