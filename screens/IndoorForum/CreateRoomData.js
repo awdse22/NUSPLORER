@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, ScrollView, StyleSheet, Alert } from 'react-native';
 import UserInput from '../../Components/UserInput';
 import UserSubmitButton from '../../Components/UserSubmitButton';
 import { useForm } from 'react-hook-form';
