@@ -20,7 +20,7 @@ const roomSchema = new Schema({
     minLength: 3,
   },
   floorNumber: {
-    type: Number,
+    type: String,
     required: true,
   },
   creator: {
