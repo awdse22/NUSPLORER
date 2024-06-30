@@ -1,0 +1,32 @@
+{
+  "cli": {
+    "version": ">= 10.0.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+      "env": {
+        "MONGODB_URI": "mongodb+srv://admin:admin@cluster0.antxzbx.mongodb.net/NUSPLORER?retryWrites=true&w=majority",
+        "JWT_SECRET": "!Qk@#9ZpP$#XcX0wZq%wA2*eX&ZkUz9B*J7!Rk&ZnLk$Yx7T4*Mp%U9K!NqP2&#"
+      }
+    },
+    "test": {
+      "env": {
+        "MONGODB_URI": "mongodb+srv://admin:admin@cluster0.antxzbx.mongodb.net/NUSPLORER?retryWrites=true&w=majority",
+        "JWT_SECRET": "!Qk@#9ZpP$#XcX0wZq%wA2*eX&ZkUz9B*J7!Rk&ZnLk$Yx7T4*Mp%U9K!NqP2&#"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

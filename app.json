@@ -12,16 +12,36 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBYYtYwdIsgeOtEKmVA1wdKe1DI98Q8-z4"
+        }
+      },
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBYYtYwdIsgeOtEKmVA1wdKe1DI98Q8-z4"
+        }
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ],
+      "package": "com.awdse22.NUSPLORER"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f5c80709-09f0-451e-a761-ec42250ed87e"
+      }
     }
   }
 }
