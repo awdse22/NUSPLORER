@@ -3,7 +3,8 @@
 	"version": "1.0.0",
 	"main": "expo/AppEntry.js",
 	"scripts": {
-		"start": "nodemon server.js",
+		"start": "node server.js",
+		"dev": "nodemon server.js",
 		"android": "expo start --android",
 		"ios": "expo start --ios",
 		"web": "expo start --web"
@@ -42,6 +43,7 @@
 		"react-native-screens": "3.31.1",
 		"react-native-web": "~0.19.10",
 		"react-native-webview": "13.8.6",
+		"serverless-http": "^3.2.0",
 		"validator": "^13.12.0"
 	},
 	"devDependencies": {
