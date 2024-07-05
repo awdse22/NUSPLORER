@@ -3,6 +3,7 @@ const router = express.Router();
 const Post = require('../models/post');
 const Vote = require('../models/vote');
 const authenticateToken = require('../tokenAuthMiddleware');
+const mongoose = require('mongoose');
 
 router.get('/', authenticateToken, async (req, res) => {
   const { page, pageSize, keyword } = req.query;
@@ -144,10 +145,12 @@ router.put('/:id/vote', authenticateToken, async (req, res) => {
   // -1 if downvote, 0 if no vote, 1 if upvote
   const { initialVoteValue, updatedVoteValue } = req.body; 
 
+  if (initialVoteValue == updatedVoteValue) {
+    return res.status(400).json({ error: 'Updated vote cannot be the same as initial vote'});
+  }
+
   const session = await mongoose.startSession();
   session.startTransaction();
-
-  
 
   try {
     let updateVoteCount = { $inc: {} };
