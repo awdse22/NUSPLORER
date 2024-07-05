@@ -28,6 +28,14 @@ const postSchema = new Schema({
   modifyTime: {
     type: Date,
   },
+  upvoteCount: {
+    type: Number,
+    default: 0
+  },
+  downvoteCount: {
+    type: Number,
+    default: 0
+  }
 });
 
 const Post = model('Post', postSchema);
