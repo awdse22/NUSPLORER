@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 export default function RoomInformation({ route }) {
     const navigation = useNavigation();
     const { _id, roomCode, buildingName, floorNumber, roomName } = route.params;
+    console.log(_id);
 
     const RoomDetail = ({icon, text}) => {
         return (

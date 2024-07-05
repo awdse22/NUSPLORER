@@ -14,9 +14,9 @@ export default function CreatePost({ route }) {
 
     async function createPost(post) {
         console.log(post);
-        // send request to backend to create room
         const token = await AsyncStorage.getItem('token');
-        const url = `https://nusplorer.onrender.com/rooms/${roomId}/posts`;
+        // const url = `https://nusplorer.onrender.com/rooms/${roomId}/posts`;
+        const url = `http://10.0.2.2:3000/rooms/${roomId}/posts`;
         
         axios.post(url, post, { 
             headers: {

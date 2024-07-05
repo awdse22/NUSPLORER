@@ -33,7 +33,8 @@ export default function LoginScreen() {
   }
 
   function authenticate(credentials) {
-    const url = 'https://nusplorer.onrender.com/login';
+    // const url = 'https://nusplorer.onrender.com/login';
+    const url = 'http://10.0.2.2:3000/login';
 
     axios.post(url, credentials).then((response) => {
       console.log('Login success with token ' + response.data.token);

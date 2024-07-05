@@ -16,7 +16,8 @@ export default function CreateRoomData() {
     async function createRoom(info) {
         console.log(info);
         const token = await AsyncStorage.getItem('token');
-        const url = `https://nusplorer.onrender.com/rooms`;
+        // const url = `https://nusplorer.onrender.com/rooms`;
+        const url = `http://10.0.2.2:3000/rooms`;
 
         axios.post(url, info, { 
             headers: {

@@ -60,7 +60,9 @@ export default function ImagesPage({ route }) {
     useFocusEffect(
         React.useCallback(() => {
             const fetchImages = async () => {
-                const url = `https://nusplorer.onrender.com/rooms/${roomId}/photos?dataType=${dataType}`;
+                // const url = `https://nusplorer.onrender.com/rooms/${roomId}/photos?dataType=${dataType}`;
+                const url = `http://10.0.2.2:3000/rooms/${roomId}/photos?dataType=${dataType}`;
+
                 axios.get(url).then((response) => {
                     setImages(response.data);
                 }).catch((error) => {
