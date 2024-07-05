@@ -144,16 +144,23 @@ router.put('/:id/vote', authenticateToken, async (req, res) => {
   // -1 if downvote, 0 if no vote, 1 if upvote
   const { initialVoteValue, updatedVoteValue } = req.body; 
 
-  const voteDifference = updatedVoteValue - initialVoteValue;
   const session = await mongoose.startSession();
   session.startTransaction();
 
+  
+
   try {
+    let updateVoteCount = { $inc: {} };
+    if (initialVoteValue == -1) {
+      updateVoteCount.$inc.downvoteCount = -1;
+    } else if (initialVoteValue == 1) {
+      updateVoteCount.$inc.upvoteCount = -1;
+    }
     if (updatedVoteValue == 0) {
       await Vote.deleteOne({ postId: postId, userId: userId }).session(session);
       const updatedPost = await Post.findOneAndUpdate(
         { _id: postId },
-        { $inc: { voteCount: voteDifference }},
+        updateVoteCount,
         { new: true }
       ).session(session);
 
@@ -161,6 +168,12 @@ router.put('/:id/vote', authenticateToken, async (req, res) => {
       session.endSession();
       return res.status(200).json(updatedPost);
     } else {
+      if (updatedVoteValue == 1) {
+        updateVoteCount.$inc.upvoteCount = 1;
+      } else if (updatedVoteValue == -1) {
+        updateVoteCount.$inc.downvoteCount = 1;
+      }
+      
       await Vote.findOneAndUpdate(
         { postId: postId, userId: userId },
         { value: updatedVoteValue },
@@ -169,7 +182,7 @@ router.put('/:id/vote', authenticateToken, async (req, res) => {
 
       const updatedPost = await Post.findOneAndUpdate(
         { _id: postId },
-        { $inc: { voteCount: voteDifference }},
+        updateVoteCount,
         { new: true }
       ).session(session);
 
@@ -183,6 +196,6 @@ router.put('/:id/vote', authenticateToken, async (req, res) => {
     console.log(error);
     res.status(500).json({ error: 'Failed to update votes'});
   }
-})
+});
 
 module.exports = router;
