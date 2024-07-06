@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, ScrollView, View, Text } from 'react-native';
+import React, { useState } from 'react';
+import { SafeAreaView, StyleSheet, ScrollView, View, Text, Alert } from 'react-native';
 import InfoPost from '../../Components/IndoorForumComponents/InfoPost';
 import PageSelector from '../../Components/IndoorForumComponents/PageSelector';
 import AddDataButton from '../../Components/IndoorForumComponents/AddDataButton';
 import axios from 'axios';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function InformationPostsPage({ route }) {
     const navigation = useNavigation();
@@ -14,22 +15,69 @@ export default function InformationPostsPage({ route }) {
     const [pageNumber, setPageNumber] = useState(1);
     const [totalPages, setTotalPages] = useState(10);
 
+    function logout(errorMessage) {
+        Alert.alert(errorMessage, 'Please login again!', [
+            {
+                text: 'OK',
+                onPress: () => {
+                    AsyncStorage.removeItem('token');
+                    navigation.navigate('Login');
+                    console.log('Token cleared and navigated to Login');
+                }
+            }
+        ])
+    };
+
     useFocusEffect(React.useCallback(() => {
         const fetchPosts = async () => {
+            const token = await AsyncStorage.getItem('token');
             // const url = `https://nusplorer.onrender.com/rooms/${roomId}/posts?page=${pageNumber}&pageSize=10&keyword=${query}`;
             const url = `http://10.0.2.2:3000/rooms/${roomId}/posts?page=${pageNumber}&pageSize=10&keyword=${query}`;
 
-            axios.get(url).then((response) => {
+            axios.get(url, { 
+                headers: {
+                    'Authorization': token ? `Bearer ${token}` : null
+                }
+            }).then((response) => {
                 setTotalPages(response.data.numberOfPages);
-                setPosts(response.data.list);
+                setPosts(response.data.postsWithUserVoteInfo);
             }).catch((error) => {
                 const errorStatus = error.response.status;
-                console.error('Error fetching data: ', error.message);
+                if (errorStatus == 401 || errorStatus == 403) {
+                    logout(error.response.data.message);
+                } else {
+                    console.error('Error fetching data: ', error.message);
+                }
             })
         }
         console.log(`Fetching posts data for ${roomCode} on page ${pageNumber}`);
         fetchPosts();
     }, [pageNumber]));
+
+    async function updateVote(postId, initialVoteValue, updatedVoteValue) {
+        const token = await AsyncStorage.getItem('token');
+        const url = `http://10.0.2.2:3000/rooms/${roomId}/posts/${postId}/vote`;
+
+        try {
+            const response = await axios.put(url, 
+                { initialVoteValue, updatedVoteValue }, 
+                {
+                headers: {
+                    'Authorization': token ? `Bearer ${token}` : null
+                }
+            });
+            return true;
+        } catch (error) {
+            const errorStatus = error.response.status;
+            if (errorStatus == 401 || errorStatus == 403) {
+                logout(error.response.data.message);
+            } else {
+                Alert.alert('Failed to update vote');
+                console.error(`Error updating vote for ${postId}: `, error.message);
+            }
+            return false;
+        }
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -44,7 +92,7 @@ export default function InformationPostsPage({ route }) {
                 </Text>
             )}
             <ScrollView>
-                {posts.map((post) => <InfoPost key={post._id} postDetails={post} />)}
+                {posts.map((post) => <InfoPost key={post._id} postDetails={post} voteUpdater={updateVote} />)}
             </ScrollView>
         </SafeAreaView>
     )

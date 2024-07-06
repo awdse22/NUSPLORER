@@ -14,7 +14,7 @@ router.get('/', authenticateToken, async (req, res) => {
   const limitNumber = Number.parseInt(pageSize) || 10;
 
   const searchQuery = {
-    roomId: roomId,
+    roomId: new mongoose.Types.ObjectId(roomId),
     $or: [
       { title: { $regex: keyword || '', $options: 'i' } },
     ],
@@ -23,6 +23,9 @@ router.get('/', authenticateToken, async (req, res) => {
   try {
     const numberOfPosts = await Post.countDocuments(searchQuery);
     const postList = await Post.aggregate([
+      {
+        $match: searchQuery
+      },
       {
         $addFields: {
           voteCount: { $subtract: ['$upvoteCount', '$downvoteCount'] },
@@ -49,7 +52,9 @@ router.get('/', authenticateToken, async (req, res) => {
       }
     ]);
 
-    const postIds = postList.map(post => post._id);
+    const postsWithUsernames = await Post.populate(postList, { path: 'creator', select: 'username' });
+
+    const postIds = postsWithUsernames.map(post => post._id);
     // Fetch info of whether the user has upvoted or downvoted the listed posts
     const votesMadeByUser = await Vote.find({
       userId,
@@ -60,7 +65,7 @@ router.get('/', authenticateToken, async (req, res) => {
       userVotes[vote.postId.toString()] = vote.value;
     });
 
-    const postsWithUserVoteInfo = postList.map(post => {
+    const postsWithUserVoteInfo = postsWithUsernames.map(post => {
       const postId = post._id.toString();
       const userVote = userVotes[postId];
       return {

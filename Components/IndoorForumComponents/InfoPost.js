@@ -1,15 +1,28 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
+import VotesDisplay from './VotesDisplay';
 
-export default function InfoPost({ postDetails }) {
+export default function InfoPost({ postDetails, voteUpdater }) {
     const postCreatedAt = new Date(postDetails.createTime).toLocaleDateString();
     const postIsModified = postDetails.modifyTime != null;
     const postLastModifiedAt = postIsModified ? new Date(postDetails.modifyTime).toLocaleDateString() : null;
 
+    async function updateVote(initial, updated) {
+        const updateSuccessful = await voteUpdater(postDetails._id, initial, updated);
+        return updateSuccessful;
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.postDetails.container}>
-                <Text style={styles.postDetails.titleText}>{postDetails.title}</Text>
+                <View style={styles.postDetails.titleContainer}>
+                    <Text style={styles.postDetails.titleText}>{postDetails.title}</Text>
+                    <VotesDisplay 
+                        voteValue={postDetails.userVote} 
+                        numberOfVotes={postDetails.voteCount} 
+                        onVoteChange={updateVote}
+                    />
+                </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Text style={styles.postDetails.usernameText}>
                         by {postDetails.creator.username}
@@ -39,7 +52,13 @@ const styles=StyleSheet.create({
             flexDirection: 'column',
             paddingLeft: 10,
             paddingTop: 8,
-            paddingBottom: 0
+            paddingBottom: 0,
+        },
+        titleContainer: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingRight: 12,
         },
         titleText: {
             fontWeight: 'bold',
