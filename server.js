@@ -4,6 +4,7 @@ const app = express();
 const mongoose = require('mongoose');
 const usersRouter = require('./routes/users');
 const roomRouter = require('./routes/room');
+const bookmarkRouter = require('./routes/bookmark');
 
 const userPagesRouter = require('./routes/userPages');
 
@@ -18,6 +19,7 @@ mongoose
 app.use(express.json({ limit: '100mb' }));
 app.use(usersRouter);
 app.use('/rooms', roomRouter);
+app.use('/bookmark', bookmarkRouter);
 app.use(
   '/:userId',
   (req, res, next) => {
@@ -32,14 +34,9 @@ app.get('/', (req, res) => {
 }); // for debugging purposes
 
 app.get('/test', (req, res) => {
-  res.send({ message: 'Server is running'});
+  res.send({ message: 'Server is running' });
 }); // for debugging purposes
 
 app.listen(PORT, () => {
   console.log(`Server running on port http://localhost:${PORT}`);
 });
-
-
-
-
-
