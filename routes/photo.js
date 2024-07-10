@@ -4,6 +4,79 @@ const router = express.Router();
 const ImageMetadata = require('../models/imageMetadata');
 const Image = require('../models/image');
 const authenticateToken = require('../tokenAuthMiddleware');
+const Vote = require('../models/vote');
+const User = require('../models/user')
+
+router.get('/', authenticateToken, async (req, res) => {
+  const { dataType } = req.query;
+  const roomId = req.roomId;
+  const { userId } = req.user;
+
+  if (!dataType) {
+    return res.status(400).json({ error: 'Invalid data type requested'})
+  }
+
+  const searchQuery = { 
+    roomId: new mongoose.Types.ObjectId(roomId),
+    dataType: dataType
+  };
+  
+  /*
+  if (description) {
+    searchQuery.description = { $regex: new RegExp(description, 'i') };
+  }
+    */
+
+  try {
+    const imageMetadataList = await ImageMetadata.aggregate([
+      {
+        $match: searchQuery
+      },
+      {
+        $addFields: {
+          voteCount: { $subtract: ['$upvoteCount', '$downvoteCount'] }
+        }
+      },
+      {
+        $sort: {
+          voteCount: -1,
+          createTime: -1
+        }
+      }
+    ]);
+
+    const listWithUserAndImageData = await ImageMetadata.populate(
+      imageMetadataList,
+      [
+        { path: 'creator', select: 'username' },
+        { path: 'imageId', select: 'imageType data'}
+      ]
+    );
+    
+    const imageMetadataIds = listWithUserAndImageData.map(image => image._id);
+    // Fetch info of whether the user has upvoted of downvoted the list of images
+    const votesMadeByUser = await Vote.find({
+      userId,
+      postId: { $in: imageMetadataIds }
+    });
+    const userVotes = {};
+    votesMadeByUser.forEach(vote => {
+      userVotes[vote.postId.toString()] = vote.value;
+    });
+
+    const listWithUserVoteInfo = listWithUserAndImageData.map(image => {
+      const userVote = userVotes[image._id.toString()];
+      return {
+        ...image,
+        userVote: userVote || 0
+      };
+    });
+
+    res.status(200).send(listWithUserVoteInfo);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 router.post('/', authenticateToken, async (req, res) => {
   const { description, dataType, imageData } = req.body;
@@ -54,37 +127,6 @@ router.post('/', authenticateToken, async (req, res) => {
   }
 });
 
-router.get('/', async (req, res) => {
-  const { dataType } = req.query;
-  const roomId = req.roomId;
-
-  const searchQuery = { roomId: roomId };
-
-  if (dataType) {
-    searchQuery.dataType = dataType;
-  }
-  
-  /*
-  if (description) {
-    searchQuery.description = { $regex: new RegExp(description, 'i') };
-  }
-    */
-
-  try {
-    const list = await ImageMetadata.find(searchQuery)
-      .populate('creator', 'username')
-      .populate({
-        path: 'imageId',
-        select: 'imageType data',
-      })
-      .sort({ createTime: -1 })
-
-    res.status(200).send(list);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   const { userId } = req.user;
@@ -99,5 +141,67 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+router.put('/:id/vote', authenticateToken, async (req, res) => {
+  const { userId } = req.user;
+  const { id: imageMetadataId } = req.params;
+  // -1 if downvote, 0 if no vote, 1 if upvote
+  const { initialVoteValue, updatedVoteValue } = req.body;
+
+  if (initialVoteValue == updatedVoteValue) {
+    return res.status(400).json({ error: 'Updated vote cannot be the same as initial vote'});
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    let updateVoteCount = { $inc: {} };
+    if (initialVoteValue == -1) {
+      updateVoteCount.$inc.downvoteCount = -1;
+    } else if (initialVoteValue == 1) {
+      updateVoteCount.$inc.upvoteCount = -1;
+    }
+    if (updatedVoteValue == 0) {
+      await Vote.deleteOne({ postId: imageMetadataId, userId: userId }).session(session);
+      const updatedMetadata = await ImageMetadata.findOneAndUpdate(
+        { _id: imageMetadataId },
+        updateVoteCount,
+        { new: true }
+      ).session(session);
+
+      await session.commitTransaction();
+      session.endSession();
+      return res.status(200).json(updatedMetadata);
+    } else {
+      if (updatedVoteValue == 1) {
+        updateVoteCount.$inc.upvoteCount = 1;
+      } else if (updatedVoteValue == -1) {
+        updateVoteCount.$inc.downvoteCount = 1;
+      }
+      
+      await Vote.findOneAndUpdate(
+        { postId: imageMetadataId, userId: userId },
+        { value: updatedVoteValue },
+        { upsert: true, new: true }
+      ).session(session);
+
+      const updatedMetadata = await ImageMetadata.findOneAndUpdate(
+        { _id: imageMetadataId },
+        updateVoteCount,
+        { new: true }
+      ).session(session);
+
+      await session.commitTransaction();
+      session.endSession();
+      return res.status(200).json(updatedMetadata);
+    }
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    console.log(error);
+    res.status(500).json({ error: 'Failed to update votes'});
+  }
+})
 
 module.exports = router;

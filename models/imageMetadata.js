@@ -30,6 +30,14 @@ const imageMetadataSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  upvoteCount: {
+    type: Number,
+    default: 0
+  },
+  downvoteCount: {
+    type: Number,
+    default: 0
+  }
 });
 
 const ImageMetadata = model('ImageMetadata', imageMetadataSchema);

@@ -14,7 +14,7 @@ export default function UploadImage({ route }) {
 
     async function uploadImage(userResponse) {
         const data = {
-            description: '',
+            description: userResponse.description,
             dataType: dataType,
             imageData: userResponse.imageData
         }
@@ -52,6 +52,19 @@ export default function UploadImage({ route }) {
                     control={control}
                     rules={{ 
                         required: 'You need to upload an image',
+                    }} 
+                />
+                <UserInput 
+                    type='post'
+                    label='Description' 
+                    fieldName='description'
+                    info={`(Optional) A description for the image`}
+                    control={control}
+                    rules={{ 
+                        maxLength: {
+                            value: 100,
+                            message: 'The description is too long!'
+                        }
                     }} 
                 />
                 <UserSubmitButton buttonName='Upload' onPress={handleSubmit(uploadImage)} />

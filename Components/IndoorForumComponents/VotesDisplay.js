@@ -4,10 +4,11 @@ import { Entypo } from '@expo/vector-icons';
 
 async function logVoteChange(initial, updated) {
     console.log(`Initial vote: ${initial}, Updated vote: ${updated}`);
-    return null;
+    return true;
 }
 
-export default function VotesDisplay({ voteValue = 0, numberOfVotes = 0, onVoteChange = logVoteChange }) {
+export default function VotesDisplay({ voteValue = 0, numberOfVotes = 0, 
+    onVoteChange = logVoteChange, textColor = 'black', alignment = 'horizontal' }) {
     const [vote, setVote] = useState(voteValue);
     const [voteCount, setVoteCount] = useState(numberOfVotes);
 
@@ -36,11 +37,11 @@ export default function VotesDisplay({ voteValue = 0, numberOfVotes = 0, onVoteC
     }
 
     return (
-        <View style={styles.container}>
+        <View style={{ flexDirection: alignment == 'horizontal' ? 'row' : 'column' }}>
             <TouchableOpacity onPress={handleUpvote}>
-                <Entypo name="arrow-bold-up" size={24} color={vote == 1 ? 'green' : '#cfcfcf'} />
+                <Entypo name="arrow-bold-up" size={24} color={vote == 1 ? 'lightgreen' : '#cfcfcf'} />
             </TouchableOpacity>
-            <Text style={{ fontWeight: 'bold', fontSize: 18 }}> {voteCount} </Text>
+            <Text style={[styles.voteCount, { color: textColor }]}> {voteCount} </Text>
             <TouchableOpacity onPress={handleDownvote}>
                 <Entypo name="arrow-down" size={24} color={vote == -1 ? 'red' : '#cfcfcf'} />
             </TouchableOpacity>
@@ -49,7 +50,9 @@ export default function VotesDisplay({ voteValue = 0, numberOfVotes = 0, onVoteC
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flexDirection: 'row',
+    voteCount: {
+        fontWeight: 'bold',
+        fontSize: 18,
+        textAlign: 'center'
     }
 })
