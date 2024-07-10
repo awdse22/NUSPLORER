@@ -98,9 +98,9 @@ b. However, this new approach would require users to contribute data for the app
 #### Plan for milestone 3
 1. Extension feature of indoor navigation forum
 Including upvote, downvote, and report bad data. This will be what we plan to have our application use in order to determine more accurate or “good” data. Data that has been highly upvoted will be displayed first to ensure users find accurate data easily. On the other hand, data that is reported a large amount of times may be subjected to removal. This ensures that the data stays updated and accurate based on the community’s input.
-2. Email verification, forget/change password and bookmark feature to personalise your campus experience
-People can bookmark their frequently visited locations based on their schedules. Users may bookmark rooms or certain posts.
-3. Improve content of posts, user settings and other quality of life features.
+2. Email verification, forget/change password
+3. bookmark feature to personalise your campus experience: People can bookmark their frequently visited locations based on their schedules. Users may bookmark rooms or certain posts.
+4. Improve content of posts, user settings and other quality of life features.
 Instead of just posting information about a room, users may add “Directions” info where they specify a starting point and they may write a navigation/procedure to go to certain rooms from the starting point using landmarks and photos. We’re planning to go for this design since there are many possible ways to go to a specific room with many possible starting points. Users may be able to search for a starting point and if directions to the room have been uploaded by other users, they may easily navigate to their desired destination.
 ### Tech Stack
 1. React Native (FrontEnd)
