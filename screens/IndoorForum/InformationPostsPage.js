@@ -57,6 +57,7 @@ export default function InformationPostsPage({ route }) {
     async function updateVote(postId, initialVoteValue, updatedVoteValue) {
         const token = await AsyncStorage.getItem('token');
         const url = `http://10.0.2.2:3000/rooms/${roomId}/posts/${postId}/vote`;
+        console.log(`roomId: ${roomId} , postId: ${postId}`); // delete this entire line later
 
         try {
             const response = await axios.put(url, 

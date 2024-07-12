@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const usersRouter = require('./routes/users');
 const roomRouter = require('./routes/room');
 const bookmarkRouter = require('./routes/bookmark');
-
+const reportRouter = require('./routes/report');
 const userPagesRouter = require('./routes/userPages');
 
 const PORT = 3000;
@@ -20,6 +20,7 @@ app.use(express.json({ limit: '100mb' }));
 app.use(usersRouter);
 app.use('/rooms', roomRouter);
 app.use('/bookmark', bookmarkRouter);
+app.use('/report', reportRouter);
 app.use(
   '/:userId',
   (req, res, next) => {
