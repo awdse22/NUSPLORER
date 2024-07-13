@@ -28,29 +28,30 @@ export default function InformationPostsPage({ route }) {
         ])
     };
 
-    useFocusEffect(React.useCallback(() => {
-        const fetchPosts = async () => {
-            const token = await AsyncStorage.getItem('token');
-            // const url = `https://nusplorer.onrender.com/rooms/${roomId}/posts?page=${pageNumber}&pageSize=10&keyword=${query}`;
-            const url = `http://10.0.2.2:3000/rooms/${roomId}/posts?page=${pageNumber}&pageSize=10&keyword=${query}`;
-
-            axios.get(url, { 
-                headers: {
-                    'Authorization': token ? `Bearer ${token}` : null
-                }
-            }).then((response) => {
-                setTotalPages(response.data.numberOfPages);
-                setPosts(response.data.postsWithUserVoteInfo);
-            }).catch((error) => {
-                const errorStatus = error.response.status;
-                if (errorStatus == 401 || errorStatus == 403) {
-                    logout(error.response.data.message);
-                } else {
-                    console.error('Error fetching data: ', error.message);
-                }
-            })
-        }
+    async function fetchPosts() {
+        const token = await AsyncStorage.getItem('token');
+        // const url = `https://nusplorer.onrender.com/rooms/${roomId}/posts?page=${pageNumber}&pageSize=10&keyword=${query}`;
+        const url = `http://10.0.2.2:3000/rooms/${roomId}/posts?page=${pageNumber}&pageSize=10&keyword=${query}`;
         console.log(`Fetching posts data for ${roomCode} on page ${pageNumber}`);
+
+        axios.get(url, { 
+            headers: {
+                'Authorization': token ? `Bearer ${token}` : null
+            }
+        }).then((response) => {
+            setTotalPages(response.data.numberOfPages);
+            setPosts(response.data.postsWithUserVoteInfo);
+        }).catch((error) => {
+            const errorStatus = error.response.status;
+            if (errorStatus == 401 || errorStatus == 403) {
+                logout(error.response.data.message);
+            } else {
+                console.error('Error fetching data: ', error.message);
+            }
+        })
+    }
+
+    useFocusEffect(React.useCallback(() => {
         fetchPosts();
     }, [pageNumber]));
 
@@ -93,7 +94,14 @@ export default function InformationPostsPage({ route }) {
                 </Text>
             )}
             <ScrollView>
-                {posts.map((post) => <InfoPost key={post._id} postDetails={post} voteUpdater={updateVote} />)}
+                {posts.map((post) => (
+                    <InfoPost 
+                        key={post._id} 
+                        postDetails={post} 
+                        voteUpdater={updateVote}
+                        refreshPage={fetchPosts} 
+                    />
+                ))}
             </ScrollView>
         </SafeAreaView>
     )
