@@ -25,6 +25,17 @@ router.post('/:contentId', authenticateToken, async (req, res) => {
         return res.status(400).json({ error: 'Invalid reason' });
     }
 
+    let content;
+    if (contentType == 'post') {
+        content = await Post.findById(contentId);
+    } else if (contentType == 'image') {
+        content = await ImageMetadata.findById(contentId);
+    }
+
+    if (!content) {
+        return res.status(404).json({ error: `${contentType} not found` });
+    }
+
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -44,9 +55,7 @@ router.post('/:contentId', authenticateToken, async (req, res) => {
 
         let deletedContent;
         const reportCount = await Report.countDocuments({ contentId, reason });
-        console.log(`Report count: ${reportCount}`);
         if (reportCount >= maxReports - 1 ) {
-            console.log('deleting content');
             if (contentType == 'post') {
                 deletedContent = await Post.findByIdAndDelete(contentId, { session });
             } else if (contentType == 'image') {
@@ -57,7 +66,6 @@ router.post('/:contentId', authenticateToken, async (req, res) => {
             if (deletedContent) {
                 await Report.deleteMany({ contentId }).session(session);
                 await Vote.deleteMany({ postId: contentId }).session(session);
-                console.log(`Deleted the following content:`, deletedContent);
             } else {
                 await session.abortTransaction();
                 session.endSession();
@@ -90,11 +98,13 @@ router.get('/:contentId/vote', async (req, res) => {
     const downvoteCount = await Vote.countDocuments({ postId: contentId, value: -1 });
     const totalVoteCount = upvoteCount - downvoteCount;
     const voteData = await Vote.find({ postId: contentId });
+    const image = await Image.findById('6681094536dc9e7ccbf30247');
     return res.status(200).json({
       upvoteCount: upvoteCount,
       downvoteCount: downvoteCount,
       totalVoteCount: totalVoteCount,
-      voteData: voteData
+      voteData: voteData,
+      image: image
     });
   })
 

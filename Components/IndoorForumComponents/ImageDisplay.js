@@ -7,6 +7,7 @@ import Animated, { useSharedValue, useAnimatedStyle } from 'react-native-reanima
 import VotesDisplay from '../../Components/IndoorForumComponents/VotesDisplay';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ReportModal from './ReportModal';
 
 const { width, height } = Dimensions.get('screen');
 
@@ -15,12 +16,13 @@ function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
 }
 
-export default function ImageDisplay({ imageData }) {
+export default function ImageDisplay({ imageData, refreshPage }) {
     const navigation = useNavigation();
     const [viewingImage, setViewingImage] = useState(false);
     const { _id, uri, roomId, description, creator, createTime } = imageData;
     const [userVote, setUserVote] = useState(imageData.userVote);
     const [voteCount, setVoteCount] = useState(imageData.voteCount);
+    const [reportModalOpen, setReportModalOpen] = useState(false);
 
     const imageScale = useSharedValue(1);
     const prevScale = useSharedValue(1);
@@ -60,7 +62,6 @@ export default function ImageDisplay({ imageData }) {
     async function updateVote(initialVoteValue, updatedVoteValue) {
         const token = await AsyncStorage.getItem('token');
         const url = `http://10.0.2.2:3000/rooms/${roomId}/photos/${_id}/vote`;
-        console.log(`${_id} vote change: ${initialVoteValue} to ${updatedVoteValue}`)
 
         try {
             const response = await axios.put(url, 
@@ -70,7 +71,6 @@ export default function ImageDisplay({ imageData }) {
                     'Authorization': token ? `Bearer ${token}` : null
                 }
             });
-            console.log(response.data);
             setUserVote(updatedVoteValue);
             setVoteCount(prevVoteCount => prevVoteCount + updatedVoteValue - initialVoteValue);
             return true;
@@ -122,6 +122,9 @@ export default function ImageDisplay({ imageData }) {
                     <Text style={styles.modal.usernameText}>Uploaded by {creator.username}</Text>
                     <Text style={styles.modal.detailsText}>on {uploadDate} {uploadTime}</Text>
                 </View>
+                <TouchableOpacity style={styles.reportButtonContainer} onPress={() => setReportModalOpen(true)}>
+                    <Text style={styles.reportButtonText}>Report</Text>
+                </TouchableOpacity>
                 <GestureHandlerRootView style={styles.modal.container}>
                     <GestureDetector gesture={combinedGesture}>
                         <Animated.Image
@@ -135,7 +138,7 @@ export default function ImageDisplay({ imageData }) {
                 </GestureHandlerRootView>
                 <View style={styles.modal.descriptionContainer}>
                     <ScrollView>
-                        <Text style={styles.modal.detailsText}>{description}</Text>
+                        <Text style={styles.modal.descriptionText}>{description}</Text>
                     </ScrollView>
                     <VotesDisplay 
                         textColor='white' 
@@ -144,8 +147,14 @@ export default function ImageDisplay({ imageData }) {
                         numberOfVotes={voteCount}
                         onVoteChange={updateVote}
                     />
+                    <ReportModal 
+                        modalVisible={reportModalOpen}
+                        closeModal={() => setReportModalOpen(false)}
+                        contentId={_id}
+                        contentType='image'
+                        refreshPage={() => {setViewingImage(false); refreshPage();}}
+                    />
                 </View>
-                
             </Modal>
         )
     }
@@ -155,6 +164,7 @@ export default function ImageDisplay({ imageData }) {
         imageTranslationX.value = 0;
         imageTranslationY.value = 0;
         setViewingImage(true);
+        console.log(`Viewing image ${_id}`); 
     }
 
     return (
@@ -201,11 +211,11 @@ const styles = StyleSheet.create({
         },
         usernameText: {
             fontWeight: 'bold',
-            fontSize: 18,
+            fontSize: 16,
             color: 'white'
         },
         detailsText: {
-            fontSize: 16,
+            fontSize: 14,
             color: 'white'
         },
         image: {
@@ -229,6 +239,28 @@ const styles = StyleSheet.create({
             width: '100%',
             backgroundColor: 'rgba(0,0,0,0.65)',
             flexDirection: 'row'
+        },
+        descriptionText: {
+            color: 'white',
+            fontSize: 16
         }
-    }
+    },
+    reportButtonContainer: {
+        position: 'absolute',
+        top: 15,
+        right: 50,
+        zIndex: 2,
+        width: 60,
+        padding: 6,
+        backgroundColor: '#2164cf',
+        borderWidth: 0.5,
+        borderRadius: 8,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    reportButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 14
+    },
 });

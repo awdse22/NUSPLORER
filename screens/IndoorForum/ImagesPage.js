@@ -19,25 +19,26 @@ export default function ImagesPage({ route }) {
     const { roomId, roomCode, dataType } = route.params;
     const [images, setImages] = useState([]);
 
+    const fetchImages = async () => {
+        const token = await AsyncStorage.getItem('token');
+        // const url = `https://nusplorer.onrender.com/rooms/${roomId}/photos?dataType=${dataType}`;
+        const url = `http://10.0.2.2:3000/rooms/${roomId}/photos?dataType=${dataType}`;
+        console.log(`Fetching ${dataType} of room ${roomCode}`);
+
+        axios.get(url, { 
+            headers: {
+                'Authorization': token ? `Bearer ${token}` : null
+            }
+        }).then((response) => {
+            setImages(response.data);
+        }).catch((error) => {
+            const errorStatus = error.response.status;
+            console.error('Error fetching data: ', error.message);
+        })
+    }
+
     useFocusEffect(
         React.useCallback(() => {
-            const fetchImages = async () => {
-                const token = await AsyncStorage.getItem('token');
-                // const url = `https://nusplorer.onrender.com/rooms/${roomId}/photos?dataType=${dataType}`;
-                const url = `http://10.0.2.2:3000/rooms/${roomId}/photos?dataType=${dataType}`;
-
-                axios.get(url, { 
-                    headers: {
-                        'Authorization': token ? `Bearer ${token}` : null
-                    }
-                }).then((response) => {
-                    setImages(response.data);
-                }).catch((error) => {
-                    const errorStatus = error.response.status;
-                    console.error('Error fetching data: ', error.message);
-                })
-            }
-            console.log(`Fetching ${dataType} of room ${roomCode}`);
             fetchImages();
         }, [])
     );
@@ -77,7 +78,7 @@ export default function ImagesPage({ route }) {
                             roomId: roomId,
                             ...image
                         };
-                        return <ImageDisplay imageData={imageData} key={image.imageId._id} />;
+                        return <ImageDisplay imageData={imageData} key={image.imageId._id} refreshPage={fetchImages} />;
                     })}
                 </View>
             </ScrollView>
