@@ -40,7 +40,7 @@ export default function IndoorRoomSearch() {
   useFocusEffect(
     React.useCallback(() => {
       fetchRooms();
-    }, []),
+    }, [query, pageNumber]),
   );
 
   return (
