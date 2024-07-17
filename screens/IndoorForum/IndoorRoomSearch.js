@@ -45,7 +45,13 @@ export default function IndoorRoomSearch() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <IndoorSearchBar label="Search rooms" onChange={setQuery} />
+      <IndoorSearchBar 
+        label="Search rooms" 
+        onChange={val => {
+          setPageNumber(1);
+          setQuery(val);
+        }} 
+      />
       <View style={styles.createRoomContainer}>
         <AddDataButton
           label="Create new room data"
