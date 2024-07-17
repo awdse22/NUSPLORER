@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, Alert, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, Alert, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -25,11 +25,13 @@ export default function ReportModal({
     const [reason, setReason] = useState(null);
     const [errorVisible, setErrorVisible] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [sendingReport, setSendingReport] = useState(false);
     
     async function report() {
         const token = await AsyncStorage.getItem('token');
         const url = `http://10.0.2.2:3000/report/${contentId}`;
         if (reason) {
+            setSendingReport(true);
             try {
                 const response = await axios.post(url, {
                     contentType: contentType,
@@ -46,6 +48,7 @@ export default function ReportModal({
                 } else {
                     Alert.alert('Report successful', `Your report for this ${contentType} has been made successfully`);
                 }
+                setSendingReport(false);
                 close();
             } catch (error) {
                 const errorStatus = error.response.status;
@@ -60,6 +63,7 @@ export default function ReportModal({
                 } else {
                     console.error(error);
                 }
+                setSendingReport(false);
             }
             
             
@@ -84,44 +88,53 @@ export default function ReportModal({
                             Report {contentType}
                         </Text>
                     </View>
-                        <Dropdown 
-                            style={styles.dropdown.container}
-                            placeholder='Select reason'
-                            labelField='label'
-                            valueField='value'
-                            data={reportReasons}
-                            onChange={item => setReason(item.value)}
-                            maxHeight={300}
-                            renderItem={item => {
-                                return (
-                                    <View style={styles.dropdown.itemContainer}>
-                                        <Text style={styles.dropdown.itemText}>
-                                            {item.label}
-                                        </Text>
-                                        {item.value == reason && (
-                                            <AntDesign 
-                                                name="check" 
-                                                size={22} 
-                                                color="black" 
-                                            />
-                                        )}
-                                    </View>
-                                )
-                            }}
+                    <Dropdown 
+                        style={styles.dropdown.container}
+                        placeholder='Select reason'
+                        labelField='label'
+                        valueField='value'
+                        data={reportReasons}
+                        onChange={item => setReason(item.value)}
+                        maxHeight={300}
+                        renderItem={item => {
+                            return (
+                                <View style={styles.dropdown.itemContainer}>
+                                    <Text style={styles.dropdown.itemText}>
+                                        {item.label}
+                                    </Text>
+                                    {item.value == reason && (
+                                        <AntDesign 
+                                            name="check" 
+                                            size={22} 
+                                            color="black" 
+                                        />
+                                    )}
+                                </View>
+                            )
+                        }}
+                    />
+                    {errorVisible && (
+                        <Text style={{ color: 'red', fontSize: 16, fontWeight: 'bold'}}>
+                            {errorMessage}
+                        </Text>
+                    )}
+                    {sendingReport ? (
+                        <ActivityIndicator 
+                            animating={true} 
+                            size='large' 
+                            color='#003db8'
+                            style={{ padding: 22 }} 
                         />
-                        {errorVisible && (
-                            <Text style={{ color: 'red', fontSize: 16, fontWeight: 'bold'}}>
-                                {errorMessage}
-                            </Text>
-                        )}
-                    <View style={styles.subContainer}>
-                        <TouchableOpacity style={styles.buttonContainer} onPress={report}>
-                            <Text style={styles.buttonText}>Report</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.buttonContainer} onPress={close}>
-                            <Text style={styles.buttonText}>Cancel</Text>
-                        </TouchableOpacity>
-                    </View>
+                    ) : (
+                        <View style={styles.subContainer}>
+                            <TouchableOpacity style={styles.buttonContainer} onPress={report}>
+                                <Text style={styles.buttonText}>Report</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.buttonContainer} onPress={close}>
+                                <Text style={styles.buttonText}>Cancel</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
                 </View>
             </View>
         </Modal>

@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
 import UserInput from '../../Components/UserInput';
 import UserSubmitButton from '../../Components/UserSubmitButton';
 import { useForm } from 'react-hook-form';
@@ -11,12 +11,14 @@ export default function CreatePost({ route }) {
     const navigation = useNavigation();
     const { roomId } = route.params;
     const {control, handleSubmit, formState: {errors}} = useForm();
+    const [loading, setLoading] = useState(false);
 
     async function createPost(post) {
         console.log(post);
         const token = await AsyncStorage.getItem('token');
         // const url = `https://nusplorer.onrender.com/rooms/${roomId}/posts`;
         const url = `http://10.0.2.2:3000/rooms/${roomId}/posts`;
+        setLoading(true);
         
         axios.post(url, post, { 
             headers: {
@@ -24,6 +26,7 @@ export default function CreatePost({ route }) {
             }
         }).then((response) => {
             console.log('Post created');
+            setLoading(false);
             navigation.goBack();
         }).catch((error) => {
             const errorStatus = error.response.status;
@@ -34,6 +37,7 @@ export default function CreatePost({ route }) {
                 Alert.alert("An error occurred while creating post");
                 console.log("Error creating post: ", errorMessage);
             }
+            setLoading(false);
         })
     }
 
@@ -68,7 +72,8 @@ export default function CreatePost({ route }) {
                         }
                     }} 
                 />
-                <UserSubmitButton buttonName='Create' onPress={handleSubmit(createPost)} />
+                {loading ? <ActivityIndicator animating={true} size='large' color='#003db8' /> 
+                : <UserSubmitButton buttonName='Post' onPress={handleSubmit(createPost)} />}
             </ScrollView>
         </View>
     )

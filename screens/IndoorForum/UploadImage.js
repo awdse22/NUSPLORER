@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, ScrollView, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import UserInput from '../../Components/UserInput';
 import UserSubmitButton from '../../Components/UserSubmitButton';
 import { useForm } from 'react-hook-form';
@@ -11,6 +11,7 @@ export default function UploadImage({ route }) {
     const navigation = useNavigation();
     const { roomId, dataType } = route.params;
     const {control, handleSubmit, formState: {errors} } = useForm();
+    const [loading, setLoading] = useState(false);
 
     async function uploadImage(userResponse) {
         const data = {
@@ -21,6 +22,7 @@ export default function UploadImage({ route }) {
         const token = await AsyncStorage.getItem('token');
         // const url = `https://nusplorer.onrender.com/rooms/${roomId}/photos`;
         const url = `http://10.0.2.2:3000/rooms/${roomId}/photos`;
+        setLoading(true);
 
         axios.post(url, data , { 
             headers: {
@@ -28,6 +30,7 @@ export default function UploadImage({ route }) {
             }
         }).then((response) => {
             console.log('Image uploaded');
+            setLoading(false);
             navigation.goBack();
         }).catch((error) => {
             const errorStatus = error.response.status;
@@ -38,6 +41,7 @@ export default function UploadImage({ route }) {
                 Alert.alert("Failed to upload image");
                 console.log("Error uploading image: ", errorMessage);
             }
+            setLoading(false);
         })
     }
 
@@ -67,7 +71,8 @@ export default function UploadImage({ route }) {
                         }
                     }} 
                 />
-                <UserSubmitButton buttonName='Upload' onPress={handleSubmit(uploadImage)} />
+                {loading ? <ActivityIndicator animating={true} size='large' color='#003db8' /> 
+                : <UserSubmitButton buttonName='Post' onPress={handleSubmit(uploadImage)} />}
             </ScrollView>
         </View>
     )

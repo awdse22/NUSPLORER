@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, ScrollView, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import UserInput from '../../Components/UserInput';
 import UserSubmitButton from '../../Components/UserSubmitButton';
 import { useForm } from 'react-hook-form';
@@ -10,14 +10,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function CreateRoomData() {
     const navigation = useNavigation();
     const {control, handleSubmit, formState: {errors}} = useForm();
-    const [errorMessageVisible, setErrorMessageVisible] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
+    const [loading, setLoading] = useState(false);
 
     async function createRoom(info) {
         console.log(info);
         const token = await AsyncStorage.getItem('token');
         // const url = `https://nusplorer.onrender.com/rooms`;
         const url = `http://10.0.2.2:3000/rooms`;
+        setLoading(true);
 
         axios.post(url, info, { 
             headers: {
@@ -25,10 +25,12 @@ export default function CreateRoomData() {
             }
         }).then((response) => {
             console.log('Room data creation success');
+            setLoading(false);
             navigation.goBack();
         }).catch((error) => {
             const errorStatus = error.response.status;
             const errorMessage = error.response.data.error;
+            setLoading(false);
             if (errorStatus == 400) {
                 Alert.alert(errorMessage);
             } else if (errorStatus == 500) {
@@ -45,7 +47,7 @@ export default function CreateRoomData() {
                     type='data'
                     label='Room Code' 
                     fieldName='roomCode'
-                    info='e.g. LT17, COM1-0201'
+                    info='e.g. LT17, COM1-02-01'
                     control={control}
                     rules={{ 
                         required: 'Please enter the room code',
@@ -93,7 +95,8 @@ export default function CreateRoomData() {
                             message: 'Room name should be at least 3 characters long'
                         }
                     }} />
-                <UserSubmitButton buttonName='Create' onPress={handleSubmit(createRoom)} />
+                {loading ? <ActivityIndicator animating={true} size='large' color='#003db8' /> 
+                    : <UserSubmitButton buttonName='Create' onPress={handleSubmit(createRoom)} />}
             </View>
         </ScrollView>
     )

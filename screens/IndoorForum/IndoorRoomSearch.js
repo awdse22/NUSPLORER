@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, View, Text, ScrollView, StyleSheet } from 'react-native';
+import { SafeAreaView, View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,12 +14,14 @@ export default function IndoorRoomSearch() {
   const [roomList, setRoomList] = useState([]);
   const [query, setQuery] = useState('');
   const [pageNumber, setPageNumber] = useState(1);
-  const [totalPages, setTotalPages] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
 
   const fetchRooms = async () => {
     // const url = `https://nusplorer.onrender.com/rooms?page=${pageNumber}&pageSize=10&keyword=${query}`;
     const url = `http://10.0.2.2:3000/rooms?page=${pageNumber}&pageSize=10&keyword=${query}`;
     const token = await AsyncStorage.getItem('token');
+    setLoading(true);
 
     axios
       .get(url, {
@@ -30,10 +32,12 @@ export default function IndoorRoomSearch() {
       .then((response) => {
         setTotalPages(response.data.numberOfPages);
         setRoomList(response.data.list);
+        setLoading(false);
       })
       .catch((error) => {
         const errorStatus = error.response.status;
         console.log('Error fetching data: ', error.message);
+        setLoading(false);
       });
   };
 
@@ -59,19 +63,29 @@ export default function IndoorRoomSearch() {
         />
       </View>
       <PageSelector totalPages={totalPages} pageNumber={pageNumber} onPageChange={setPageNumber} />
-      {roomList.length == 0 && (
-        <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: 'bold' }}>No data found</Text>
-      )}
       <ScrollView>
-        <View style={styles.roomDisplayWrapper}>
-          {roomList.map((room) => (
-            <RoomDisplay 
-              key={room._id} 
-              roomData={room} 
-              onBookmarkedChange={fetchRooms}
-            />
-          ))}
+      {loading ? (
+        <ActivityIndicator 
+          animating={true}
+          size='large'
+          color='#003db8'
+        />
+      ) : (
+        <View>
+          {roomList.length == 0 && (
+          <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: 'bold' }}>No data found</Text>
+          )}
+          <View style={styles.roomDisplayWrapper}>
+            {roomList.map((room) => (
+              <RoomDisplay 
+                key={room._id} 
+                roomData={room} 
+                onBookmarkedChange={fetchRooms}
+              />
+            ))}
+          </View>
         </View>
+      )}
       </ScrollView>
     </SafeAreaView>
   );

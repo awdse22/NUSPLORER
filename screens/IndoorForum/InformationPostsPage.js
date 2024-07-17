@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, ScrollView, View, Text, Alert } from 'react-native';
+import { SafeAreaView, StyleSheet, ScrollView, View, Text, Alert, ActivityIndicator } from 'react-native';
 import InfoPost from '../../Components/IndoorForumComponents/InfoPost';
 import PageSelector from '../../Components/IndoorForumComponents/PageSelector';
 import AddDataButton from '../../Components/IndoorForumComponents/AddDataButton';
@@ -13,7 +13,8 @@ export default function InformationPostsPage({ route }) {
     const [posts, setPosts] = useState([]);
     const [query, setQuery] = useState(''); // search query, not implemented
     const [pageNumber, setPageNumber] = useState(1);
-    const [totalPages, setTotalPages] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+    const [loadingPosts, setLoadingPosts] = useState(false);
 
     function logout(errorMessage) {
         Alert.alert(errorMessage, 'Please login again!', [
@@ -32,6 +33,7 @@ export default function InformationPostsPage({ route }) {
         const token = await AsyncStorage.getItem('token');
         // const url = `https://nusplorer.onrender.com/rooms/${roomId}/posts?page=${pageNumber}&pageSize=10&keyword=${query}`;
         const url = `http://10.0.2.2:3000/rooms/${roomId}/posts?page=${pageNumber}&pageSize=10&keyword=${query}`;
+        setLoadingPosts(true);
         console.log(`Fetching posts data for ${roomCode} on page ${pageNumber}`);
 
         axios.get(url, { 
@@ -41,6 +43,7 @@ export default function InformationPostsPage({ route }) {
         }).then((response) => {
             setTotalPages(response.data.numberOfPages);
             setPosts(response.data.postsWithUserVoteInfo);
+            setLoadingPosts(false);
         }).catch((error) => {
             const errorStatus = error.response.status;
             if (errorStatus == 401 || errorStatus == 403) {
@@ -48,6 +51,7 @@ export default function InformationPostsPage({ route }) {
             } else {
                 console.error('Error fetching data: ', error.message);
             }
+            setLoadingPosts(false);
         })
     }
 
@@ -87,21 +91,31 @@ export default function InformationPostsPage({ route }) {
             <View style={styles.createPostContainer}>
                 <AddDataButton label='Create post' onPress={() => navigation.navigate('Create Post', { roomId: roomId })} />
             </View>
-            <PageSelector totalPages={totalPages} pageNumber={pageNumber} onPageChange={setPageNumber} />   
-            {posts.length == 0 && (
-                <Text style={styles.noInformation}>
-                    There are no posts of any information currently
-                </Text>
-            )}
+            <PageSelector totalPages={totalPages} pageNumber={pageNumber} onPageChange={setPageNumber} />
             <ScrollView>
-                {posts.map((post) => (
-                    <InfoPost 
-                        key={post._id} 
-                        postDetails={post} 
-                        voteUpdater={updateVote}
-                        refreshPage={fetchPosts} 
+                {loadingPosts ? (
+                    <ActivityIndicator 
+                        animating={true}
+                        size='large'
+                        color='#003db8'
                     />
-                ))}
+                ) : (
+                    <View>
+                        {posts.length == 0 && (
+                            <Text style={styles.noInformation}>
+                                There are no posts of any information currently
+                            </Text>
+                        )}
+                        {posts.map((post) => (
+                            <InfoPost 
+                                key={post._id} 
+                                postDetails={post} 
+                                voteUpdater={updateVote}
+                                refreshPage={fetchPosts} 
+                            />
+                        ))}
+                    </View>
+                )}
             </ScrollView>
         </SafeAreaView>
     )

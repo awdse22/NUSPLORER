@@ -5,7 +5,8 @@ import {
     View, 
     Text, 
     ScrollView, 
-    Alert
+    Alert,
+    ActivityIndicator
 } from 'react-native';
 import AddDataButton from '../../Components/IndoorForumComponents/AddDataButton';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -18,11 +19,13 @@ export default function ImagesPage({ route }) {
     // dataType here is either "Entrance Photos" or "Floor Plans/Maps"
     const { roomId, roomCode, dataType } = route.params;
     const [images, setImages] = useState([]);
+    const [loadingImages, setLoadingImages] = useState(false);
 
     const fetchImages = async () => {
         const token = await AsyncStorage.getItem('token');
         // const url = `https://nusplorer.onrender.com/rooms/${roomId}/photos?dataType=${dataType}`;
         const url = `http://10.0.2.2:3000/rooms/${roomId}/photos?dataType=${dataType}`;
+        setLoadingImages(true);
         console.log(`Fetching ${dataType} of room ${roomCode}`);
 
         axios.get(url, { 
@@ -31,9 +34,11 @@ export default function ImagesPage({ route }) {
             }
         }).then((response) => {
             setImages(response.data);
+            setLoadingImages(false);
         }).catch((error) => {
             const errorStatus = error.response.status;
             console.error('Error fetching data: ', error.message);
+            setLoadingImages(false);
         })
     }
 
@@ -66,21 +71,29 @@ export default function ImagesPage({ route }) {
                 />
             </View>
             <ScrollView>
-                <View style={styles.imageDisplayWrapper}>
-                    {images.length == 0 && (
-                        <Text style={styles.noInformation}>
-                            There are no images of {dataType}
-                        </Text>
-                    )}
-                    {images.map((image) => {
-                        const imageData = {
-                            uri: `data:image/${image.imageId.imageType};base64,${image.imageId.data}`,
-                            roomId: roomId,
-                            ...image
-                        };
-                        return <ImageDisplay imageData={imageData} key={image.imageId._id} refreshPage={fetchImages} />;
-                    })}
-                </View>
+                {loadingImages ? (
+                    <ActivityIndicator 
+                        animating={true}
+                        size='large'
+                        color='#003db8'
+                    />
+                ) : (
+                    <View style={styles.imageDisplayWrapper}>
+                        {images.length == 0 && (
+                            <Text style={styles.noInformation}>
+                                There are currently no uploaded images
+                            </Text>
+                        )}
+                        {images.map((image) => {
+                            const imageData = {
+                                uri: `data:image/${image.imageId.imageType};base64,${image.imageId.data}`,
+                                roomId: roomId,
+                                ...image
+                            };
+                            return <ImageDisplay imageData={imageData} key={image.imageId._id} refreshPage={fetchImages} />;
+                        })}
+                    </View>
+                )}
             </ScrollView>
         </SafeAreaView>
     )
@@ -107,5 +120,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'center',
+    },
+    noInformation: {
+        textAlign: 'center', 
+        fontSize: 16, 
+        fontWeight: 'bold',
+        margin: 10,
     }
 })
