@@ -40,7 +40,7 @@ export default function ReportModal({
                     }
                 })
                 
-                if (response.data.deletedContent) {
+                if (response.data.contentDeleted) {
                     Alert.alert('Report successful', `Due to a large amount of reports, the ${contentType} has been removed`);
                     refreshPage();
                 } else {
@@ -53,7 +53,7 @@ export default function ReportModal({
                 if (errorStatus == 400) {
                     Alert.alert(errorMessage);
                 } else if (errorStatus == 404) {
-                    Alert.alert(`The ${contentType} is not found or may have been deleted`);
+                    Alert.alert(errorMessage, `The ${contentType} is not found or may have been deleted`);
                 } else if (errorStatus == 500) {
                     Alert.alert("An error occurred while making a report");
                     console.log(`Error making report: `, errorMessage);

@@ -59,7 +59,11 @@ export default function IndoorRoomSearch() {
       <ScrollView>
         <View style={styles.roomDisplayWrapper}>
           {roomList.map((room) => (
-            <RoomDisplay key={room._id} roomData={room} onBookmarkedChange={fetchRooms} />
+            <RoomDisplay 
+              key={room._id} 
+              roomData={room} 
+              onBookmarkedChange={fetchRooms}
+            />
           ))}
         </View>
       </ScrollView>

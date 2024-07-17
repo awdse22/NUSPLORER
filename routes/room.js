@@ -5,6 +5,7 @@ const Room = require('../models/room');
 const Bookmark = require('../models/bookmark');
 const postRouter = require('./post');
 const photoRouter = require('./photo');
+const mongoose = require('mongoose');
 
 router.use(
   '/:roomId/posts',
@@ -137,5 +138,18 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+router.get('/:id', authenticateToken, async (req,res) => {
+  const { id } = req.params;
+  const postsData = await mongoose.model('Post').find({ roomId: id });
+  const imagesData = await mongoose.model('ImageMetadata').find({ roomId: id });
+  const reportsData = await mongoose.model('Report').find({ contentId: id, contentType: 'room' });
+  return res.status(200).json({
+    roomId: id,
+    postsData: postsData,
+    imagesData: imagesData,
+    reportsData: reportsData
+  })
+})
 
 module.exports = router;

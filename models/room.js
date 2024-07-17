@@ -42,6 +42,26 @@ const roomSchema = new Schema({
   },
 });
 
+roomSchema.statics.deleteRoomWithData = async function(roomId, session) {
+  let room;
+  try {
+    room = await this.find({ _id: roomId }).session(session);
+  } catch (error) {
+    throw new Error('Error finding room: ' + error.message);
+  }
+
+  if (room) {
+    await mongoose.model('ImageMetadata').deleteByRoomId(roomId, session);
+    await mongoose.model('Post').deleteByRoomId(roomId, session);
+    await mongoose.model('Report').deleteMany({ contentId: roomId }).session(session);
+    try {
+      await this.findByIdAndDelete(roomId).session(session);
+    } catch (error) {
+      throw new Error('Error deleting room: ' + error.message);
+    }
+  }
+}
+
 const Room = model('Room', roomSchema);
 
 module.exports = Room;
