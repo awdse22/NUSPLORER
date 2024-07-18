@@ -7,6 +7,8 @@ import Animated, { useSharedValue, useAnimatedStyle } from 'react-native-reanima
 import VotesDisplay from '../../Components/IndoorForumComponents/VotesDisplay';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
+import OptionsModal from './OptionsModal';
 import ReportModal from './ReportModal';
 
 const { width, height } = Dimensions.get('screen');
@@ -22,6 +24,7 @@ export default function ImageDisplay({ imageData, refreshPage }) {
     const { _id, uri, roomId, description, creator, createTime } = imageData;
     const [userVote, setUserVote] = useState(imageData.userVote);
     const [voteCount, setVoteCount] = useState(imageData.voteCount);
+    const [optionsModalOpen, setOptionsModalOpen] = useState(false);
     const [reportModalOpen, setReportModalOpen] = useState(false);
 
     const imageScale = useSharedValue(1);
@@ -109,6 +112,11 @@ export default function ImageDisplay({ imageData, refreshPage }) {
         ])
     };
 
+    function makeReport() {
+        setOptionsModalOpen(false);
+        setReportModalOpen(true);
+    }
+
     function renderModal() {
         if (!imageData) return null;
 
@@ -122,8 +130,8 @@ export default function ImageDisplay({ imageData, refreshPage }) {
                     <Text style={styles.modal.usernameText}>Uploaded by {creator.username}</Text>
                     <Text style={styles.modal.detailsText}>on {uploadDate} {uploadTime}</Text>
                 </View>
-                <TouchableOpacity style={styles.reportButtonContainer} onPress={() => setReportModalOpen(true)}>
-                    <Text style={styles.reportButtonText}>Report</Text>
+                <TouchableOpacity style={styles.modal.optionsButton} onPress={() => setOptionsModalOpen(true)}>
+                            <Ionicons name="ellipsis-vertical" size={30} color="white" />
                 </TouchableOpacity>
                 <GestureHandlerRootView style={styles.modal.container}>
                     <GestureDetector gesture={combinedGesture}>
@@ -146,6 +154,11 @@ export default function ImageDisplay({ imageData, refreshPage }) {
                         voteValue={userVote} 
                         numberOfVotes={voteCount}
                         onVoteChange={updateVote}
+                    />
+                    <OptionsModal 
+                        modalVisible={optionsModalOpen}
+                        closeModal={() => setOptionsModalOpen(false)}
+                        makeReport={makeReport}
                     />
                     <ReportModal 
                         modalVisible={reportModalOpen}
@@ -198,6 +211,12 @@ const styles = StyleSheet.create({
             justifyContent: "center",
             alignItems: "center",
         },
+        optionsButton: {
+            position: 'absolute',
+            top: 16,
+            right: 48,
+            zIndex: 2,
+        },
         detailsContainer: {
             position: 'absolute',
             top: 0,
@@ -244,23 +263,5 @@ const styles = StyleSheet.create({
             color: 'white',
             fontSize: 16
         }
-    },
-    reportButtonContainer: {
-        position: 'absolute',
-        top: 15,
-        right: 50,
-        zIndex: 2,
-        width: 60,
-        padding: 6,
-        backgroundColor: '#2164cf',
-        borderWidth: 0.5,
-        borderRadius: 8,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    reportButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: 14
     },
 });

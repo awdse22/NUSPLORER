@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Modal } from 'react-native';
-import VotesDisplay from './VotesDisplay';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import VotesDisplay from './VotesDisplay';
+import OptionsModal from './OptionsModal';
 import ReportModal from './ReportModal';
 
 export default function InfoPost({ postDetails, voteUpdater, refreshPage }) {
-    const [modalOpen, setModalOpen] = useState(false);
+    const [optionsModalOpen, setOptionsModalOpen] = useState(false);
     const [reportModalOpen, setReportModalOpen] = useState(false);
 
     const postCreatedAt = new Date(postDetails.createTime).toLocaleDateString();
@@ -18,35 +19,8 @@ export default function InfoPost({ postDetails, voteUpdater, refreshPage }) {
     }
 
     function makeReport() {
-        setModalOpen(false);
+        setOptionsModalOpen(false);
         setReportModalOpen(true);
-    }
-
-    function renderModal() {
-        return (
-            <Modal visible={modalOpen} animationType='fade' transparent={true}>
-                <View style={styles.modal.container}>
-                    <View style={styles.modal.window}>
-                        <TouchableOpacity 
-                            onPress={makeReport}
-                            style={[styles.modal.button, { borderBottomWidth: 1 }]}
-                        >
-                            <Text style={[styles.modal.buttonText, { color: 'red' }]}>
-                                Report post
-                            </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity 
-                            onPress={() => setModalOpen(false)}
-                            style={styles.modal.button}
-                        >
-                            <Text style={styles.modal.buttonText}>
-                                Cancel
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
-        )
     }
 
     return (
@@ -60,7 +34,7 @@ export default function InfoPost({ postDetails, voteUpdater, refreshPage }) {
                             numberOfVotes={postDetails.voteCount} 
                             onVoteChange={updateVote}
                         />
-                        <TouchableOpacity onPress={() => setModalOpen(true)}>
+                        <TouchableOpacity onPress={() => setOptionsModalOpen(true)}>
                             <Ionicons name="ellipsis-vertical" size={24} color="black" />
                         </TouchableOpacity>
                     </View>
@@ -77,7 +51,11 @@ export default function InfoPost({ postDetails, voteUpdater, refreshPage }) {
                 </View>
             </View>
             <Text style={styles.postContent}>{postDetails.content}</Text>
-            {renderModal()}
+            <OptionsModal 
+                modalVisible={optionsModalOpen}
+                closeModal={() => setOptionsModalOpen(false)}
+                makeReport={makeReport}
+            />
             <ReportModal 
                 modalVisible={reportModalOpen} 
                 closeModal={() => setReportModalOpen(false)}
@@ -128,29 +106,5 @@ const styles=StyleSheet.create({
     postContent: {
         fontSize: 15,
         padding: 10
-    },
-    modal: {
-        container: {
-        backgroundColor: "rgba(0,0,0,0.5)",
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        },
-        window: {
-        backgroundColor: "white",
-        borderRadius: 10,
-        width: "70%",
-        },
-        button: {
-        width: "100%",
-        height: 50,
-        padding: 5,
-        justifyContent: "center",
-        alignItems: "center",
-        borderColor: "grey",
-        },
-        buttonText: {
-        fontSize: 18,
-        },
     },
 })

@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import OptionsModal from '../../Components/IndoorForumComponents/OptionsModal';
 import ReportModal from '../../Components/IndoorForumComponents/ReportModal';
 
 export default function RoomInformation({ route }) {
     const navigation = useNavigation();
     const { _id, roomCode, buildingName, floorNumber, roomName } = route.params;
+    const [optionsModalOpen, setOptionsModalOpen] = useState(false);
     const [reportModalOpen, setReportModalOpen] = useState(false);
 
     const RoomDetail = ({icon, text}) => {
@@ -49,14 +51,24 @@ export default function RoomInformation({ route }) {
         ])
     };
 
+    function makeReport() {
+        setOptionsModalOpen(false);
+        setReportModalOpen(true);
+    }
+
     return (
         <View style={styles.container}>
             <ScrollView>
                 <View style={styles.details.detailsContainer}>
                     <View style={styles.details.titleContainer}>
                         <Text style={styles.details.titleText}> Room Details </Text>
-                        <TouchableOpacity style={styles.reportButtonContainer} onPress={() => setReportModalOpen(true)}>
-                            <Text style={styles.reportButtonText}>Report</Text>
+                        <TouchableOpacity onPress={() => setOptionsModalOpen(true)}>
+                            <Ionicons 
+                                name="ellipsis-vertical" 
+                                size={26} 
+                                color="black" 
+                                style={{ padding: 2, marginBottom: 4 }}
+                                />
                         </TouchableOpacity>
                     </View>
                     <RoomDetail 
@@ -82,6 +94,11 @@ export default function RoomInformation({ route }) {
                     <InfoNavigation label='Info/Directions' page='Information Posts Page' />
                 </View>
             </ScrollView>
+            <OptionsModal 
+                modalVisible={optionsModalOpen}
+                closeModal={() => setOptionsModalOpen(false)}
+                makeReport={makeReport}
+            />
             <ReportModal 
                 modalVisible={reportModalOpen}
                 closeModal={() => setReportModalOpen(false)}
