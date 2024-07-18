@@ -35,7 +35,8 @@ router.get('/', authenticateToken, async (req, res) => {
               then: '$createTime',
               else: '$modifyTime'
             }
-          }
+          },
+          sameUser: { $eq: ['$creator', new mongoose.Types.ObjectId(userId)] }
         }
       },
       {
@@ -133,14 +134,31 @@ router.delete('/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   const { userId } = req.user;
 
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const post = await Post.findOneAndDelete({ _id: id, creator: userId });
+    const post = await Post.findById(id);
     if (!post) {
-      return res.status(404).json({ error: 'Post not found' });
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ error: 'Post is not found or may have been deleted' });
     }
-    res.status(200).json(post);
+
+    if (post.creator == userId) {
+      await Post.deleteByPostId(id, session);
+      await session.commitTransaction();
+      session.endSession();
+    } else {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(403).json({ error: "You're not authorized to deleted this post" })
+    }
+    return res.status(200).json(post);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    await session.abortTransaction();
+    session.endSession();
+    return res.status(500).json({ error: error.message });
   }
 });
 

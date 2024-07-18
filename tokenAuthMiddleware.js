@@ -6,12 +6,12 @@ function authenticateToken(req, res, next) {
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
-        return res.status(401).json({ message: 'Unauthorized request' });
+        return res.status(401).json({ error: 'Unauthorized request' });
     }
 
     jwt.verify(token, process.env.JWT_SECRET, (error, user) => {
         if (error) {
-            return res.status(403).json({ message: 'Forbidden request' });
+            return res.status(403).json({ error: 'Forbidden request' });
         }
         req.user = user;
         next();

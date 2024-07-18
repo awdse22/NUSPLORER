@@ -40,7 +40,7 @@ export default function OptionsModal({ modalVisible, closeModal,
                     />
                     <OptionsButton 
                         onPress={deleteFunction}
-                        label='Edit'
+                        label='Delete'
                     />
                     <OptionsButton 
                         onPress={closeModal}

@@ -1,21 +1,107 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import VotesDisplay from './VotesDisplay';
 import OptionsModal from './OptionsModal';
 import ReportModal from './ReportModal';
 
-export default function InfoPost({ postDetails, voteUpdater, refreshPage }) {
+export default function InfoPost({ postDetails, refreshPage }) {
     const [optionsModalOpen, setOptionsModalOpen] = useState(false);
     const [reportModalOpen, setReportModalOpen] = useState(false);
 
+    const { _id, roomId, title, content, creator, voteCount, userVote, sameUser } = postDetails;
     const postCreatedAt = new Date(postDetails.createTime).toLocaleDateString();
     const postIsModified = postDetails.modifyTime != null;
     const postLastModifiedAt = postIsModified ? new Date(postDetails.modifyTime).toLocaleDateString() : null;
 
-    async function updateVote(initial, updated) {
-        const updateSuccessful = await voteUpdater(postDetails._id, initial, updated);
-        return updateSuccessful;
+    function logout(errorMessage) {
+        Alert.alert(errorMessage, 'Please login again!', [
+            {
+                text: 'OK',
+                onPress: () => {
+                    AsyncStorage.removeItem('token');
+                    navigation.navigate('Login');
+                    console.log('Token cleared and navigated to Login');
+                }
+            }
+        ])
+    };
+
+    async function updateVote(initialVoteValue, updatedVoteValue) {
+        const token = await AsyncStorage.getItem('token');
+        const url = `http://10.0.2.2:3000/rooms/${roomId}/posts/${_id}/vote`;
+        console.log(`roomId: ${roomId} , postId: ${_id}`); // delete this entire line later
+
+        try {
+            await axios.put(url, 
+                { initialVoteValue, updatedVoteValue }, 
+                {
+                headers: {
+                    'Authorization': token ? `Bearer ${token}` : null
+                }
+            });
+            return true;
+        } catch (error) {
+            const errorStatus = error.response.status;
+            const errorMessage = error.response.data.error;
+            if (errorStatus == 401 || errorStatus == 403) {
+                logout(errorMessage);
+            } else {
+                Alert.alert('Failed to update vote');
+                console.error(`Error updating vote for ${_id}: `, error.message);
+            }
+            return false;
+        }
+    }
+
+    async function editPost() {
+        console.log('Edit post');
+    }
+
+    function deletePostConfirmation() {
+        Alert.alert(
+            'Deleting post',
+            'Are you sure you want to delete this post?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Delete', onPress: () => deletePost() }
+            ]
+        );
+    }
+
+    async function deletePost() {
+        const token = await AsyncStorage.getItem('token');
+        const url = `http://10.0.2.2:3000/rooms/${roomId}/posts/${_id}`;
+
+        axios.delete(url, {
+            headers: {
+                'Authorization': token ? `Bearer ${token}` : null
+            }
+        }).then(response => {
+            const postTitle = response.data.title;
+            Alert.alert('Post deleted', `Your post "${postTitle}" has been deleted successfully`);
+            setOptionsModalOpen(false);
+            refreshPage();
+        }).catch(error => {
+            const errorStatus = error.response.status;
+            const errorMessage = error.response.data.error;
+            if (errorStatus == 401) {
+                setOptionsModalOpen(false);
+                logout(errorMessage);
+            } else if (errorStatus == 403) {
+                Alert.alert('Forbidden request', errorMessage);
+            } else if (errorStatus == 404) {
+                Alert.alert(
+                    'Post not found', 
+                    errorMessage,
+                    [{ text: 'OK', onPress: () => refreshPage() }]
+                );
+            } else if (errorStatus == 500) {
+                Alert.alert('Error deleting post', errorMessage);
+            }
+        })
     }
 
     function makeReport() {
@@ -27,11 +113,11 @@ export default function InfoPost({ postDetails, voteUpdater, refreshPage }) {
         <View style={styles.container}>
             <View style={styles.postDetails.container}>
                 <View style={styles.postDetails.titleContainer}>
-                    <Text style={styles.postDetails.titleText}>{postDetails.title}</Text>
+                    <Text style={styles.postDetails.titleText}>{title}</Text>
                     <View style={{ flexDirection: 'row' }}>
                         <VotesDisplay 
-                            voteValue={postDetails.userVote} 
-                            numberOfVotes={postDetails.voteCount} 
+                            voteValue={userVote} 
+                            numberOfVotes={voteCount} 
                             onVoteChange={updateVote}
                         />
                         <TouchableOpacity onPress={() => setOptionsModalOpen(true)}>
@@ -41,7 +127,7 @@ export default function InfoPost({ postDetails, voteUpdater, refreshPage }) {
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Text style={styles.postDetails.usernameText}>
-                        by {postDetails.creator.username}
+                        by {creator.username}
                     </Text>
                     <Text style={styles.postDetails.dateText}>
                         {postIsModified ? `Last modified at ${postLastModifiedAt}`
@@ -50,11 +136,13 @@ export default function InfoPost({ postDetails, voteUpdater, refreshPage }) {
                     </Text>
                 </View>
             </View>
-            <Text style={styles.postContent}>{postDetails.content}</Text>
+            <Text style={styles.postContent}>{content}</Text>
             <OptionsModal 
                 modalVisible={optionsModalOpen}
                 closeModal={() => setOptionsModalOpen(false)}
                 makeReport={makeReport}
+                editFunction={sameUser ? editPost : null}
+                deleteFunction={sameUser ? deletePostConfirmation : null}
             />
             <ReportModal 
                 modalVisible={reportModalOpen} 

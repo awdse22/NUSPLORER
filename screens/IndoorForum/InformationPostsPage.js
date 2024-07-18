@@ -59,32 +59,6 @@ export default function InformationPostsPage({ route }) {
         fetchPosts();
     }, [pageNumber]));
 
-    async function updateVote(postId, initialVoteValue, updatedVoteValue) {
-        const token = await AsyncStorage.getItem('token');
-        const url = `http://10.0.2.2:3000/rooms/${roomId}/posts/${postId}/vote`;
-        console.log(`roomId: ${roomId} , postId: ${postId}`); // delete this entire line later
-
-        try {
-            const response = await axios.put(url, 
-                { initialVoteValue, updatedVoteValue }, 
-                {
-                headers: {
-                    'Authorization': token ? `Bearer ${token}` : null
-                }
-            });
-            return true;
-        } catch (error) {
-            const errorStatus = error.response.status;
-            if (errorStatus == 401 || errorStatus == 403) {
-                logout(error.response.data.message);
-            } else {
-                Alert.alert('Failed to update vote');
-                console.error(`Error updating vote for ${postId}: `, error.message);
-            }
-            return false;
-        }
-    }
-
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.titleText}>{roomCode} info</Text>
@@ -110,7 +84,6 @@ export default function InformationPostsPage({ route }) {
                             <InfoPost 
                                 key={post._id} 
                                 postDetails={post} 
-                                voteUpdater={updateVote}
                                 refreshPage={fetchPosts} 
                             />
                         ))}
