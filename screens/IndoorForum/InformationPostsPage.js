@@ -63,7 +63,13 @@ export default function InformationPostsPage({ route }) {
         <SafeAreaView style={styles.container}>
             <Text style={styles.titleText}>{roomCode} info</Text>
             <View style={styles.createPostContainer}>
-                <AddDataButton label='Create post' onPress={() => navigation.navigate('Create Post', { roomId: roomId })} />
+                <AddDataButton 
+                    label='Create post' 
+                    onPress={() => navigation.navigate('Create Post', { 
+                        roomId: roomId, 
+                        mode: 'Create'
+                    })} 
+                />
             </View>
             <PageSelector totalPages={totalPages} pageNumber={pageNumber} onPageChange={setPageNumber} />
             <ScrollView>

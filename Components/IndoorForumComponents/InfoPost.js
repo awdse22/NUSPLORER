@@ -3,11 +3,14 @@ import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtDecode } from 'jwt-decode';
+import { useNavigation } from '@react-navigation/native';
 import VotesDisplay from './VotesDisplay';
 import OptionsModal from './OptionsModal';
 import ReportModal from './ReportModal';
 
 export default function InfoPost({ postDetails, refreshPage }) {
+    const navigation = useNavigation();
     const [optionsModalOpen, setOptionsModalOpen] = useState(false);
     const [reportModalOpen, setReportModalOpen] = useState(false);
 
@@ -57,7 +60,28 @@ export default function InfoPost({ postDetails, refreshPage }) {
     }
 
     async function editPost() {
-        console.log('Edit post');
+        const token = await AsyncStorage.getItem('token');
+        if (!token) {
+            logout('Unauthorized request');
+            return;
+        }
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.userId;
+        if (userId == creator._id) {
+            console.log(`Editing post ${title}`);
+            setOptionsModalOpen(false);
+            navigation.navigate('Create Post', {
+                roomId: roomId,
+                mode: 'Edit',
+                editParams: {
+                    postId: _id,
+                    title: title,
+                    content: content
+                }
+            });
+        } else {
+            Alert.alert('Forbidden request', 'You do not have the permission to edit this post!');
+        }
     }
 
     function deletePostConfirmation() {
@@ -125,12 +149,12 @@ export default function InfoPost({ postDetails, refreshPage }) {
                         </TouchableOpacity>
                     </View>
                 </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ flexDirection: 'column' }}>
                     <Text style={styles.postDetails.usernameText}>
                         by {creator.username}
                     </Text>
                     <Text style={styles.postDetails.dateText}>
-                        {postIsModified ? `Last modified at ${postLastModifiedAt}`
+                        {postIsModified ? `Last modified: ${postLastModifiedAt}`
                             : `Created at ${postCreatedAt}`
                         }
                     </Text>
@@ -188,7 +212,6 @@ const styles=StyleSheet.create({
         dateText: {
             fontSize: 13,
             color: 'grey',
-            marginLeft: 8,
         }
     },
     postContent: {

@@ -35,7 +35,8 @@ export default function IndoorForumNavigator() {
                 options={({ route }) => ({ title: route.params.dataType })} />
             <IndoorForumStack.Screen 
                 name='Create Post'
-                component={CreatePost} />
+                component={CreatePost}
+                options={({ route }) => ({ title: `${route.params.mode} post`})} />
             <IndoorForumStack.Screen 
                 name='Upload Image'
                 component={UploadImage} />

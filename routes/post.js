@@ -109,22 +109,25 @@ router.put('/:id', authenticateToken, async (req, res) => {
   const { userId } = req.user;
 
   try {
-    const post = await Post.findOneAndUpdate(
+    const post = await Post.findById(id);
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    if (post.creator.toString() !== userId) {
+      return res.status(403).json({ error: 'You do not have the permission to edit this post!'});
+    }
+
+    const updatedPost = await Post.findOneAndUpdate(
       { _id: id },
       {
         title,
         content,
-        modifier: userId,
         modifyTime: new Date(),
       },
       { new: true },
     );
 
-    if (!post) {
-      return res.status(404).json({ error: 'Post not found' });
-    }
-
-    res.status(200).json(post);
+    res.status(200).json(updatedPost);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
