@@ -7,6 +7,7 @@ import InformationPostsPage from './InformationPostsPage';
 import CreatePost from './CreatePost';
 import ImagesPage from './ImagesPage';
 import UploadImage from './UploadImage';
+import EditImageDescription from './EditImageDescription';
 
 const IndoorForumStack = createStackNavigator();
 
@@ -40,6 +41,9 @@ export default function IndoorForumNavigator() {
             <IndoorForumStack.Screen 
                 name='Upload Image'
                 component={UploadImage} />
+            <IndoorForumStack.Screen
+                name='Edit Image Description'
+                component={EditImageDescription} />
         </IndoorForumStack.Navigator>
     )
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, ScrollView, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import UserInput from '../../Components/UserInput';
 import UserSubmitButton from '../../Components/UserSubmitButton';
@@ -7,11 +7,17 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-export default function UploadImage({ route }) {
+export default function EditImageDescription({ route }) {
     const navigation = useNavigation();
-    const { roomId, dataType } = route.params;
-    const {control, handleSubmit, formState: {errors} } = useForm();
+    const { roomId, imageMetadataId, description } = route.params;
+    const {control, handleSubmit, setValue, formState: {errors} } = useForm();
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (description) {
+            setValue('description', description)
+        }
+    })
 
     function logout(errorMessage) {
         Alert.alert(errorMessage, 'Please login again!', [
@@ -26,23 +32,16 @@ export default function UploadImage({ route }) {
         ])
     };
 
-    async function uploadImage(userResponse) {
-        const data = {
-            description: userResponse.description,
-            dataType: dataType,
-            imageData: userResponse.imageData
-        }
+    async function editDescription(userResponse) {
         const token = await AsyncStorage.getItem('token');
-        // const url = `https://nusplorer.onrender.com/rooms/${roomId}/photos`;
-        const url = `http://10.0.2.2:3000/rooms/${roomId}/photos`;
+        const url=`http://10.0.2.2:3000/rooms/${roomId}/photos/${imageMetadataId}`;
         setLoading(true);
 
-        axios.post(url, data , { 
+        axios.put(url, userResponse, {
             headers: {
                 'Authorization': token ? `Bearer ${token}` : null
             }
         }).then((response) => {
-            console.log('Image uploaded');
             setLoading(false);
             navigation.goBack();
         }).catch((error) => {
@@ -50,9 +49,15 @@ export default function UploadImage({ route }) {
             const errorMessage = error.response.data.error;
             if (errorStatus == 400) {
                 Alert.alert(errorMessage);
-            } else if (errorStatus == 401 || errorStatus == 403) {
+            } else if (errorStatus == 401) {
                 setLoading(false);
                 logout(errorMessage);
+            } else if (errorStatus == 403) {
+                setLoading(false);
+                Alert.alert('Forbidden request', errorMessage);
+            } else if (errorStatus == 404) {
+                setLoading(false);
+                Alert.alert('Image not found', errorMessage);
             } else if (errorStatus == 500) {
                 Alert.alert("Failed to upload image");
                 console.log("Error uploading image: ", errorMessage);
@@ -62,18 +67,8 @@ export default function UploadImage({ route }) {
     }
 
     return (
-        <View style={styles.container}>
+            <View style={styles.container}>
             <ScrollView>
-                <UserInput 
-                    type='image'
-                    label='Upload Image' 
-                    fieldName='imageData'
-                    info={`Upload ${dataType.toLowerCase()} to help guide other users to the locations`}
-                    control={control}
-                    rules={{ 
-                        required: 'You need to upload an image',
-                    }} 
-                />
                 <UserInput 
                     type='post'
                     label='Description' 
@@ -88,7 +83,7 @@ export default function UploadImage({ route }) {
                     }} 
                 />
                 {loading ? <ActivityIndicator animating={true} size='large' color='#003db8' /> 
-                : <UserSubmitButton buttonName='Post' onPress={handleSubmit(uploadImage)} />}
+                : <UserSubmitButton buttonName='Edit' onPress={handleSubmit(editDescription)} />}
             </ScrollView>
         </View>
     )

@@ -1,9 +1,16 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 
-export default function OptionsModal({ modalVisible, closeModal, 
+export default function OptionsModal({ modalVisible, closeModal, contentType, 
     makeReport = null , editFunction = null, deleteFunction = null }) {
     
+    const editable = 
+        contentType == 'post'
+        ? 'post'
+        : contentType == 'image'
+        ? 'description'
+        : 'room data'
+
     const OptionsButton = ({ onPress, label, isBottom = false, extraTextStyle = null }) => {
         if (!onPress) return null;
         const buttonTextStyle = extraTextStyle 
@@ -36,11 +43,11 @@ export default function OptionsModal({ modalVisible, closeModal,
                     />
                     <OptionsButton 
                         onPress={editFunction}
-                        label='Edit'
+                        label={`Edit ${editable}`}
                     />
                     <OptionsButton 
                         onPress={deleteFunction}
-                        label='Delete'
+                        label={`Delete ${contentType}`}
                     />
                     <OptionsButton 
                         onPress={closeModal}

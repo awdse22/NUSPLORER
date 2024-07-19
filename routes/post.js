@@ -145,19 +145,23 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     if (!post) {
       await session.abortTransaction();
       session.endSession();
-      return res.status(404).json({ error: 'Post is not found or may have been deleted' });
+      return res.status(404).json({ 
+        error: 'The post is not found or may have been deleted' 
+      });
     }
 
     if (post.creator == userId) {
       await Post.deleteByPostId(id, session);
       await session.commitTransaction();
       session.endSession();
+      return res.status(200).json(post);
     } else {
       await session.abortTransaction();
       session.endSession();
-      return res.status(403).json({ error: "You're not authorized to deleted this post" })
+      return res.status(403).json({ 
+        error: "You're not authorized to deleted this post" 
+      })
     }
-    return res.status(200).json(post);
   } catch (error) {
     await session.abortTransaction();
     session.endSession();

@@ -164,6 +164,7 @@ export default function InfoPost({ postDetails, refreshPage }) {
             <OptionsModal 
                 modalVisible={optionsModalOpen}
                 closeModal={() => setOptionsModalOpen(false)}
+                contentType='post'
                 makeReport={makeReport}
                 editFunction={sameUser ? editPost : null}
                 deleteFunction={sameUser ? deletePostConfirmation : null}

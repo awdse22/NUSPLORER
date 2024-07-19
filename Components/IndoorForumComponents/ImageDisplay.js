@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { StyleSheet, View, Text, TouchableOpacity, Dimensions, Modal, Image, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Dimensions, Modal, Image, ScrollView, Alert } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { useSharedValue, useAnimatedStyle } from 'react-native-reanimated';
 import VotesDisplay from '../../Components/IndoorForumComponents/VotesDisplay';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtDecode } from 'jwt-decode';
 import { Ionicons } from '@expo/vector-icons';
 import OptionsModal from './OptionsModal';
 import ReportModal from './ReportModal';
@@ -21,7 +22,7 @@ function clamp(value, min, max) {
 export default function ImageDisplay({ imageData, refreshPage }) {
     const navigation = useNavigation();
     const [viewingImage, setViewingImage] = useState(false);
-    const { _id, uri, roomId, description, creator, createTime } = imageData;
+    const { _id, uri, roomId, description, creator, createTime, sameUser } = imageData;
     const [userVote, setUserVote] = useState(imageData.userVote);
     const [voteCount, setVoteCount] = useState(imageData.voteCount);
     const [optionsModalOpen, setOptionsModalOpen] = useState(false);
@@ -62,6 +63,19 @@ export default function ImageDisplay({ imageData, refreshPage }) {
         ]
     }));
 
+    function logout(errorMessage) {
+        Alert.alert(errorMessage, 'Please login again!', [
+            {
+                text: 'OK',
+                onPress: () => {
+                    AsyncStorage.removeItem('token');
+                    navigation.navigate('Login');
+                    console.log('Token cleared and navigated to Login');
+                }
+            }
+        ])
+    }
+
     async function updateVote(initialVoteValue, updatedVoteValue) {
         const token = await AsyncStorage.getItem('token');
         const url = `http://10.0.2.2:3000/rooms/${roomId}/photos/${_id}/vote`;
@@ -89,6 +103,72 @@ export default function ImageDisplay({ imageData, refreshPage }) {
         }
     }
 
+    async function editDescription() {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) {
+            logout('Unauthorized request');
+            return;
+        }
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.userId;
+        if (userId == creator._id) {
+            setOptionsModalOpen(false);
+            setViewingImage(false);
+            navigation.navigate('Edit Image Description', {
+                roomId: roomId,
+                imageMetadataId: _id,
+                description: description
+            });
+        } else {
+            Alert.alert('Forbidden request', 'You do not have the permission to edit this post!');
+        }
+    }
+
+    function deleteImageConfirmation() {
+        Alert.alert(
+            'Deleting post',
+            'Are you sure you want to delete this image?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Delete', onPress: () => deleteImage() }
+            ]
+        );
+    }
+
+    async function deleteImage() {
+        const token = await AsyncStorage.getItem('token');
+        const url = `http://10.0.2.2:3000/rooms/${roomId}/photos/${_id}`;
+
+        axios.delete(url, {
+            headers: {
+                'Authorization': token ? `Bearer ${token}` : null
+            }
+        }).then(response => {
+            Alert.alert('Image deleted', `Your image has been deleted successfully`);
+            setOptionsModalOpen(false);
+            setViewingImage(false);
+            refreshPage();
+        }).catch(error => {
+            const errorStatus = error.response.status;
+            const errorMessage = error.response.data.error;
+            if (errorStatus == 401) {
+                setOptionsModalOpen(false);
+                setViewingImage(false);
+                logout(errorMessage);
+            } else if (errorStatus == 403) {
+                Alert.alert('Forbidden request', errorMessage);
+            } else if (errorStatus == 404) {
+                Alert.alert(
+                    'Image not found', 
+                    errorMessage,
+                    [{ text: 'OK', onPress: () => refreshPage() }]
+                );
+            } else if (errorStatus == 500) {
+                Alert.alert('Error deleting image', errorMessage);
+            }
+        })
+    }
+
     const CloseModalButton = () => {
         return (
             <View style={styles.modal.closeButton}>
@@ -97,20 +177,7 @@ export default function ImageDisplay({ imageData, refreshPage }) {
                 </TouchableOpacity>
             </View>
         )
-    };
-
-    function logout(errorMessage) {
-        Alert.alert(errorMessage, 'Please login again!', [
-            {
-                text: 'OK',
-                onPress: () => {
-                    AsyncStorage.removeItem('token');
-                    navigation.navigate('Login');
-                    console.log('Token cleared and navigated to Login');
-                }
-            }
-        ])
-    };
+    }
 
     function makeReport() {
         setOptionsModalOpen(false);
@@ -158,7 +225,10 @@ export default function ImageDisplay({ imageData, refreshPage }) {
                     <OptionsModal 
                         modalVisible={optionsModalOpen}
                         closeModal={() => setOptionsModalOpen(false)}
+                        contentType='image'
                         makeReport={makeReport}
+                        editFunction={sameUser ? editDescription : null}
+                        deleteFunction={sameUser ? deleteImageConfirmation : null}
                     />
                     <ReportModal 
                         modalVisible={reportModalOpen}

@@ -5,7 +5,6 @@ const ImageMetadata = require('../models/imageMetadata');
 const Image = require('../models/image');
 const authenticateToken = require('../tokenAuthMiddleware');
 const Vote = require('../models/vote');
-const User = require('../models/user')
 
 router.get('/', authenticateToken, async (req, res) => {
   const { dataType } = req.query;
@@ -34,7 +33,8 @@ router.get('/', authenticateToken, async (req, res) => {
       },
       {
         $addFields: {
-          voteCount: { $subtract: ['$upvoteCount', '$downvoteCount'] }
+          voteCount: { $subtract: ['$upvoteCount', '$downvoteCount'] },
+          sameUser: { $eq: ['$creator', new mongoose.Types.ObjectId(userId)] }
         }
       },
       {
@@ -127,17 +127,70 @@ router.post('/', authenticateToken, async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
+  const { userId } = req.user;
+  const { id } = req.params;
+  const { description } = req.body;
+
+  try {
+    const imageMetadata = await ImageMetadata.findById(id);
+    if (!imageMetadata) {
+      return res.status(404).json({ 
+        error: "The image description you're trying to edit is not found or has been deleted" 
+      });
+    }
+    if (imageMetadata.creator.toString() !== userId) {
+      return res.status(403).json({ 
+        error: 'You do not have the permission to edit this description!'
+      })
+    }
+
+    const updatedMetadata = await ImageMetadata.findOneAndUpdate(
+      { _id: id },
+      {
+        description
+      },
+      { new: true },
+    );
+
+    res.status(200).json(updatedMetadata);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.delete('/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   const { userId } = req.user;
 
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    const photo = await Photo.findOneAndDelete({ _id: id, creator: userId });
-    if (!photo) {
-      return res.status(404).json({ error: 'Photo not found' });
+    const imageMetadata = await ImageMetadata.findById(id);
+    if (!imageMetadata) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ 
+        error: 'The image is not found or may have been deleted' 
+      });
     }
-    res.status(200).json(photo);
+
+    if (imageMetadata.creator == userId) {
+      await ImageMetadata.deleteByImageMetadataId(id, session);
+      await session.commitTransaction();
+      session.endSession();
+      return res.status(200).json(imageMetadata);
+    } else {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(403).json({ 
+        error: "You're not authorized to deleted this image" 
+      })
+    }
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
     res.status(500).json({ error: error.message });
   }
 });
@@ -202,6 +255,6 @@ router.put('/:id/vote', authenticateToken, async (req, res) => {
     console.log(error);
     res.status(500).json({ error: 'Failed to update votes'});
   }
-})
+});
 
 module.exports = router;
