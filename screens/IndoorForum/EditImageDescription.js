@@ -19,19 +19,6 @@ export default function EditImageDescription({ route }) {
         }
     })
 
-    function logout(errorMessage) {
-        Alert.alert(errorMessage, 'Please login again!', [
-            {
-                text: 'OK',
-                onPress: () => {
-                    AsyncStorage.removeItem('token');
-                    navigation.navigate('Login');
-                    console.log('Token cleared and navigated to Login');
-                }
-            }
-        ])
-    };
-
     async function editDescription(userResponse) {
         const token = await AsyncStorage.getItem('token');
         const url=`http://10.0.2.2:3000/rooms/${roomId}/photos/${imageMetadataId}`;
@@ -47,11 +34,18 @@ export default function EditImageDescription({ route }) {
         }).catch((error) => {
             const errorStatus = error.response.status;
             const errorMessage = error.response.data.error;
-            if (errorStatus == 400) {
-                Alert.alert(errorMessage);
-            } else if (errorStatus == 401) {
+            if (errorStatus == 401) {
                 setLoading(false);
-                logout(errorMessage);
+                Alert.alert(errorMessage, 'Please login again!', [
+                    {
+                        text: 'OK',
+                        onPress: () => {
+                            AsyncStorage.removeItem('token');
+                            navigation.navigate('Login');
+                            console.log('Token cleared and navigated to Login');
+                        }
+                    }
+                ]);
             } else if (errorStatus == 403) {
                 setLoading(false);
                 Alert.alert('Forbidden request', errorMessage);
@@ -59,9 +53,17 @@ export default function EditImageDescription({ route }) {
                 setLoading(false);
                 Alert.alert('Image not found', errorMessage);
             } else if (errorStatus == 500) {
-                Alert.alert("Failed to upload image");
-                console.log("Error uploading image: ", errorMessage);
+                Alert.alert(
+                    'Failed to update description',
+                    "An error occurred in the server while updating image description"
+                );
+            } else {
+                Alert.alert(
+                    'Failed to update description',
+                    'An unknown error occurred while updating the image description'
+                );
             }
+            console.log("Error editing image description: ", errorMessage);
             setLoading(false);
         })
     }

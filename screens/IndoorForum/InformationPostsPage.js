@@ -15,25 +15,16 @@ export default function InformationPostsPage({ route }) {
     const [pageNumber, setPageNumber] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loadingPosts, setLoadingPosts] = useState(false);
-
-    function logout(errorMessage) {
-        Alert.alert(errorMessage, 'Please login again!', [
-            {
-                text: 'OK',
-                onPress: () => {
-                    AsyncStorage.removeItem('token');
-                    navigation.navigate('Login');
-                    console.log('Token cleared and navigated to Login');
-                }
-            }
-        ])
-    };
+    const [errorMessageVisible, setErrorMessageVisible] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     async function fetchPosts() {
         const token = await AsyncStorage.getItem('token');
         // const url = `https://nusplorer.onrender.com/rooms/${roomId}/posts?page=${pageNumber}&pageSize=10&keyword=${query}`;
         const url = `http://10.0.2.2:3000/rooms/${roomId}/posts?page=${pageNumber}&pageSize=10&keyword=${query}`;
         setLoadingPosts(true);
+        setErrorMessageVisible(false);
+        setErrorMessage('');
         console.log(`Fetching posts data for ${roomCode} on page ${pageNumber}`);
 
         axios.get(url, { 
@@ -47,10 +38,24 @@ export default function InformationPostsPage({ route }) {
         }).catch((error) => {
             const errorStatus = error.response.status;
             if (errorStatus == 401 || errorStatus == 403) {
-                logout(error.response.data.message);
+                Alert.alert(errorMessage, 'Please login again!', [
+                    {
+                        text: 'OK',
+                        onPress: () => {
+                            AsyncStorage.removeItem('token');
+                            navigation.navigate('Login');
+                            console.log('Token cleared and navigated to Login');
+                        }
+                    }
+                ]);
+            } else if (errorStatus == 500) {
+                setErrorMessage('An error occurred in the server while fetching posts');
+                setErrorMessageVisible(true);
             } else {
-                console.error('Error fetching data: ', error.message);
+                setErrorMessage('An unknown error occurred while fetching posts');
+                setErrorMessageVisible(true);
             }
+            console.log('Error fetching data: ', error.message);
             setLoadingPosts(false);
         })
     }
@@ -82,9 +87,13 @@ export default function InformationPostsPage({ route }) {
                 ) : (
                     <View>
                         {posts.length == 0 && (
-                            <Text style={styles.noInformation}>
-                                There are no posts of any information currently
-                            </Text>
+                            errorMessageVisible ? (
+                                <Text style={[styles.noDataFound, { color: 'red' }]}>{errorMessage}</Text>
+                            ) : (
+                                <Text style={styles.noDataFound}>
+                                    There are no posts of any information currently
+                                </Text>
+                            )
                         )}
                         {posts.map((post) => (
                             <InfoPost 
@@ -117,7 +126,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
-    noInformation: {
+    noDataFound: {
         textAlign: 'center', 
         fontSize: 16, 
         fontWeight: 'bold',

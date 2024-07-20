@@ -52,11 +52,21 @@ export default function CreatePost({ route }) {
             const errorStatus = error.response.status;
             const errorMessage = error.response.data.error;
             if (errorStatus == 400) {
-                Alert.alert(errorMessage);
+                Alert.alert('Bad request', errorMessage);
+            } else if (errorStatus == 401 || errorStatus == 403) {
+                logout(errorMessage);
             } else if (errorStatus == 500) {
-                Alert.alert("An error occurred while creating post");
-                console.log("Error creating post: ", errorMessage);
+                Alert.alert(
+                    'Failed to create post',
+                    "An error occurred in the server while creating post"
+                );
+            } else {
+                Alert.alert(
+                    'Failed to create post',
+                    'An unknown error occurred while creating post'
+                );
             }
+            console.log("Error creating post: ", errorMessage);
             setLoading(false);
         })
     }
@@ -86,9 +96,17 @@ export default function CreatePost({ route }) {
             } else if (errorStatus == 403) {
                 Alert.alert('Forbidden request', errorMessage)
             } else if (errorStatus == 500) {
-                Alert.alert("An error occurred while editing post");
-                console.log("Error editing post: ", errorMessage);
+                Alert.alert(
+                    'Failed to edit post',
+                    "An error occurred in the server while editing post"
+                );
+            } else {
+                Alert.alert(
+                    'Failed to edit post',
+                    'An unknown error occurred while editing post'
+                );
             }
+            console.log("Error editing post: ", errorMessage);
             setLoading(false);
         })
     }

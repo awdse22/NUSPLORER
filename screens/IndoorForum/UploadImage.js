@@ -13,19 +13,6 @@ export default function UploadImage({ route }) {
     const {control, handleSubmit, formState: {errors} } = useForm();
     const [loading, setLoading] = useState(false);
 
-    function logout(errorMessage) {
-        Alert.alert(errorMessage, 'Please login again!', [
-            {
-                text: 'OK',
-                onPress: () => {
-                    AsyncStorage.removeItem('token');
-                    navigation.navigate('Login');
-                    console.log('Token cleared and navigated to Login');
-                }
-            }
-        ])
-    };
-
     async function uploadImage(userResponse) {
         const data = {
             description: userResponse.description,
@@ -49,14 +36,30 @@ export default function UploadImage({ route }) {
             const errorStatus = error.response.status;
             const errorMessage = error.response.data.error;
             if (errorStatus == 400) {
-                Alert.alert(errorMessage);
+                Alert.alert('Bad request', errorMessage);
             } else if (errorStatus == 401 || errorStatus == 403) {
-                setLoading(false);
-                logout(errorMessage);
+                Alert.alert(errorMessage, 'Please login again!', [
+                    {
+                        text: 'OK',
+                        onPress: () => {
+                            AsyncStorage.removeItem('token');
+                            navigation.navigate('Login');
+                            console.log('Token cleared and navigated to Login');
+                        }
+                    }
+                ]);
             } else if (errorStatus == 500) {
-                Alert.alert("Failed to upload image");
-                console.log("Error uploading image: ", errorMessage);
+                Alert.alert(
+                    'Failed to upload image',
+                    "An error occurred in the server while uploading image"
+                );
+            } else {
+                Alert.alert(
+                    'Failed to upload image',
+                    'An unknown error occurred while uploading image'
+                );
             }
+            console.log("Error uploading image: ", errorMessage);
             setLoading(false);
         })
     }

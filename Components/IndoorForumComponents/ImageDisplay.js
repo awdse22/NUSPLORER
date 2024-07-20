@@ -93,12 +93,34 @@ export default function ImageDisplay({ imageData, refreshPage }) {
             return true;
         } catch (error) {
             const errorStatus = error.response.status;
+            const errorMessage = error.response.data.error;
             if (errorStatus == 401 || errorStatus == 403) {
-                logout(error.response.data.message);
+                setViewingImage(false);
+                logout(errorMessage);
+            } else if (errorStatus == 400) {
+                Alert.alert(
+                    'Bad request',
+                    `There is an issue with the request to update your vote, please try again.`
+                );
+            } else if (errorStatus == 404) {
+                Alert.alert(
+                    'Post not found', 
+                    errorMessage,
+                    [{ text: 'OK', onPress: () => refreshPage() }]
+                );
+                setViewingImage(false);
+            } else if (errorStatus == 500) {
+                Alert.alert(
+                    'Failed to update vote', 
+                    'An error occurred in the server while updating vote'
+                );
             } else {
-                Alert.alert('Failed to update vote');
-                console.error(`Error updating vote for ${_id}: `, error.message);
+                Alert.alert(
+                    'Failed to update vote',
+                    'An unknown error occurred while updating vote'
+                )
             }
+            console.log(`Error updating vote for image ${_id}: `, error.message);
             return false;
         }
     }
@@ -164,7 +186,15 @@ export default function ImageDisplay({ imageData, refreshPage }) {
                     [{ text: 'OK', onPress: () => refreshPage() }]
                 );
             } else if (errorStatus == 500) {
-                Alert.alert('Error deleting image', errorMessage);
+                Alert.alert(
+                    'Failed to delete image', 
+                    'An error occurred in the server while deleting image'
+                );
+            } else {
+                Alert.alert(
+                    'Failed to delete image',
+                    'An unknown error occurred while deleting image'
+                );
             }
         })
     }

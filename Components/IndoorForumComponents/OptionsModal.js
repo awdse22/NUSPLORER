@@ -1,17 +1,19 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, ActivityIndicator } from 'react-native';
 
 export default function OptionsModal({ modalVisible, closeModal, contentType, 
     makeReport = null , editFunction = null, deleteFunction = null }) {
-    
+    const [deletingContent, setDeletingContent] = useState(false);
     const editable = 
         contentType == 'post'
         ? 'post'
         : contentType == 'image'
         ? 'description'
-        : 'room data'
+        : contentType == 'room'
+        ? 'room data'
+        : ''
 
-    const OptionsButton = ({ onPress, label, isBottom = false, extraTextStyle = null }) => {
+    const OptionsButton = ({ onPress, label, isBottom = false, extraTextStyle = null, activity = null }) => {
         if (!onPress) return null;
         const buttonTextStyle = extraTextStyle 
             ? [styles.buttonText, extraTextStyle]
@@ -25,11 +27,25 @@ export default function OptionsModal({ modalVisible, closeModal, contentType,
                 onPress={onPress}
                 style={buttonStyle}
             >
-                <Text style={buttonTextStyle}>
-                    {label}
-                </Text>
+                {activity == true ? (
+                    <ActivityIndicator 
+                        animating={true}
+                        size='large'
+                        color='#003db8'
+                    />
+                ) : (
+                    <Text style={buttonTextStyle}>
+                        {label}
+                    </Text>
+                )}
             </TouchableOpacity>
         )
+    }
+
+    async function deleteContent() {
+        setDeletingContent(true);
+        await deleteFunction();
+        setDeletingContent(false);
     }
 
     return (
@@ -46,8 +62,9 @@ export default function OptionsModal({ modalVisible, closeModal, contentType,
                         label={`Edit ${editable}`}
                     />
                     <OptionsButton 
-                        onPress={deleteFunction}
+                        onPress={deleteFunction ? deleteContent : null}
                         label={`Delete ${contentType}`}
+                        activity={deletingContent}
                     />
                     <OptionsButton 
                         onPress={closeModal}

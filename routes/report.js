@@ -11,6 +11,7 @@ const Vote = require('../models/vote');
 
 // number of reports for the same reason before a data/content is deleted
 const maxReports = 3; 
+const reasons = [ 'Inappropriate/Offensive/Irrelevant', 'Inaccurate/Outdated' ];
 
 router.post('/:contentId', authenticateToken, async (req, res) => {
     const { userId } = req.user;
@@ -18,7 +19,6 @@ router.post('/:contentId', authenticateToken, async (req, res) => {
     const { contentType, reason } = req.body;
 
     const contentTypes = ['post', 'image', 'room'];
-    const reasons = [ 'Inappropriate/Offensive/Irrelevant', 'Inaccurate/Outdated' ];
     if (!contentTypes.includes(contentType)) {
         return res.status(400).json({ error: 'Invalid content type' });
     }
@@ -38,7 +38,7 @@ router.post('/:contentId', authenticateToken, async (req, res) => {
         }
 
         if (!content) {
-            return res.status(404).json({ error: `${contentType} not found` });
+            return res.status(404).json({ error: `The ${contentType} is not found or may have been deleted` });
         }
 
         const reportCheck = await Report.findOne({ userId: userId, contentId: contentId });

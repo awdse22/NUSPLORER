@@ -111,7 +111,9 @@ router.put('/:id', authenticateToken, async (req, res) => {
   try {
     const post = await Post.findById(id);
     if (!post) {
-      return res.status(404).json({ error: 'Post not found' });
+      return res.status(404).json({ 
+        error: "The post you're trying to edit is not found or may have been deleted" 
+      });
     }
     if (post.creator.toString() !== userId) {
       return res.status(403).json({ error: 'You do not have the permission to edit this post!'});
@@ -159,7 +161,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
       await session.abortTransaction();
       session.endSession();
       return res.status(403).json({ 
-        error: "You're not authorized to deleted this post" 
+        error: "You do not have the permission to deleted this post" 
       })
     }
   } catch (error) {
@@ -183,6 +185,15 @@ router.put('/:id/vote', authenticateToken, async (req, res) => {
   session.startTransaction();
 
   try {
+    const post = await Post.findById(postId);
+    if (!post) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({
+        error: "The post you're trying to update your vote for is not found or may have been deleted"
+      })
+    }
+
     let updateVoteCount = { $inc: {} };
     if (initialVoteValue == -1) {
       updateVoteCount.$inc.downvoteCount = -1;
@@ -227,7 +238,7 @@ router.put('/:id/vote', authenticateToken, async (req, res) => {
     await session.abortTransaction();
     session.endSession();
     console.log(error);
-    res.status(500).json({ error: 'Failed to update votes'});
+    res.status(500).json({ error: error.message });
   }
 });
 

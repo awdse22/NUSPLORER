@@ -24,6 +24,52 @@ router.use(
   photoRouter,
 );
 
+router.get('/', authenticateToken, async (req, res) => {
+  const { page, pageSize, keyword } = req.query;
+  const { userId } = req.user;
+
+  const pageNumber = Number.parseInt(page) || 1;
+  const limitNumber = Number.parseInt(pageSize) || 10;
+
+  const searchQuery = {
+    $or: [
+      { roomCode: { $regex: keyword || '', $options: 'i' } },
+      { roomName: { $regex: keyword || '', $options: 'i' } },
+    ],
+  };
+
+  try {
+    const numberOfRooms = await Room.countDocuments(searchQuery);
+    const list = await Room.find(searchQuery)
+      .populate('creator', 'username')
+      .populate('modifier', 'username')
+      .sort({ roomCode: 1 })
+      .skip((pageNumber - 1) * limitNumber)
+      .limit(limitNumber);
+
+    const result = [...list];
+
+    for (let i = 0; i < result.length; i++) {
+      const room = result[i];
+      const bookmark = await Bookmark.findOne({ roomId: room._id, creator: userId }).lean();
+      if (bookmark) {
+        const updatedRoom = {
+          ...room.toObject(),
+          isBookmarked: true,
+          bookmarkId: bookmark._id.toString(),
+        };
+        result[i] = updatedRoom;
+      }
+    }
+
+    const numberOfPages = Math.ceil(numberOfRooms / limitNumber);
+
+    res.status(200).json({ numberOfPages, list: result });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.post('/', authenticateToken, async (req, res) => {
   const { roomCode, roomName, buildingName, floorNumber } = req.body;
   const { userId } = req.user;
@@ -73,52 +119,6 @@ router.put('/:id', authenticateToken, async (req, res) => {
     }
 
     res.status(200).json(room);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.get('/', authenticateToken, async (req, res) => {
-  const { page, pageSize, keyword } = req.query;
-  const { userId } = req.user;
-
-  const pageNumber = Number.parseInt(page) || 1;
-  const limitNumber = Number.parseInt(pageSize) || 10;
-
-  const searchQuery = {
-    $or: [
-      { roomCode: { $regex: keyword || '', $options: 'i' } },
-      { roomName: { $regex: keyword || '', $options: 'i' } },
-    ],
-  };
-
-  try {
-    const numberOfRooms = await Room.countDocuments(searchQuery);
-    const list = await Room.find(searchQuery)
-      .populate('creator', 'username')
-      .populate('modifier', 'username')
-      .sort({ roomCode: 1 })
-      .skip((pageNumber - 1) * limitNumber)
-      .limit(limitNumber);
-
-    const result = [...list];
-
-    for (let i = 0; i < result.length; i++) {
-      const room = result[i];
-      const bookmark = await Bookmark.findOne({ roomId: room._id, creator: userId }).lean();
-      if (bookmark) {
-        const updatedRoom = {
-          ...room.toObject(),
-          isBookmarked: true,
-          bookmarkId: bookmark._id.toString(),
-        };
-        result[i] = updatedRoom;
-      }
-    }
-
-    const numberOfPages = Math.ceil(numberOfRooms / limitNumber);
-
-    res.status(200).json({ numberOfPages, list: result });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -20,12 +20,16 @@ export default function ImagesPage({ route }) {
     const { roomId, roomCode, dataType } = route.params;
     const [images, setImages] = useState([]);
     const [loadingImages, setLoadingImages] = useState(false);
+    const [errorMessageVisible, setErrorMessageVisible] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const fetchImages = async () => {
         const token = await AsyncStorage.getItem('token');
         // const url = `https://nusplorer.onrender.com/rooms/${roomId}/photos?dataType=${dataType}`;
         const url = `http://10.0.2.2:3000/rooms/${roomId}/photos?dataType=${dataType}`;
         setLoadingImages(true);
+        setErrorMessageVisible(false);
+        setErrorMessage('');
         console.log(`Fetching ${dataType} of room ${roomCode}`);
 
         axios.get(url, { 
@@ -37,7 +41,30 @@ export default function ImagesPage({ route }) {
             setLoadingImages(false);
         }).catch((error) => {
             const errorStatus = error.response.status;
-            console.error('Error fetching data: ', error.message);
+            const errorMessage = error.response.data.error;
+            if (errorStatus == 400) {
+                setErrorMessage('There is an issue with the request to fetch data, please try again');
+                setErrorMessageVisible(true);
+            } else if (errorStatus == 401 || errorStatus == 403) {
+                Alert.alert(errorMessage, 'Please login again!', [
+                    {
+                        text: 'OK',
+                        onPress: () => {
+                            AsyncStorage.removeItem('token');
+                            navigation.navigate('Login');
+                            console.log('Token cleared and navigated to Login');
+                        }
+                    }
+                ]);
+            } else if (errorStatus == 500) {
+                setErrorMessage('An error occurred in the server while fetching images');
+                setErrorMessageVisible(true);
+            } else {
+                setErrorMessage('An unknown error occurred while fetching images');
+                setErrorMessageVisible(true);
+            }
+            console.log('Error fetching data: ', error.message);
+            setImages([]);
             setLoadingImages(false);
         })
     }
@@ -47,19 +74,6 @@ export default function ImagesPage({ route }) {
             fetchImages();
         }, [])
     );
-
-    function logout(errorMessage) {
-        Alert.alert(errorMessage, 'Please login again!', [
-            {
-                text: 'OK',
-                onPress: () => {
-                    AsyncStorage.removeItem('token');
-                    navigation.navigate('Login');
-                    console.log('Token cleared and navigated to Login');
-                }
-            }
-        ])
-    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -80,9 +94,13 @@ export default function ImagesPage({ route }) {
                 ) : (
                     <View style={styles.imageDisplayWrapper}>
                         {images.length == 0 && (
-                            <Text style={styles.noInformation}>
-                                There are currently no uploaded images
-                            </Text>
+                            errorMessageVisible ? (
+                                <Text style={[styles.noDataFound, { color: 'red' }]}>{errorMessage}</Text>
+                            ) : (
+                                <Text style={styles.noDataFound}>
+                                    There are no uploaded images currently
+                                </Text>
+                            )
                         )}
                         {images.map((image) => {
                             const imageData = {
@@ -121,10 +139,10 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         justifyContent: 'center',
     },
-    noInformation: {
+    noDataFound: {
         textAlign: 'center', 
         fontSize: 16, 
         fontWeight: 'bold',
         margin: 10,
-    }
+    },
 })

@@ -6,6 +6,8 @@ const Image = require('../models/image');
 const authenticateToken = require('../tokenAuthMiddleware');
 const Vote = require('../models/vote');
 
+const imageTypes = [ "Entrance Photos", "Floor Plans/Maps"];
+
 router.get('/', authenticateToken, async (req, res) => {
   const { dataType } = req.query;
   const roomId = req.roomId;
@@ -19,12 +21,6 @@ router.get('/', authenticateToken, async (req, res) => {
     roomId: new mongoose.Types.ObjectId(roomId),
     dataType: dataType
   };
-  
-  /*
-  if (description) {
-    searchQuery.description = { $regex: new RegExp(description, 'i') };
-  }
-    */
 
   try {
     const imageMetadataList = await ImageMetadata.aggregate([
@@ -71,7 +67,6 @@ router.get('/', authenticateToken, async (req, res) => {
         userVote: userVote || 0
       };
     });
-
     res.status(200).send(listWithUserVoteInfo);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -82,6 +77,10 @@ router.post('/', authenticateToken, async (req, res) => {
   const { description, dataType, imageData } = req.body;
   const { userId } = req.user;
   const roomId = req.roomId;
+
+  if (!imageTypes.includes(dataType)) {
+    return res.status(400).json({ error: 'Invalid image type'});
+  }
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -209,6 +208,15 @@ router.put('/:id/vote', authenticateToken, async (req, res) => {
   session.startTransaction();
 
   try {
+    const imageMetadata = await ImageMetadata.findById(imageMetadataId);
+    if (!imageMetadata) {
+      await session.abortTransaction();
+      session.endSession();e
+      return res.status(404).json({
+        error: "The image you're trying to update your vote for is not found or may have been deleted"
+      })
+    }
+
     let updateVoteCount = { $inc: {} };
     if (initialVoteValue == -1) {
       updateVoteCount.$inc.downvoteCount = -1;

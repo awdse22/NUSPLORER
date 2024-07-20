@@ -24,19 +24,39 @@ export default function CreateRoomData() {
                 'Authorization': token ? `Bearer ${token}` : null
             }
         }).then((response) => {
-            console.log('Room data creation success');
+            Alert.alert('Room created successfully')
             setLoading(false);
             navigation.goBack();
         }).catch((error) => {
             const errorStatus = error.response.status;
             const errorMessage = error.response.data.error;
-            setLoading(false);
+
             if (errorStatus == 400) {
-                Alert.alert(errorMessage);
+                Alert.alert('Bad request', errorMessage);
+            } else if (errorStatus == 401 || errorStatus == 403) {
+                Alert.alert(errorMessage, 'Please login again!', [
+                    {
+                        text: 'OK',
+                        onPress: () => {
+                            AsyncStorage.removeItem('token');
+                            navigation.navigate('Login');
+                            console.log('Token cleared and navigated to Login');
+                        }
+                    }
+                ])
             } else if (errorStatus == 500) {
-                Alert.alert("An error occurred while creating room");
-                console.log("Error creating room: ", errorMessage);
+                Alert.alert(
+                    'Failed to create room data',
+                    "An error occurred in the server while creating room"
+                );
+            } else {
+                Alert.alert(
+                    'Failed to create room data',
+                    "An unknown error occurred while creating room"
+                );
             }
+            setLoading(false);
+            console.log("Error creating room: ", errorMessage);
         })
     }
 

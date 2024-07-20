@@ -35,7 +35,7 @@ export default function InfoPost({ postDetails, refreshPage }) {
     async function updateVote(initialVoteValue, updatedVoteValue) {
         const token = await AsyncStorage.getItem('token');
         const url = `http://10.0.2.2:3000/rooms/${roomId}/posts/${_id}/vote`;
-        console.log(`roomId: ${roomId} , postId: ${_id}`); // delete this entire line later
+        console.log(`Updating vote from ${initialVoteValue} to ${updatedVoteValue} roomId: ${roomId} , postId: ${_id}`); // delete this entire line later
 
         try {
             await axios.put(url, 
@@ -51,16 +51,36 @@ export default function InfoPost({ postDetails, refreshPage }) {
             const errorMessage = error.response.data.error;
             if (errorStatus == 401 || errorStatus == 403) {
                 logout(errorMessage);
+            } else if (errorStatus == 400) {
+                Alert.alert(
+                    'Bad request',
+                    `There is an issue with the request to update your vote for post "${title}", please try again.`
+                );
+            } else if (errorStatus == 404) {
+                Alert.alert(
+                    'Post not found', 
+                    errorMessage,
+                    [{ text: 'OK', onPress: () => refreshPage() }]
+                );
+            } else if (errorStatus == 500) {
+                Alert.alert(
+                    'Failed to update vote', 
+                    'An error occurred in the server while updating vote'
+                );
             } else {
-                Alert.alert('Failed to update vote');
-                console.error(`Error updating vote for ${_id}: `, error.message);
+                Alert.alert(
+                    'Failed to update vote',
+                    'An unknown error occurred while updating vote'
+                )
             }
+            console.log(`Error updating vote for post ${_id}: `, error.message);
             return false;
         }
     }
 
     async function editPost() {
         const token = await AsyncStorage.getItem('token');
+
         if (!token) {
             logout('Unauthorized request');
             return;
@@ -68,7 +88,6 @@ export default function InfoPost({ postDetails, refreshPage }) {
         const decodedToken = jwtDecode(token);
         const userId = decodedToken.userId;
         if (userId == creator._id) {
-            console.log(`Editing post ${title}`);
             setOptionsModalOpen(false);
             navigation.navigate('Create Post', {
                 roomId: roomId,
@@ -123,8 +142,17 @@ export default function InfoPost({ postDetails, refreshPage }) {
                     [{ text: 'OK', onPress: () => refreshPage() }]
                 );
             } else if (errorStatus == 500) {
-                Alert.alert('Error deleting post', errorMessage);
+                Alert.alert(
+                    'Failed to delete post', 
+                    'An error occurred in the server while deleting post'
+                );
+            } else {
+                Alert.alert(
+                    'Failed to delete post',
+                    'An unknown error occurred while deleting post'
+                )
             }
+            console.log('Error deleting post: ', errorMessage);
         })
     }
 
@@ -205,7 +233,7 @@ const styles=StyleSheet.create({
             fontWeight: 'bold',
             fontSize: 19,
             flex: 1,
-            paddingRight: 8,
+            paddingRight: 10,
         },
         usernameText: {
             fontSize: 16

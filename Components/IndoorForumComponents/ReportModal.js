@@ -4,6 +4,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Dropdown } from 'react-native-element-dropdown';
 import { AntDesign } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 const reportReasons = [
     { 
@@ -22,6 +23,7 @@ function dummyRefresh() {
 
 export default function ReportModal({ 
     modalVisible, closeModal, contentId, contentType, refreshPage = dummyRefresh }) {
+    const navigation = useNavigation();
     const [reason, setReason] = useState(null);
     const [errorVisible, setErrorVisible] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
@@ -43,10 +45,16 @@ export default function ReportModal({
                 })
                 
                 if (response.data.contentDeleted) {
-                    Alert.alert('Report successful', `Due to a large amount of reports, the ${contentType} has been removed`);
+                    Alert.alert(
+                        'Report successful', 
+                        `Due to a large amount of reports, the ${contentType} has been removed`
+                    );
                     refreshPage();
                 } else {
-                    Alert.alert('Report successful', `Your report for this ${contentType} has been made successfully`);
+                    Alert.alert(
+                        'Report successful', 
+                        `Your report for this ${contentType} has been made successfully`
+                    );
                 }
                 setSendingReport(false);
                 close();
@@ -55,13 +63,32 @@ export default function ReportModal({
                 const errorMessage = error.response.data.error;
                 if (errorStatus == 400) {
                     Alert.alert(errorMessage);
+                } else if (errorStatus == 401 || errorStatus == 403) {
+                    Alert.alert(errorMessage, 'Please login again!', [
+                        {
+                            text: 'OK',
+                            onPress: () => {
+                                AsyncStorage.removeItem('token');
+                                navigation.navigate('Login');
+                                console.log('Token cleared and navigated to Login');
+                            }
+                        }
+                    ]);
                 } else if (errorStatus == 404) {
-                    Alert.alert(errorMessage, `The ${contentType} is not found or may have been deleted`);
+                    Alert.alert('Data not found', errorMessage);
+                    refreshPage();
                 } else if (errorStatus == 500) {
-                    Alert.alert("An error occurred while making a report");
+                    Alert.alert(
+                        `Failed to report ${contentType}`,
+                        `An error occurred in the server while reporting ${contentType}`
+                    );
                     console.log(`Error making report: `, errorMessage);
                 } else {
-                    console.error(error);
+                    Alert.alert(
+                        `Failed to report ${contentType}`,
+                        `An unknown error occurred while reporting ${contentType}`
+                    );
+                    console.log(`Error making report: `, errorMessage);
                 }
                 setSendingReport(false);
             }
