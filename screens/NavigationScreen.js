@@ -1,15 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Text,
   View,
   StyleSheet,
-  TextInput,
   TouchableWithoutFeedback,
   Keyboard,
   Modal,
   TouchableOpacity,
-  ScrollView,
-  Button,
   Alert,
   FlatList,
 } from 'react-native';
@@ -125,10 +122,18 @@ export default function NavigationScreen() {
       setLocationInput(text);
       location.currLocation = text;
       if (text) {
+        const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+          text,
+        )}&key=${apiKey}`;
+        const response = await axios.get(geocodeUrl).catch((error) => {});
         const results = Object.keys(VenueData).filter((key) =>
           key.toLowerCase().includes(text.toLowerCase()),
         );
-        setLocationSuggestions(results.slice(0, 5));
+        let originalResults = [];
+        if (response.data?.results.length > 0) {
+          originalResults = response.data.results.map((result) => result.formatted_address);
+        }
+        setLocationSuggestions([...results.slice(0, 5), ...originalResults.slice(0, 5)]);
       } else {
         setLocationSuggestions([]);
       }

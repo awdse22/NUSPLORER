@@ -128,20 +128,6 @@ export default function SettingsScreen() {
         </View>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.row} onPress={() => navigator.navigate('Change Password')}>
-        <Text style={styles.label}>Change password</Text>
-        <View style={styles.value}>
-          <Entypo name="chevron-right" size={24} color="black" />
-        </View>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.row} onPress={() => navigator.navigate('Manage User Data')}>
-        <Text style={styles.label}>Manage user data</Text>
-        <View style={styles.value}>
-          <Entypo name="chevron-right" size={24} color="black" />
-        </View>
-      </TouchableOpacity>
-
       <TouchableOpacity style={[styles.row, { marginTop: 20 }]} onPress={deleteAccount}>
         <Text style={styles.logout}>Delete account</Text>
       </TouchableOpacity>
