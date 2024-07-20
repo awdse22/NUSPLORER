@@ -1,50 +1,179 @@
-import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import React, { useState, useEffect } from 'react';
+import { Alert, TextInput, TouchableOpacity, Text, View, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const SettingsButton = ({ name, onPress }) => {
-    return (
-        <View style={styles.settingsButton}>
-            <TouchableOpacity onPress={onPress}>
-                <Text style={styles.settingsButtonText}>{name}</Text>
-            </TouchableOpacity>
-        </View>
-    )
-}
+import { Entypo } from '@expo/vector-icons';
+import { jwtDecode } from 'jwt-decode';
 
 export default function SettingsScreen() {
-    const navigator = useNavigation();
+  const navigator = useNavigation();
+  const [username, setUsername] = useState('No data');
+  const [email, setEmail] = useState('No data');
+  const [errorVisible, setErrorVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-    function logout() {
-        AsyncStorage.removeItem('token');
-        navigator.navigate('Login');
-        console.log('token cleared');
-    }
+  async function getUserDetails() {
+    const token = await AsyncStorage.getItem('token');
+    const decodedToken = jwtDecode(token);
+    const userId = decodedToken.userId;
+    const url = `http://10.0.2.2:3000/${userId}/userDetails`;
 
-    return (
-        <View style={styles.container}>
-            <SettingsButton name='User Details' onPress={() => navigator.navigate('User Details')} />
-            <SettingsButton name='Change password' onPress={() => navigator.navigate('Change Password')} />
-            <SettingsButton name='Manage user data' onPress={() => navigator.navigate('Manage User Data')} />
-            <SettingsButton name='Logout' onPress={logout}/>
+    axios
+      .get(url, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : null,
+        },
+      })
+      .then((response) => {
+        const userData = response.data.userData;
+        setEmail(userData.email);
+        setUsername(userData.username);
+        setErrorVisible(false);
+        setErrorMessage('');
+      })
+      .catch((error) => {
+        const errorStatus = error.response.status;
+        if (errorStatus == 401 || errorStatus == 403) {
+          Alert.alert(error.response.data.message, 'Please login again!', [
+            {
+              text: 'OK',
+              onPress: () => logout(),
+            },
+          ]);
+        } else if (errorStatus == 404 || errorStatus == 500) {
+          setErrorMessage(error.response.data.message);
+          setErrorVisible(true);
+        } else {
+          console.error('Error in backend', error);
+        }
+      });
+  }
+
+  useEffect(() => {
+    getUserDetails();
+  }, []);
+
+  function logout() {
+    AsyncStorage.removeItem('token');
+    navigator.navigate('Login');
+    console.log('token cleared');
+  }
+
+  async function updateUsername() {
+    Alert.prompt(
+      'Update Username',
+      'Enter your new username:',
+      async (newUsername) => {
+        if (newUsername) {
+          const token = await AsyncStorage.getItem('token');
+          const decodedToken = jwtDecode(token);
+          const userId = decodedToken.userId;
+          const url = `http://10.0.2.2:3000/${userId}/updateUsername`;
+
+          await axios.put(
+            url,
+            { newUsername },
+            {
+              headers: {
+                Authorization: token ? `Bearer ${token}` : null,
+              },
+            },
+          );
+          getUserDetails();
+        }
+      },
+      'plain-text',
+      username,
+    );
+  }
+
+  function deleteAccount() {
+    Alert.alert('Delete Account', 'Are you sure you want to delete your account?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Delete',
+        onPress: async () => {
+          const token = await AsyncStorage.getItem('token');
+          const decodedToken = jwtDecode(token);
+          const userId = decodedToken.userId;
+          const url = `http://10.0.2.2:3000/${userId}/deleteAccount`;
+          await axios.delete(url, {
+            headers: {
+              Authorization: token ? `Bearer ${token}` : null,
+            },
+          });
+          logout();
+        },
+      },
+    ]);
+  }
+
+  return (
+    <View style={styles.container}>
+      {errorVisible && <Text>{errorMessage}</Text>}
+      <View style={styles.row}>
+        <Text style={styles.label}>Email</Text>
+        <Text style={styles.value}>{email}</Text>
+      </View>
+
+      <TouchableOpacity style={styles.row} onPress={updateUsername}>
+        <Text style={styles.label}>Username</Text>
+        <View style={styles.value}>
+          <Text>{username}</Text>
+          <Entypo name="chevron-right" size={24} color="black" />
         </View>
-    )
+      </TouchableOpacity>
+
+      <TouchableOpacity style={[styles.row, { marginTop: 20 }]} onPress={deleteAccount}>
+        <Text style={styles.logout}>Delete account</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.row} onPress={logout}>
+        <Text style={styles.logout}>Logout</Text>
+      </TouchableOpacity>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        justifyContent: 'flex-start',
-        height: '100%',
-        width: '100%',
-    },
-    settingsButton: {
-        borderBottomWidth: 1,
-        padding: 10,
-    },
-    settingsButtonText: {
-        fontSize: 16,
-        fontWeight: 'bold',
-    }
-})
+  container: {
+    justifyContent: 'flex-start',
+    height: '100%',
+    width: '100%',
+    paddingTop: 10,
+  },
+  settingsButton: {
+    borderBottomWidth: 1,
+    padding: 10,
+  },
+  settingsButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  row: {
+    padding: 12,
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    borderBottomColor: '#e9e9e9',
+    borderBottomWidth: 1,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  value: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logout: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'red',
+  },
+});

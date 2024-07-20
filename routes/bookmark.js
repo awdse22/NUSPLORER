@@ -18,10 +18,10 @@ router.post('/', authenticateToken, async (req, res) => {
     res.status(201).json(newBookmark);
   } catch (error) {
     if (error.code == 11000) {
-      return res.status(400).json({ error: 'Bookmark already exists' });
+      return res.status(400).json({ message: 'Bookmark already exists' });
     }
     console.log(error.message);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -42,12 +42,12 @@ router.put('/:id', authenticateToken, async (req, res) => {
     );
 
     if (!bookmark) {
-      return res.status(404).json({ error: 'Bookmark not found' });
+      return res.status(404).json({ message: 'Bookmark not found' });
     }
 
     res.status(200).json(bookmark);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -59,7 +59,7 @@ router.get('/', async (req, res) => {
       .populate('modifier', 'username');
     res.status(200).json(bookmarks);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -68,13 +68,16 @@ router.delete('/:id', authenticateToken, async (req, res) => {
   const { userId } = req.user;
 
   try {
-    const bookmark = await Bookmark.findOneAndDelete({ _id: id, creator: userId });
+    const bookmark = await Bookmark.findOneAndDelete({
+      _id: id,
+      creator: userId,
+    });
     if (!bookmark) {
-      return res.status(404).json({ error: 'Bookmark not found' });
+      return res.status(404).json({ message: 'Bookmark not found' });
     }
     res.status(200).json(bookmark);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 

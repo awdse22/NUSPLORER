@@ -15,23 +15,21 @@ router.get('/', authenticateToken, async (req, res) => {
 
   const searchQuery = {
     roomId: new mongoose.Types.ObjectId(roomId),
-    $or: [
-      { title: { $regex: keyword || '', $options: 'i' } },
-    ],
+    $or: [{ title: { $regex: keyword || '', $options: 'i' } }],
   };
 
   try {
     const numberOfPosts = await Post.countDocuments(searchQuery);
     const postList = await Post.aggregate([
       {
-        $match: searchQuery
+        $match: searchQuery,
       },
       {
         $addFields: {
           voteCount: { $subtract: ['$upvoteCount', '$downvoteCount'] },
           latestModification: {
             $cond: {
-              if : { $eq: [ '$modifyTime', null] },
+              if: { $eq: ['$modifyTime', null] },
               then: '$createTime',
               else: '$modifyTime'
             }
@@ -42,36 +40,39 @@ router.get('/', authenticateToken, async (req, res) => {
       {
         $sort: {
           voteCount: -1,
-          latestModification: -1
-        }
+          latestModification: -1,
+        },
       },
       {
-        $skip: (pageNumber - 1) * limitNumber
+        $skip: (pageNumber - 1) * limitNumber,
       },
       {
-        $limit: limitNumber
-      }
+        $limit: limitNumber,
+      },
     ]);
 
-    const postsWithUsernames = await Post.populate(postList, { path: 'creator', select: 'username' });
+    const postsWithUsernames = await Post.populate(postList, {
+      path: 'creator',
+      select: 'username',
+    });
 
-    const postIds = postsWithUsernames.map(post => post._id);
+    const postIds = postsWithUsernames.map((post) => post._id);
     // Fetch info of whether the user has upvoted or downvoted the listed posts
     const votesMadeByUser = await Vote.find({
       userId,
-      postId: { $in: postIds }
+      postId: { $in: postIds },
     });
     const userVotes = {};
-    votesMadeByUser.forEach(vote => {
+    votesMadeByUser.forEach((vote) => {
       userVotes[vote.postId.toString()] = vote.value;
     });
 
-    const postsWithUserVoteInfo = postsWithUsernames.map(post => {
+    const postsWithUserVoteInfo = postsWithUsernames.map((post) => {
       const postId = post._id.toString();
       const userVote = userVotes[postId];
       return {
         ...post,
-        userVote: userVote || 0
+        userVote: userVote || 0,
       };
     });
 
@@ -79,7 +80,7 @@ router.get('/', authenticateToken, async (req, res) => {
     res.status(200).json({ numberOfPages, postsWithUserVoteInfo });
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -99,7 +100,7 @@ router.post('/', authenticateToken, async (req, res) => {
     });
     res.status(201).json(newPost);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -131,7 +132,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
 
     res.status(200).json(updatedPost);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -175,10 +176,10 @@ router.put('/:id/vote', authenticateToken, async (req, res) => {
   const { userId } = req.user;
   const { id: postId } = req.params;
   // -1 if downvote, 0 if no vote, 1 if upvote
-  const { initialVoteValue, updatedVoteValue } = req.body; 
+  const { initialVoteValue, updatedVoteValue } = req.body;
 
   if (initialVoteValue == updatedVoteValue) {
-    return res.status(400).json({ error: 'Updated vote cannot be the same as initial vote'});
+    return res.status(400).json({ message: 'Updated vote cannot be the same as initial vote' });
   }
 
   const session = await mongoose.startSession();
@@ -202,11 +203,9 @@ router.put('/:id/vote', authenticateToken, async (req, res) => {
     }
     if (updatedVoteValue == 0) {
       await Vote.deleteOne({ postId: postId, userId: userId }).session(session);
-      const updatedPost = await Post.findOneAndUpdate(
-        { _id: postId },
-        updateVoteCount,
-        { new: true }
-      ).session(session);
+      const updatedPost = await Post.findOneAndUpdate({ _id: postId }, updateVoteCount, {
+        new: true,
+      }).session(session);
 
       await session.commitTransaction();
       session.endSession();
@@ -217,18 +216,16 @@ router.put('/:id/vote', authenticateToken, async (req, res) => {
       } else if (updatedVoteValue == -1) {
         updateVoteCount.$inc.downvoteCount = 1;
       }
-      
+
       await Vote.findOneAndUpdate(
         { postId: postId, userId: userId },
         { value: updatedVoteValue },
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       ).session(session);
 
-      const updatedPost = await Post.findOneAndUpdate(
-        { _id: postId },
-        updateVoteCount,
-        { new: true }
-      ).session(session);
+      const updatedPost = await Post.findOneAndUpdate({ _id: postId }, updateVoteCount, {
+        new: true,
+      }).session(session);
 
       await session.commitTransaction();
       session.endSession();
