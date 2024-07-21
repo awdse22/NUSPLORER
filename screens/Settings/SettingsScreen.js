@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Alert, TextInput, TouchableOpacity, Text, View, StyleSheet } from 'react-native';
+import { Alert, TouchableOpacity, Text, View, StyleSheet } from 'react-native';
+import Dialog from 'react-native-dialog';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,8 +11,10 @@ export default function SettingsScreen() {
   const navigator = useNavigation();
   const [username, setUsername] = useState('No data');
   const [email, setEmail] = useState('No data');
+  const [newUsername, setNewUsername] = useState('');
   const [errorVisible, setErrorVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [dialogVisible, setDialogVisible] = useState(false);
 
   async function getUserDetails() {
     const token = await AsyncStorage.getItem('token');
@@ -61,31 +64,8 @@ export default function SettingsScreen() {
   }
 
   async function updateUsername() {
-    Alert.prompt(
-      'Update Username',
-      'Enter your new username:',
-      async (newUsername) => {
-        if (newUsername) {
-          const token = await AsyncStorage.getItem('token');
-          const decodedToken = jwtDecode(token);
-          const userId = decodedToken.userId;
-          const url = `http://10.0.2.2:3000/${userId}/updateUsername`;
-
-          await axios.put(
-            url,
-            { newUsername },
-            {
-              headers: {
-                Authorization: token ? `Bearer ${token}` : null,
-              },
-            },
-          );
-          getUserDetails();
-        }
-      },
-      'plain-text',
-      username,
-    );
+    setNewUsername(username);
+    setDialogVisible(true);
   }
 
   function deleteAccount() {
@@ -134,6 +114,36 @@ export default function SettingsScreen() {
       <TouchableOpacity style={styles.row} onPress={logout}>
         <Text style={styles.logout}>Logout</Text>
       </TouchableOpacity>
+
+      <Dialog.Container visible={dialogVisible}>
+        <Dialog.Title>Update Username</Dialog.Title>
+        <Dialog.Description>Enter your new username:</Dialog.Description>
+        <Dialog.Input onChangeText={(text) => setNewUsername(text)} value={newUsername} />
+        <Dialog.Button label="Cancel" onPress={() => setDialogVisible(false)} />
+        <Dialog.Button
+          label="Update"
+          onPress={async () => {
+            setDialogVisible(false);
+            if (newUsername) {
+              const token = await AsyncStorage.getItem('token');
+              const decodedToken = jwtDecode(token);
+              const userId = decodedToken.userId;
+              const url = `http://10.0.2.2:3000/${userId}/updateUsername`;
+
+              await axios.put(
+                url,
+                { newUsername },
+                {
+                  headers: {
+                    Authorization: token ? `Bearer ${token}` : null,
+                  },
+                },
+              );
+              getUserDetails();
+            }
+          }}
+        />
+      </Dialog.Container>
     </View>
   );
 }
