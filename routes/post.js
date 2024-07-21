@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Post = require('../models/post');
 const Vote = require('../models/vote');
+const Report = require('../models/report');
 const authenticateToken = require('../tokenAuthMiddleware');
 const mongoose = require('mongoose');
 
@@ -238,5 +239,25 @@ router.put('/:id/vote', authenticateToken, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+router.get('/:id', authenticateToken, async (req, res) => {
+  // for getting data of content, votes and reports of a post
+  // only for debugging and testing purposes
+  const { id } = req.params;
+
+  try {
+    const post = await Post.findById(id);
+    const votes = await Vote.find({ postId: id });
+    const reports = await Report.find({ contentId: id, contentType: 'post' });
+    return res.status(200).json({
+      post: post,
+      votes: votes,
+      reports: reports
+    })
+  } catch (error) {
+    console.log('Error getting post data: ', error.message);
+    return res.status(500).json({ error: error.message });
+  }
+})
 
 module.exports = router;

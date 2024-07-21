@@ -1,8 +1,19 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, ScrollView, View, Text, Alert, ActivityIndicator } from 'react-native';
+import { 
+  SafeAreaView, 
+  StyleSheet, 
+  ScrollView, 
+  View, 
+  Text, 
+  Alert, 
+  ActivityIndicator, 
+  TouchableWithoutFeedback, 
+  Keyboard 
+} from 'react-native';
 import InfoPost from '../../Components/IndoorForumComponents/InfoPost';
 import PageSelector from '../../Components/IndoorForumComponents/PageSelector';
 import AddDataButton from '../../Components/IndoorForumComponents/AddDataButton';
+import IndoorSearchBar from '../../Components/IndoorForumComponents/IndoorSearchBar';
 import axios from 'axios';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -62,21 +73,34 @@ export default function InformationPostsPage({ route }) {
 
   useFocusEffect(React.useCallback(() => {
     fetchPosts();
-  }, [pageNumber]));
+  }, [query, pageNumber]));
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.titleText}>{roomCode} info</Text>
-      <View style={styles.createPostContainer}>
-        <AddDataButton 
-          label='Create post' 
-          onPress={() => navigation.navigate('Create Post', { 
-            roomId: roomId, 
-            mode: 'Create'
-          })} 
-        />
-      </View>
-      <PageSelector totalPages={totalPages} pageNumber={pageNumber} onPageChange={setPageNumber} />
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.titleContainer}>
+          <Text style={styles.titleText}>{roomCode} info</Text>
+          <AddDataButton 
+            label='Create post' 
+            onPress={() => navigation.navigate('Create Post', { 
+              roomId: roomId, 
+              mode: 'Create'
+            })} 
+          />
+        </View>
+      </TouchableWithoutFeedback>
+      <IndoorSearchBar 
+        label="Search post title"
+        onChange={val => {
+          setPageNumber(1);
+          setQuery(val);
+        }}
+      />
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={{ width: '100%'}}>
+          <PageSelector totalPages={totalPages} pageNumber={pageNumber} onPageChange={setPageNumber} />
+        </View>
+      </TouchableWithoutFeedback>
       <ScrollView>
         {loadingPosts ? (
           <ActivityIndicator 
@@ -120,11 +144,12 @@ const styles = StyleSheet.create({
     fontSize: 26,
     paddingLeft: 10,
   },
-  createPostContainer: {
+  titleContainer: {
     padding: 5,
     width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center'
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   noDataFound: {
     textAlign: 'center', 

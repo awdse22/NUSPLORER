@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { SafeAreaView, View, TextInput, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 
-export default function IndoorSearchBar({ label, onChange, toggleOptions }) {
+export default function IndoorSearchBar({ label, onChange, toggleOptions = null }) {
     const [query, setQuery] = useState('');
 
     function modify(text) {
@@ -22,9 +22,11 @@ export default function IndoorSearchBar({ label, onChange, toggleOptions }) {
                     onChangeText={modify}
                 />
             </View>
-            <TouchableOpacity onPress={toggleOptions}>
-                <Ionicons name="ellipsis-vertical-circle" size={40} color="black" />
-            </TouchableOpacity>
+            {toggleOptions && (
+                <TouchableOpacity onPress={toggleOptions}>
+                    <Ionicons name="ellipsis-vertical-circle" size={40} color="black" />
+                </TouchableOpacity>
+            )}
         </SafeAreaView>
     );
 }
@@ -35,7 +37,8 @@ const styles = StyleSheet.create({
         width: '100%',
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderBottomWidth: 1,
+        borderWidth: 1,
+        borderRadius: 8,
         borderColor: '#e0e0e0',
         flexDirection: 'row',
         padding: 10,

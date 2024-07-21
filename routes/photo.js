@@ -5,6 +5,7 @@ const ImageMetadata = require('../models/imageMetadata');
 const Image = require('../models/image');
 const authenticateToken = require('../tokenAuthMiddleware');
 const Vote = require('../models/vote');
+const Report = require('../models/report');
 
 const imageTypes = [ "Entrance Photos", "Floor Plans/Maps"];
 
@@ -261,5 +262,27 @@ router.put('/:id/vote', authenticateToken, async (req, res) => {
     res.status(500).json({ message: 'Failed to update votes' });
   }
 });
+
+router.get('/:id', authenticateToken, async (req, res) => {
+  // for getting data of content, votes and reports of an image
+  // only for debugging and testing purposes
+  const { id } = req.params;
+
+  try {
+    const imageMetadata = await ImageMetadata.findById(id).populate(
+      { path: 'imageId', select: 'imageType data' },
+    );
+    const votes = await Vote.find({ postId: id });
+    const reports = await Report.find({ contentId: id, contentType: 'image' });
+    return res.status(200).json({
+      imageMetadata: imageMetadata,
+      votes: votes,
+      reports: reports
+    })
+  } catch (error) {
+    console.log('Error getting image data: ', error.message);
+    return res.status(500).json({ error: error.message });
+  }
+})
 
 module.exports = router;

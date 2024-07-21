@@ -141,6 +141,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
 });
 
 router.get('/:id', authenticateToken, async (req,res) => {
+  // for getting data of a room, only for debugging and testing purposes
   const { id } = req.params;
   const postsData = await mongoose.model('Post').find({ roomId: id });
   const imagesData = await mongoose.model('ImageMetadata').find({ roomId: id });

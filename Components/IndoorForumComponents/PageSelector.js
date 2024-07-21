@@ -93,7 +93,6 @@ const styles=StyleSheet.create({
         alignContent: 'center',
         justifyContent: 'center',
         padding: 8,
-        paddingTop: 0,
     },
     button: {
         width: 35,
