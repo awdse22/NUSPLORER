@@ -100,7 +100,11 @@ export default function CreateRoomData() {
             pattern: {
               value: /^(B[1-9]|[1-9]\d*)$/,
               message: 'Invalid floor number',
-            } 
+            },
+            maxLength: {
+              value: 2,
+              message: 'Floor number should be at most 2 characters long'
+            }
           }} />
         <UserInput 
           type='data'

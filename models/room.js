@@ -32,11 +32,6 @@ const roomSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  modifier: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
   modifyTime: {
     type: Date,
   },

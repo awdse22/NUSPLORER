@@ -106,7 +106,7 @@ export default function IndoorRoomSearch() {
               <RoomDisplay 
                 key={room._id} 
                 roomData={room} 
-                onBookmarkedChange={fetchRooms}
+                refreshPage={fetchRooms}
               />
             ))}
           </View>

@@ -42,11 +42,33 @@ router.get('/', authenticateToken, async (req, res) => {
     const numberOfRooms = await Room.countDocuments(searchQuery);
     const list = await Room.find(searchQuery)
       .populate('creator', 'username')
-      .populate('modifier', 'username')
       .sort({ roomCode: 1 })
       .skip((pageNumber - 1) * limitNumber)
       .limit(limitNumber);
 
+    const roomIds = list.map(room => room._id);
+    const bookmarks = await Bookmark.find({ roomId: { $in: roomIds }, creator: userId }).lean();
+    const userBookmarks = {};
+    bookmarks.forEach((bookmark) => {
+      userBookmarks[bookmark.roomId.toString()] = bookmark._id.toString();
+    });
+
+    const listWithBookmarks = list.map((room) => {
+      const roomId = room._id.toString();
+      const roomBookmark = userBookmarks[roomId];
+      if (roomBookmark) {
+        return {
+          ...room.toObject(),
+          isBookmarked: true,
+          bookmarkId: roomBookmark
+        }
+      } else {
+        return room;
+      }
+    })
+
+    // old code kept temporarily 
+    /*
     const result = [...list];
 
     for (let i = 0; i < result.length; i++) {
@@ -60,12 +82,13 @@ router.get('/', authenticateToken, async (req, res) => {
         };
         result[i] = updatedRoom;
       }
-    }
+    }*/
 
     const numberOfPages = Math.ceil(numberOfRooms / limitNumber);
 
-    res.status(200).json({ numberOfPages, list: result });
+    res.status(200).json({ numberOfPages, list: listWithBookmarks });
   } catch (error) {
+    console.log(error.message);
     res.status(500).json({ error: error.message });
   }
 });
@@ -81,8 +104,6 @@ router.post('/', authenticateToken, async (req, res) => {
       buildingName,
       floorNumber,
       creator: userId,
-
-      modifier: userId,
       createTime: new Date(),
       modifyTime: new Date(),
     });
@@ -109,7 +130,6 @@ router.put('/:id', authenticateToken, async (req, res) => {
         roomName,
         buildingName,
         floorNumber,
-        modifier: userId,
         modifyTime: new Date(),
       },
       { new: true },

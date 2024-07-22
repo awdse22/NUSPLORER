@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, View, Text, StyleSheet } from 'react-native';
+import { SafeAreaView, ScrollView, View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import RoomDisplay from '../Components/IndoorForumComponents/RoomDisplay';
+import IndoorRoomSearch from './IndoorForum/IndoorRoomSearch';
 
 export default function Bookmarks() {
   const [bookmarks, setBookmarks] = useState([]);

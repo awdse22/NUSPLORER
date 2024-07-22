@@ -1,16 +1,84 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import OptionsModal from '../../Components/IndoorForumComponents/OptionsModal';
 import ReportModal from '../../Components/IndoorForumComponents/ReportModal';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function RoomInformation({ route }) {
     const navigation = useNavigation();
     const { _id, roomCode, buildingName, floorNumber, roomName } = route.params;
     const [optionsModalOpen, setOptionsModalOpen] = useState(false);
     const [reportModalOpen, setReportModalOpen] = useState(false);
+    const [isBookmarked, setIsBookmarked] = useState(route.params.isBookmarked);
+    const [bookmarkId, setBookmarkId] = useState(route.params.bookmarkId);
+    const [loading, setLoading] = useState(false);
+
+    async function updateBookmarkStatus() {
+        setLoading(true);
+        try {
+            const token = await AsyncStorage.getItem('token');
+            if (isBookmarked) {
+                await axios.delete(`http://10.0.2.2:3000/bookmark/${bookmarkId}`, {
+                headers: {
+                    Authorization: token ? `Bearer ${token}` : null,
+                },
+                data: { roomId: _id }
+                });
+                setBookmarkId(null);
+            } else {
+                const response = await axios.post(
+                'http://10.0.2.2:3000/bookmark',
+                { roomId: _id },
+                {
+                    headers: {
+                    Authorization: token ? `Bearer ${token}` : null,
+                    },
+                },
+                );
+                setBookmarkId(response.data._id);
+            }
+            setIsBookmarked(prev => !prev);
+            setLoading(false);
+        } catch (error) {
+            const errorStatus = error.response.status;
+            const errorMessage = error.response.data.error;
+            let actionString = isBookmarked ? 'remove' : 'add';
+
+            if (errorStatus == 401 || errorStatus == 403) {
+                Alert.alert(errorMessage, 'Please login again!', [
+                {
+                    text: 'OK',
+                    onPress: () => {
+                    AsyncStorage.removeItem('token');
+                    navigation.navigate('Login');
+                    console.log('Token cleared and navigated to Login');
+                    }
+                }
+                ]);
+            } else if (errorStatus == 404) {
+                Alert.alert('Data not found', errorMessage, [
+                {
+                    text: 'Refresh',
+                    onPress: () => refreshPage()
+                }
+                ]);
+            } else if (errorStatus == 500) {
+                Alert.alert(
+                `Failed to ${actionString} bookmark`,
+                `An error occurred in the server while trying to ${actionString} bookmark`
+                );
+            } else {
+                Alert.alert(
+                `Failed to ${actionString} bookmark`,
+                `An unknown error occurred while trying to ${actionString} bookmark`
+                );
+            }
+            setLoading(false);
+        }
+    };
 
     const RoomDetail = ({icon, text}) => {
         return (
@@ -62,14 +130,27 @@ export default function RoomInformation({ route }) {
                 <View style={styles.details.detailsContainer}>
                     <View style={styles.details.titleContainer}>
                         <Text style={styles.details.titleText}> Room Details </Text>
-                        <TouchableOpacity onPress={() => setOptionsModalOpen(true)}>
-                            <Ionicons 
-                                name="ellipsis-vertical" 
-                                size={26} 
-                                color="black" 
-                                style={{ padding: 2, marginBottom: 4 }}
+                        <View style={{ flexDirection: 'row'}}>
+                            {loading ? (
+                                <ActivityIndicator 
+                                animating={true}
+                                size='small'
+                                color='#003db8'
                                 />
-                        </TouchableOpacity>
+                            ) : (
+                                <TouchableOpacity onPress={updateBookmarkStatus}>
+                                <MaterialCommunityIcons name="heart" size={26} color={isBookmarked ? 'red' : 'grey'} />
+                                </TouchableOpacity>
+                            )}
+                            <TouchableOpacity onPress={() => setOptionsModalOpen(true)}>
+                                <Ionicons 
+                                    name="ellipsis-vertical" 
+                                    size={26} 
+                                    color="black" 
+                                    style={{ padding: 2, marginBottom: 4 }}
+                                    />
+                            </TouchableOpacity>
+                        </View>
                     </View>
                     <RoomDetail 
                         icon=<MaterialIcons name="meeting-room" size={36} color="black" />
