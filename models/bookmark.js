@@ -3,27 +3,15 @@ const mongoose = require('mongoose');
 const { Schema, model } = mongoose;
 
 const bookmarkSchema = new Schema({
-  creator: {
+  userId: {
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true,
   },
-  modifier: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
-  roomId: {
+  room: {
     type: Schema.Types.ObjectId,
     ref: 'Room',
     required: true,
-  },
-  createTime: {
-    type: Date,
-    default: Date.now,
-  },
-  modifyTime: {
-    type: Date,
   },
 });
 

@@ -47,10 +47,10 @@ router.get('/', authenticateToken, async (req, res) => {
       .limit(limitNumber);
 
     const roomIds = list.map(room => room._id);
-    const bookmarks = await Bookmark.find({ roomId: { $in: roomIds }, creator: userId }).lean();
+    const bookmarks = await Bookmark.find({ room: { $in: roomIds }, userId: userId }).lean();
     const userBookmarks = {};
     bookmarks.forEach((bookmark) => {
-      userBookmarks[bookmark.roomId.toString()] = bookmark._id.toString();
+      userBookmarks[bookmark.room.toString()] = bookmark._id.toString();
     });
 
     const listWithBookmarks = list.map((room) => {
@@ -83,7 +83,7 @@ router.get('/', authenticateToken, async (req, res) => {
         result[i] = updatedRoom;
       }
     }*/
-
+    
     const numberOfPages = Math.ceil(numberOfRooms / limitNumber);
 
     res.status(200).json({ numberOfPages, list: listWithBookmarks });

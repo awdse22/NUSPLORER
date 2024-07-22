@@ -26,6 +26,7 @@ export default function IndoorRoomSearch() {
     setLoading(true);
     setErrorMessage('');
     setErrorMessageVisible(false);
+    console.log(`Fetching room data for query "${query}" page number ${pageNumber}`)
 
     axios
       .get(url, {

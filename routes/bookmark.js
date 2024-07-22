@@ -17,18 +17,16 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 
     const newBookmark = await Bookmark.create({
-      creator: userId,
-      modifier: userId,
-      roomId,
-      createTime: new Date(),
-      modifyTime: new Date(),
+      userId: userId,
+      room: roomId,
     });
+
     res.status(201).json(newBookmark);
   } catch (error) {
+    console.log(error.message);
     if (error.code == 11000) {
       return res.status(500).json({ message: 'Bookmark already exists' });
     }
-    console.log(error.message);
     res.status(500).json({ message: error.message });
   }
 });
@@ -59,13 +57,16 @@ router.put('/:id', authenticateToken, async (req, res) => {
   }
 });
 
-router.get('/', async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
+  // Run the function to update the documents
+  const { userId } = req.user;
+
   try {
-    const bookmarks = await Bookmark.find()
-      .populate('roomId')
-      .populate('creator', 'username')
+    const bookmarks = await Bookmark.find({ userId: userId })
+      .populate('room');
     res.status(200).json(bookmarks);
   } catch (error) {
+    console.log(error.message);
     res.status(500).json({ message: error.message });
   }
 });
@@ -85,7 +86,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
 
     const bookmark = await Bookmark.findOneAndDelete({
       _id: id,
-      creator: userId,
+      userId: userId,
     });
     res.status(200).json(bookmark);
   } catch (error) {

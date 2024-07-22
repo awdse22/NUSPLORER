@@ -58,6 +58,7 @@ function MainTabNavigator() {
         component={Bookmarks}
         options={{
           tabBarIcon: (props) => <FontAwesome name="bookmark" {...props} />,
+          headerShown: true
         }}
       />
       <MainTab.Screen

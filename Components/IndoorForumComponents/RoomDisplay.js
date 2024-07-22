@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function RoomDisplay({ roomData, refreshPage }) {
+export default function RoomDisplay({ roomData, refreshPage, onBookmarkedChange = null }) {
   const navigation = useNavigation();
   const [isBookmarked, setIsBookmarked] = useState(roomData.isBookmarked);
   const [bookmarkId, setBookmarkId] = useState(roomData.bookmarkId);
@@ -110,7 +110,7 @@ export default function RoomDisplay({ roomData, refreshPage }) {
                   color='#003db8'
                 />
               ) : (
-                <TouchableOpacity onPress={updateBookmarkStatus}>
+                <TouchableOpacity onPress={onBookmarkedChange ? onBookmarkedChange : updateBookmarkStatus}>
                   <MaterialCommunityIcons name="heart" size={26} color={isBookmarked ? 'red' : 'grey'} />
                 </TouchableOpacity>
               )}
