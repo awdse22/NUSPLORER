@@ -49,6 +49,7 @@ roomSchema.statics.deleteRoomWithData = async function(roomId, session) {
     await mongoose.model('ImageMetadata').deleteByRoomId(roomId, session);
     await mongoose.model('Post').deleteByRoomId(roomId, session);
     await mongoose.model('Report').deleteMany({ contentId: roomId }).session(session);
+    await mongoose.model('Bookmark').deleteMany({ room: roomId }).session(session);
     try {
       await this.findByIdAndDelete(roomId).session(session);
     } catch (error) {

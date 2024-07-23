@@ -6,14 +6,24 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import RoomDisplay from '../Components/IndoorForumComponents/RoomDisplay';
 import IndoorRoomSearch from './IndoorForum/IndoorRoomSearch';
+import IndoorSearchBar from '../Components/IndoorForumComponents/IndoorSearchBar';
 
 export default function Bookmarks() {
   const [bookmarks, setBookmarks] = useState([]);
   const [fetchingBookmarks, setFetchingBookmarks] = useState(false);
+  const [errorMessageVisible, setErrorMessageVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [query, setQuery] = useState('');
+
+  const filteredBookmarks = bookmarks.filter(bm => {
+    return bm.room.roomCode.toLowerCase().includes(query.toLowerCase());
+  });
 
   async function fetchBookmarks() {
     const token = await AsyncStorage.getItem('token');
     const url = 'http://10.0.2.2:3000/bookmark';
+    setFetchingBookmarks(true);
+
     axios
       .get(url, {
         headers: {
@@ -22,9 +32,32 @@ export default function Bookmarks() {
       })
       .then((response) => {
         setBookmarks(response.data);
+        setFetchingBookmarks(false);
       })
       .catch((error) => {
+        const errorStatus = error.response.status;
+        const errorMessage = error.response.data.error;
+        if (errorStatus == 401 || errorStatus == 403) {
+          Alert.alert(errorMessage, 'Please login again!', [
+            {
+              text: 'OK',
+              onPress: () => {
+                AsyncStorage.removeItem('token');
+                navigation.navigate('Login');
+                console.log('Token cleared and navigated to Login');
+              }
+            }
+          ]);
+        } else if (errorStatus == 500) {
+          setErrorMessage('An error occurred in the server while fetching room data');
+          setErrorMessageVisible(true);
+        } else {
+          setErrorMessage('An unknown error occurred while fetching room data');
+          setErrorMessageVisible(true);
+        }
         console.log('Error fetching data: ', error.message);
+        setRoomList([]);
+        setLoading(false);
       });
   };
 
@@ -32,7 +65,6 @@ export default function Bookmarks() {
     const token = await AsyncStorage.getItem('token');
     const url = `http://10.0.2.2:3000/bookmark/${bookmarkId}`;
     try {
-      console.log(`Deleting bookmark ${bookmarkId}, room ${roomId}`)
       const deletedBookmark = await axios.delete(url, {
         headers: {
           Authorization: token ? `Bearer ${token}` : null,
@@ -42,7 +74,6 @@ export default function Bookmarks() {
       if (deletedBookmark) {
         setBookmarks(prev => prev.filter(bm => bm._id !== deletedBookmark.data._id));
       }
-      console.log(deletedBookmark.data);
     } catch (error) {
       const errorStatus = error.response.status;
       const errorMessage = error.response.data.error;
@@ -83,27 +114,41 @@ export default function Bookmarks() {
   useFocusEffect(
     React.useCallback(() => {
       fetchBookmarks();
+      setQuery('');
     }, []),
   );
 
   return (
     <SafeAreaView style={styles.container}>
-      {bookmarks.length === 0 ? (
-        <View style={styles.empty}>
-          <Text style={styles.emptyText}>No data found</Text>
-        </View>
+      <IndoorSearchBar 
+        label="Search bookmarks" 
+        onChange={setQuery} 
+      />
+      {fetchingBookmarks ? (
+        <ActivityIndicator 
+          animating={true}
+          size='large'
+          color='#003db8'
+        />
       ) : (
-        <ScrollView>
-          <View style={styles.roomDisplayWrapper}>
-            {bookmarks.map((bookmark) => (
-              <RoomDisplay
-                key={bookmark._id}
-                roomData={{ ...bookmark.room, isBookmarked: true, bookmarkId: bookmark._id }}
-                onBookmarkedChange={() => removeBookmark(bookmark._id, bookmark.room._id)}
-              />
-            ))}
-          </View>
-        </ScrollView>
+        <View>
+          {filteredBookmarks.length == 0 && (
+            errorMessageVisible ? (
+              <Text style={[styles.noDataFound, { color: 'red' }]}>{errorMessage}</Text>
+            ) : <Text style={styles.noDataFound}>No data found</Text>
+          )}
+          <ScrollView>
+            <View style={styles.roomDisplayWrapper}>
+              {filteredBookmarks.map((bookmark) => (
+                <RoomDisplay
+                  key={bookmark._id}
+                  roomData={{ ...bookmark.room, isBookmarked: true, bookmarkId: bookmark._id }}
+                  onBookmarkedChange={() => removeBookmark(bookmark._id, bookmark.room._id)}
+                />
+              ))}
+            </View>
+          </ScrollView>
+        </View>
       )}
     </SafeAreaView>
   );
@@ -112,18 +157,18 @@ export default function Bookmarks() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
     backgroundColor: '#d1fdff',
   },
+
   empty: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  emptyText: {
+  noDataFound: {
     textAlign: 'center',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   roomDisplayWrapper: {
     flexDirection: 'row',
