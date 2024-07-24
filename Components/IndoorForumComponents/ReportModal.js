@@ -49,13 +49,13 @@ export default function ReportModal({
               'Report successful', 
               `Due to a large amount of reports, the ${contentType} has been removed`
           );
-          refreshPage();
         } else {
           Alert.alert(
             'Report successful', 
             `Your report for this ${contentType} has been made successfully`
           );
         }
+        refreshPage();
         setSendingReport(false);
         close();
       } catch (error) {

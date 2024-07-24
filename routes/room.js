@@ -40,25 +40,59 @@ router.get('/', authenticateToken, async (req, res) => {
 
   try {
     const numberOfRooms = await Room.countDocuments(searchQuery);
-    const list = await Room.find(searchQuery)
-      .populate('creator', 'username')
-      .sort({ roomCode: 1 })
-      .skip((pageNumber - 1) * limitNumber)
-      .limit(limitNumber);
+    const list = await Room.aggregate([
+      {
+        $match: searchQuery,
+      },
+      {
+        $lookup: {
+          from: 'reports',
+          let: { roomId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ['$contentId', '$$roomId'] },
+                    { $eq: ['$userId', new mongoose.Types.ObjectId(userId)] }
+                  ]
+                }
+              }
+            }
+          ],
+          as: 'reports'
+        }
+      },
+      {
+        $match: {
+          $expr: { $eq: [{ $size: '$reports' }, 0] }
+        }
+      },
+      {
+        $sort: { roomCode: 1 }
+      },
+      {
+        $skip: (pageNumber - 1) * limitNumber,
+      },
+      {
+        $limit: limitNumber,
+      }
+    ]);
+    const listWithRoomCreator = await Room.populate(list, { path: 'creator', select: 'username' });
 
-    const roomIds = list.map(room => room._id);
+    const roomIds = listWithRoomCreator.map(room => room._id);
     const bookmarks = await Bookmark.find({ room: { $in: roomIds }, userId: userId }).lean();
     const userBookmarks = {};
     bookmarks.forEach((bookmark) => {
       userBookmarks[bookmark.room.toString()] = bookmark._id.toString();
     });
 
-    const listWithBookmarks = list.map((room) => {
+    const listWithBookmarks = listWithRoomCreator.map((room) => {
       const roomId = room._id.toString();
       const roomBookmark = userBookmarks[roomId];
       if (roomBookmark) {
         return {
-          ...room.toObject(),
+          ...room,
           isBookmarked: true,
           bookmarkId: roomBookmark
         }
@@ -66,23 +100,6 @@ router.get('/', authenticateToken, async (req, res) => {
         return room;
       }
     })
-
-    // old code kept temporarily 
-    /*
-    const result = [...list];
-
-    for (let i = 0; i < result.length; i++) {
-      const room = result[i];
-      const bookmark = await Bookmark.findOne({ roomId: room._id, creator: userId }).lean();
-      if (bookmark) {
-        const updatedRoom = {
-          ...room.toObject(),
-          isBookmarked: true,
-          bookmarkId: bookmark._id.toString(),
-        };
-        result[i] = updatedRoom;
-      }
-    }*/
     
     const numberOfPages = Math.ceil(numberOfRooms / limitNumber);
 

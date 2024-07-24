@@ -26,6 +26,28 @@ router.get('/', authenticateToken, async (req, res) => {
         $match: searchQuery,
       },
       {
+        $lookup: {
+          from: 'reports',
+          let: { postId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ['$contentId', '$$postId'] },
+                    { $eq: ['$userId', new mongoose.Types.ObjectId(userId)] }
+                  ]
+                }
+              }
+            }
+          ],
+          as: 'reports'
+        }
+      },
+      {
+        $match: { $expr: { $eq: [{ $size: '$reports' }, 0] }}
+      },
+      {
         $addFields: {
           voteCount: { $subtract: ['$upvoteCount', '$downvoteCount'] },
           latestModification: {
@@ -35,7 +57,7 @@ router.get('/', authenticateToken, async (req, res) => {
               else: '$modifyTime'
             }
           },
-          sameUser: { $eq: ['$creator', new mongoose.Types.ObjectId(userId)] }
+          sameUser: { $eq: ['$creator', new mongoose.Types.ObjectId(userId)] },
         }
       },
       {
