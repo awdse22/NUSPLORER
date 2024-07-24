@@ -26,14 +26,17 @@ router.put('/updateUsername', authenticateToken, async (req, res) => {
     const userData = await User.findOne({ _id: req.userId });
 
     if (userData) {
-      userData.username = newUsername;
-      await userData.save();
+      const usernameAvailable = await User.isUsernameAvailable(newUsername);
+      if (!usernameAvailable) {
+        return res.status(401).json({ message: 'The username is in use' });
+      }
+      await User.updateOne({ _id: req.userId }, { username: newUsername }, { runValidators: true });
       return res.status(200).json({ message: 'Username updated successfully' });
     }
     return res.status(404).json({ message: 'No data found' });
   } catch (error) {
     console.error('Error querying database', error);
-    return res.status(500).json({ message: 'Error updating username' });
+    return res.status(500).json({ message: error.message });
   }
 });
 
@@ -62,11 +65,15 @@ router.put('/updatePassword', authenticateToken, async (req, res) => {
     const { currentPassword, newPassword } = req.body;
     const userData = await User.findOne({ _id: req.userId });
 
+    if (newPassword.length < 8) {
+      return res.status(400).json({ message: 'Password must be at least 8 characters' });
+    }
+
     if (userData) {
       const isPasswordMatch = await bcrypt.compare(currentPassword, userData.password);
       if (isPasswordMatch) {
         userData.password = await bcrypt.hash(newPassword, 10);
-        await userData.save();
+        await User.updateOne({ _id: req.userId }, { password: userData.password });
         return res.status(200).json({ message: 'Password updated successfully' });
       }
       return res.status(500).json({ message: 'Invalid password' });
@@ -74,7 +81,7 @@ router.put('/updatePassword', authenticateToken, async (req, res) => {
     return res.status(404).json({ message: 'No data found' });
   } catch (error) {
     console.error('Error querying database', error);
-    return res.status(500).json({ message: 'Error updating password' });
+    return res.status(500).json({ message: error.message });
   }
 });
 
