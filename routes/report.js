@@ -94,29 +94,4 @@ router.post('/:contentId', authenticateToken, async (req, res) => {
   }
 });
 
-router.get('/:contentId/vote', async (req, res) => {
-  // get vote data of a post, ONLY FOR DEBUGGING PURPOSES
-  // used to check whether all votes under a content are deleted properly
-  const { contentId: contentId } = req.params;
-  const upvoteCount = await Vote.countDocuments({ postId: contentId, value: 1 });
-  const downvoteCount = await Vote.countDocuments({ postId: contentId, value: -1 });
-  const totalVoteCount = upvoteCount - downvoteCount;
-  const reportData = await Report.find({ contentId: contentId });
-  const voteData = await Vote.find({ postId: contentId });
-  const imageMetadata = await ImageMetadata.findById(contentId);
-  let image;
-  if (imageMetadata) {
-    // image = await Image.findById(imageMetadata.imageId);
-  }
-  image = await Image.findById('669792355ed12f9ee123d77f');
-  return res.status(200).json({
-    upvoteCount: upvoteCount,
-    downvoteCount: downvoteCount,
-    totalVoteCount: totalVoteCount,
-    reportData: reportData,
-    voteData: voteData,
-    image: image
-  });
-})
-
 module.exports = router;

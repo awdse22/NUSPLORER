@@ -3,12 +3,13 @@ import { SafeAreaView, ScrollView, View, Text, StyleSheet, ActivityIndicator, Al
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 import RoomDisplay from '../Components/IndoorForumComponents/RoomDisplay';
-import IndoorRoomSearch from './IndoorForum/IndoorRoomSearch';
 import IndoorSearchBar from '../Components/IndoorForumComponents/IndoorSearchBar';
 
 export default function Bookmarks() {
+  const navigation = useNavigation();
   const [bookmarks, setBookmarks] = useState([]);
   const [fetchingBookmarks, setFetchingBookmarks] = useState(false);
   const [errorMessageVisible, setErrorMessageVisible] = useState(false);
@@ -56,14 +57,15 @@ export default function Bookmarks() {
           setErrorMessageVisible(true);
         }
         console.log('Error fetching data: ', error.message);
-        setRoomList([]);
-        setLoading(false);
+        setBookmarks([]);
+        setFetchingBookmarks(false);
       });
   };
 
   async function removeBookmark(bookmarkId, roomId) {
     const token = await AsyncStorage.getItem('token');
     const url = `http://10.0.2.2:3000/bookmark/${bookmarkId}`;
+    setFetchingBookmarks(true);
     try {
       const deletedBookmark = await axios.delete(url, {
         headers: {
@@ -73,6 +75,7 @@ export default function Bookmarks() {
       });
       if (deletedBookmark) {
         setBookmarks(prev => prev.filter(bm => bm._id !== deletedBookmark.data._id));
+        setFetchingBookmarks(false);
       }
     } catch (error) {
       const errorStatus = error.response.status;
@@ -107,7 +110,7 @@ export default function Bookmarks() {
           `An unknown error occurred while trying to remove bookmark`
         );
       }
-
+      setFetchingBookmarks(false);
     }
   }
 
@@ -166,6 +169,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   noDataFound: {
+    paddingTop: 16,
     textAlign: 'center',
     fontSize: 16,
     fontWeight: 'bold'

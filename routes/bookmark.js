@@ -31,32 +31,6 @@ router.post('/', authenticateToken, async (req, res) => {
   }
 });
 
-router.put('/:id', authenticateToken, async (req, res) => {
-  const { id } = req.params;
-  const { roomId } = req.body;
-  const { userId } = req.user;
-
-  try {
-    const bookmark = await Bookmark.findOneAndUpdate(
-      { _id: id },
-      {
-        roomId,
-        modifier: userId,
-        modifyTime: new Date(),
-      },
-      { new: true },
-    );
-
-    if (!bookmark) {
-      return res.status(404).json({ message: 'Bookmark not found' });
-    }
-
-    res.status(200).json(bookmark);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
 router.get('/', authenticateToken, async (req, res) => {
   // Run the function to update the documents
   const { userId } = req.user;

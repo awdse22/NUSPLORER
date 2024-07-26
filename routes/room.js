@@ -134,34 +134,6 @@ router.post('/', authenticateToken, async (req, res) => {
   }
 });
 
-router.put('/:id', authenticateToken, async (req, res) => {
-  const { id } = req.params;
-  const { roomCode, roomName, buildingName, floorNumber } = req.body;
-  const { userId } = req.user;
-
-  try {
-    const room = await Room.findOneAndUpdate(
-      { _id: id },
-      {
-        roomCode,
-        roomName,
-        buildingName,
-        floorNumber,
-        modifyTime: new Date(),
-      },
-      { new: true },
-    );
-
-    if (!room) {
-      return res.status(404).json({ message: 'Room not found' });
-    }
-
-    res.status(200).json(room);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
 router.delete('/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
   const { userId } = req.user;
