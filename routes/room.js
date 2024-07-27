@@ -127,25 +127,10 @@ router.post('/', authenticateToken, async (req, res) => {
     res.status(201).json(newRoom);
   } catch (error) {
     if (error.code == 11000) {
-      return res.status(400).json({ message: 'A room with this room code already exists' });
+      return res.status(400).json({ error: 'A room with this room code already exists' });
     }
     console.log(error.message);
-    res.status(500).json({ message: error.message });
-  }
-});
-
-router.delete('/:id', authenticateToken, async (req, res) => {
-  const { id } = req.params;
-  const { userId } = req.user;
-
-  try {
-    const room = await Room.findOneAndDelete({ _id: id, creator: userId });
-    if (!room) {
-      return res.status(404).json({ message: 'Room not found' });
-    }
-    res.status(200).json(room);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
