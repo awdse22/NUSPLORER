@@ -84,14 +84,8 @@ To create a campus navigation system for outdoor use and forum for indoor locati
 ### Scope of Project:
 The Android App provides a comprehensive campus navigation system at NUS, featuring outdoor maps, outdoor navigation system, indoor navigation forum, and bookmarking capabilities.
 #### User Authentication: (Milestone 1)
-After opening the app, users are able to see the main login page above (the left pic).
--Do you have an account already?-
--> No
-If the user doesn’t have an account, they will need to press “Register an account” and will see the page like this to require users enter username, email, password, and confirm password. To be noticed, there are requirements for each part. For username, the required length is 3-10 characters; for email, it has to be a valid email address; for password, it has to be >=8 characters long; for confirm password, it has to be the same with respectively. (the middle pic) 
--Have you fulfilled all the requirements?-
--> No
-If users fail to fulfill all those requirements when creating an account, there will appear warnings in red and cannot register successfully. (the right pic) 
-![image](https://github.com/user-attachments/assets/b2c22686-c100-4fb2-9297-f21404f19ae8)
+![image](https://github.com/user-attachments/assets/9d19f9c1-48b2-4fab-928c-25b7b78a022e)
+
 
 #### Problems encountered
 1. For the outdoor navigation function, fully implementing the real-time navigation process is challenging due to its reliance on an emulator and the limitations of available free resources online. Therefore, we have modified this feature to focus on route planning, which can display a simulated route in written form. This allows users to use it as a reference.
