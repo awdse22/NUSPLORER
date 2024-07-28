@@ -85,6 +85,15 @@ To create a campus navigation system for outdoor use and forum for indoor locati
 The Android App provides a comprehensive campus navigation system at NUS, featuring outdoor maps, outdoor navigation system, indoor navigation forum, and bookmarking capabilities.
 #### User Authentication: (Milestone 1)
 ![image](https://github.com/user-attachments/assets/9d19f9c1-48b2-4fab-928c-25b7b78a022e)
+![image](https://github.com/user-attachments/assets/e1ba716f-38d9-4d3e-9079-891e51497ea0)
+![image](https://github.com/user-attachments/assets/d81aadf3-8cb2-4986-a58b-e5f7925bc759)
+#### Outdoor Map: (Milestone 2)
+After login successfully, users can automatically see the map section displayed on the screen. Here users can enter the location they want to find in the search bar, which features predictive text input to assist users in finding their desired location. Upon clicking "search," the map will automatically navigate to the searched location. Users can also zoom in and out to adjust the size.
+![image](https://github.com/user-attachments/assets/ce250081-4657-47e0-8ac8-f60089dd4386)
+#### Outdoor navigation system: (Milestone 2)
+Users can input their current location and desired destination in the navigation feature. By integrating coordinate information from NUSMods-Venues about room locations, users can input not only locations existing in Google Maps (such as Biz2, Kent Ridge MRT), but also can directly enter room numbers (like AS1-0201, S17-0405) for navigation. For two waypoints, users can choose between driving, bicycling, transit, and walking to find the best route. After selecting driving, bicycling, or walking, the map interface will simulate the specific route planning. Clicking the "Next" button allows users to view the next navigation step. If "Next" is clicked accidentally, users can click "Prev" to return to the previous navigation step.For transit, due to limited free resources provided by Google Maps API, clicking transit will automatically open the Google Maps web interface in the browser for public transit suggestions. Additionally, the outdoor navigation system developed here supports multiple waypoints for route planning. Specifically, users can add waypoints using "add destination below" and remove waypoints as needed. However, for transit, Google Maps itself does not support providing public transit routes with multiple waypoints, which will display a warning. For other modes of transportation, route planning can proceed as normal.
+![image](https://github.com/user-attachments/assets/9521df0e-f1ca-4f40-8517-9527a5de7017)
+
 
 
 #### Problems encountered
