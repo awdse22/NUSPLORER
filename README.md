@@ -66,28 +66,36 @@ To create a campus navigation system for outdoor use and forum for indoor locati
 3. As a student having various classes on certain days, I want to be able to find and get data of the rooms of my class. 
 4. As a student looking for the classrooms for the first time, I want to be able to know what the locations or entrances to those rooms look like and if possible, find maps to those rooms.
 5. As a user, I want to share relevant information and my experience finding a newly opened area so that more people can benefit from it.
-6. As a user, I want to help contribute to the student community by upvoting accurate data and reporting bad/inaccurate data so other students can easily find the data they need for their destinations.
-7. As a student needing to keep track of my class locations, I want to bookmark these places.
-8. As a user I want to have my bookmarks and data saved and be able to access it through my devices.
-9. As a user, I want to retrieve the most updated information about each room and their respective areas or help to maintain them.
+6. As a user, I want to help contribute to the student community by upvoting accurate data and I want to find data which have been deemed credible by community votes.
+7. As a user, I want to be able to avoid viewing irrelevant or inappropriate data by reporting them.
+8. As a student needing to keep track of my class locations, I want to bookmark these places.
+9. As a user I want to have my bookmarks and data saved and be able to access it through my devices.
+10. As a user, I want to retrieve the most updated information about each room and their respective areas or help to maintain them.
+
 ### Features
 1. Feature 1 (core): A map with available buildings, faculties, and facilities.
 2. Feature 2 (core): A user authentication system so users can have their bookmarks or data saved and upload data.
-3. Feature 3 (core): An accurate and updated navigation system for the inside and outside the entire campus, providing routes to various destinations (e.g., faculties, rooms available under nusmods-venues).
+3. Feature 3 (core): An accurate and updated navigation system for the outside the entire campus, providing routes to various destinations (e.g., faculties, rooms available under nusmods-venues).
 4. Feature 4 (core): An indoor wayfinding forum that provides a comprehensive and up-to-date resource for navigating indoor areas. Users can create and read posts through this community-driven approach.
 5. Feature 5 (core): A page for users to find maps or photos of their indoor destinations, or upload them to help other future users.
-6. Feature 6 (extension): A feature associated with the forum feature that allows users to upvote, downvote posts, and report bad data.
-7. Feature 7 (extension): A feature allowing users to bookmark locations for their various activities or based on their schedules/timetables. 
-8. Feature 8 (extension): Improved user account management experience with a feature for users wanting to change password, for if they forget password and email verification for users creating accounts.
+6. Feature 6 (extension): A feature associated with the forum feature that allows users to upvote and downvote posts. Posts with more upvotes will be displayed first.
+7. Feature 7 (extension): Users may report various content so they can avoid seeing irrelevant data. Multiple reports from different users of a data for the same reason will subject the data to deletion.
+8. Feature 8 (extension): A feature allowing users to bookmark locations for their various activities or based on their schedules/timetables. 
 ### Scope of Project:
 The Android App provides a comprehensive campus navigation system at NUS, featuring outdoor maps, outdoor navigation system, indoor navigation forum, and bookmarking capabilities.
-#### Core features developed by milestone 2
-1. Map section
-After integrating google map api, users are able to view an accurate map displayed under the map section. They can enter the desired place in the search bar, and zoom in to effortlessly locate buildings, classrooms, and more from a comprehensive view of campus facilities.
-2. Outdoor navigation system
-After integrating google (map) routes api and venue information available on nusmods, the app can compute routes (support walking, bicycling, driving, and transit with public transportation) for users to get their desired locations (including those rooms that are not internally stored in google map, for example, AS1-0201). It also supports “add stops”, in which users are able to get optimal route planning when they tend to go to multiple destinations.
-3. Indoor navigation forum
-This platform allows users to read, collaborate and share relevant information and maps/photos about indoor navigation, providing a comprehensive solution through collective intelligence gradually. This is the basic structure for this feature, extended features (like upvote, downvote…) will be implemented by the next milestone.
+#### User Authentication: (Milestone 1)
+![image](https://github.com/user-attachments/assets/9d19f9c1-48b2-4fab-928c-25b7b78a022e)
+![image](https://github.com/user-attachments/assets/e1ba716f-38d9-4d3e-9079-891e51497ea0)
+![image](https://github.com/user-attachments/assets/d81aadf3-8cb2-4986-a58b-e5f7925bc759)
+#### Outdoor Map: (Milestone 2)
+After login successfully, users can automatically see the map section displayed on the screen. Here users can enter the location they want to find in the search bar, which features predictive text input to assist users in finding their desired location. Upon clicking "search," the map will automatically navigate to the searched location. Users can also zoom in and out to adjust the size.
+![image](https://github.com/user-attachments/assets/ce250081-4657-47e0-8ac8-f60089dd4386)
+#### Outdoor navigation system: (Milestone 2)
+Users can input their current location and desired destination in the navigation feature. By integrating coordinate information from NUSMods-Venues about room locations, users can input not only locations existing in Google Maps (such as Biz2, Kent Ridge MRT), but also can directly enter room numbers (like AS1-0201, S17-0405) for navigation. For two waypoints, users can choose between driving, bicycling, transit, and walking to find the best route. After selecting driving, bicycling, or walking, the map interface will simulate the specific route planning. Clicking the "Next" button allows users to view the next navigation step. If "Next" is clicked accidentally, users can click "Prev" to return to the previous navigation step.For transit, due to limited free resources provided by Google Maps API, clicking transit will automatically open the Google Maps web interface in the browser for public transit suggestions. Additionally, the outdoor navigation system developed here supports multiple waypoints for route planning. Specifically, users can add waypoints using "add destination below" and remove waypoints as needed. However, for transit, Google Maps itself does not support providing public transit routes with multiple waypoints, which will display a warning. For other modes of transportation, route planning can proceed as normal.
+![image](https://github.com/user-attachments/assets/9521df0e-f1ca-4f40-8517-9527a5de7017)
+
+
+
 #### Problems encountered
 1. For the outdoor navigation function, fully implementing the real-time navigation process is challenging due to its reliance on an emulator and the limitations of available free resources online. Therefore, we have modified this feature to focus on route planning, which can display a simulated route in written form. This allows users to use it as a reference.
 2. For the outdoor navigation function, given the limitations of available free resources online, the "add stops" function is not supported for public transportation and cannot be properly displayed in the app. Therefore, we have modified this feature to include a link that opens "maps" on the phone when users tap “transit”, where more details are provided.
