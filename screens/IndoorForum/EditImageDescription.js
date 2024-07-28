@@ -21,7 +21,7 @@ export default function EditImageDescription({ route }) {
 
     async function editDescription(userResponse) {
         const token = await AsyncStorage.getItem('token');
-        const url=`http://10.0.2.2:3000/rooms/${roomId}/photos/${imageMetadataId}`;
+        const url=`https://nusplorer.onrender.com/rooms/${roomId}/photos/${imageMetadataId}`;
         setLoading(true);
 
         axios.put(url, userResponse, {

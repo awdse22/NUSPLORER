@@ -22,7 +22,7 @@ export default function Bookmarks() {
 
   async function fetchBookmarks() {
     const token = await AsyncStorage.getItem('token');
-    const url = 'http://10.0.2.2:3000/bookmark';
+    const url = 'https://nusplorer.onrender.com/bookmark';
     setFetchingBookmarks(true);
 
     axios
@@ -64,7 +64,7 @@ export default function Bookmarks() {
 
   async function removeBookmark(bookmarkId, roomId) {
     const token = await AsyncStorage.getItem('token');
-    const url = `http://10.0.2.2:3000/bookmark/${bookmarkId}`;
+    const url = `https://nusplorer.onrender.com/bookmark/${bookmarkId}`;
     setFetchingBookmarks(true);
     try {
       const deletedBookmark = await axios.delete(url, {

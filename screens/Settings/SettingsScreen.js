@@ -22,7 +22,7 @@ export default function SettingsScreen() {
     const token = await AsyncStorage.getItem('token');
     const decodedToken = jwtDecode(token);
     const userId = decodedToken.userId;
-    const url = `http://10.0.2.2:3000/${userId}/userDetails`;
+    const url = `https://nusplorer.onrender.com/${userId}/userDetails`;
 
     axios
       .get(url, {
@@ -78,7 +78,7 @@ export default function SettingsScreen() {
       const decodedToken = jwtDecode(token);
       const userId = decodedToken.userId;
 
-      const url = `http://10.0.2.2:3000/${userId}/deleteAccount`;
+      const url = `https://nusplorer.onrender.com/${userId}/deleteAccount`;
       await axios.delete(url, {
         headers: {
           Authorization: token ? `Bearer ${token}` : null,
@@ -142,7 +142,7 @@ export default function SettingsScreen() {
                 const token = await AsyncStorage.getItem('token');
                 const decodedToken = jwtDecode(token);
                 const userId = decodedToken.userId;
-                const url = `http://10.0.2.2:3000/${userId}/updateUsername`;
+                const url = `https://nusplorer.onrender.com/${userId}/updateUsername`;
 
                 await axios.put(
                   url,

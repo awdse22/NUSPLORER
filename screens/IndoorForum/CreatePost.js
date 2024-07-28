@@ -36,8 +36,7 @@ export default function CreatePost({ route }) {
   async function createPost(post) {
     console.log(post);
     const token = await AsyncStorage.getItem('token');
-    // const url = `https://nusplorer.onrender.com/rooms/${roomId}/posts`;
-    const url = `http://10.0.2.2:3000/rooms/${roomId}/posts`;
+    const url = `https://nusplorer.onrender.com/rooms/${roomId}/posts`;
     setLoading(true);
     
     axios.post(url, post, { 
@@ -74,8 +73,7 @@ export default function CreatePost({ route }) {
   async function editPost(post) {
     console.log(post);
     const token = await AsyncStorage.getItem('token');
-    // const url = `https://nusplorer.onrender.com/rooms/${roomId}/posts`;
-    const url = `http://10.0.2.2:3000/rooms/${roomId}/posts/${editParams.postId}`;
+    const url = `https://nusplorer.onrender.com/rooms/${roomId}/posts/${editParams.postId}`;
     setLoading(true);
     
     axios.put(url, post, { 

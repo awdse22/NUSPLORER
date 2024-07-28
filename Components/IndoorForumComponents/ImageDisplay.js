@@ -78,7 +78,7 @@ export default function ImageDisplay({ imageData, refreshPage }) {
 
     async function updateVote(initialVoteValue, updatedVoteValue) {
         const token = await AsyncStorage.getItem('token');
-        const url = `http://10.0.2.2:3000/rooms/${roomId}/photos/${_id}/vote`;
+        const url = `https://nusplorer.onrender.com/rooms/${roomId}/photos/${_id}/vote`;
 
         try {
             const response = await axios.put(url, 
@@ -159,7 +159,7 @@ export default function ImageDisplay({ imageData, refreshPage }) {
 
     async function deleteImage() {
         const token = await AsyncStorage.getItem('token');
-        const url = `http://10.0.2.2:3000/rooms/${roomId}/photos/${_id}`;
+        const url = `https://nusplorer.onrender.com/rooms/${roomId}/photos/${_id}`;
 
         axios.delete(url, {
             headers: {

@@ -20,8 +20,7 @@ export default function IndoorRoomSearch() {
   const [errorMessage, setErrorMessage] = useState('');
 
   const fetchRooms = async () => {
-    // const url = `https://nusplorer.onrender.com/rooms?page=${pageNumber}&pageSize=10&keyword=${query}`;
-    const url = `http://10.0.2.2:3000/rooms?page=${pageNumber}&pageSize=10&keyword=${query}`;
+    const url = `https://nusplorer.onrender.com/rooms?page=${pageNumber}&pageSize=10&keyword=${query}`;
     const token = await AsyncStorage.getItem('token');
     setLoading(true);
     setErrorMessage('');

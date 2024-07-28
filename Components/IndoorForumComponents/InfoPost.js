@@ -34,7 +34,7 @@ export default function InfoPost({ postDetails, refreshPage }) {
 
     async function updateVote(initialVoteValue, updatedVoteValue) {
         const token = await AsyncStorage.getItem('token');
-        const url = `http://10.0.2.2:3000/rooms/${roomId}/posts/${_id}/vote`;
+        const url = `https://nusplorer.onrender.com/rooms/${roomId}/posts/${_id}/vote`;
         console.log(`Updating vote from ${initialVoteValue} to ${updatedVoteValue} roomId: ${roomId} , postId: ${_id}`); // delete this entire line later
 
         try {
@@ -116,7 +116,7 @@ export default function InfoPost({ postDetails, refreshPage }) {
 
     async function deletePost() {
         const token = await AsyncStorage.getItem('token');
-        const url = `http://10.0.2.2:3000/rooms/${roomId}/posts/${_id}`;
+        const url = `https://nusplorer.onrender.com/rooms/${roomId}/posts/${_id}`;
 
         axios.delete(url, {
             headers: {

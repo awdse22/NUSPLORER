@@ -31,8 +31,7 @@ export default function InformationPostsPage({ route }) {
 
   async function fetchPosts() {
     const token = await AsyncStorage.getItem('token');
-    // const url = `https://nusplorer.onrender.com/rooms/${roomId}/posts?page=${pageNumber}&pageSize=10&keyword=${query}`;
-    const url = `http://10.0.2.2:3000/rooms/${roomId}/posts?page=${pageNumber}&pageSize=10&keyword=${query}`;
+    const url = `https://nusplorer.onrender.com/rooms/${roomId}/posts?page=${pageNumber}&pageSize=10&keyword=${query}`;
     setLoadingPosts(true);
     setErrorMessageVisible(false);
     setErrorMessage('');

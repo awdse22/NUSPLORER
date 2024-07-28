@@ -22,7 +22,7 @@ export default function UserDetailsScreen() {
     const token = await AsyncStorage.getItem('token');
     const decodedToken = jwtDecode(token);
     const userId = decodedToken.userId;
-    const url = `http://10.0.2.2:3000/${userId}/userDetails`;
+    const url = `https://nusplorer.onrender.com/${userId}/userDetails`;
 
     axios
       .get(url, {

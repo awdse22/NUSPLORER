@@ -16,7 +16,7 @@ export default function RoomDisplay({ roomData, refreshPage, onBookmarkedChange 
     try {
       const token = await AsyncStorage.getItem('token');
       if (isBookmarked) {
-        await axios.delete(`http://10.0.2.2:3000/bookmark/${bookmarkId}`, {
+        await axios.delete(`https://nusplorer.onrender.com/bookmark/${bookmarkId}`, {
           headers: {
             Authorization: token ? `Bearer ${token}` : null,
           },
@@ -25,7 +25,7 @@ export default function RoomDisplay({ roomData, refreshPage, onBookmarkedChange 
         setBookmarkId(null);
       } else {
         const response = await axios.post(
-          'http://10.0.2.2:3000/bookmark',
+          'https://nusplorer.onrender.com/bookmark',
           { roomId: roomData._id },
           {
             headers: {

@@ -25,8 +25,7 @@ export default function ImagesPage({ route }) {
 
   const fetchImages = async () => {
     const token = await AsyncStorage.getItem('token');
-    // const url = `https://nusplorer.onrender.com/rooms/${roomId}/photos?dataType=${dataType}`;
-    const url = `http://10.0.2.2:3000/rooms/${roomId}/photos?dataType=${dataType}`;
+    const url = `https://nusplorer.onrender.com/rooms/${roomId}/photos?dataType=${dataType}`;
     setLoadingImages(true);
     setErrorMessageVisible(false);
     setErrorMessage('');

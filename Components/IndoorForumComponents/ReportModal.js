@@ -31,7 +31,7 @@ export default function ReportModal({
   
   async function report() {
     const token = await AsyncStorage.getItem('token');
-    const url = `http://10.0.2.2:3000/report/${contentId}`;
+    const url = `https://nusplorer.onrender.com/report/${contentId}`;
     if (reason) {
       setSendingReport(true);
       try {

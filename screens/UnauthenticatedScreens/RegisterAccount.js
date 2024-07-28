@@ -20,10 +20,7 @@ export default function RegisterAccount() {
   const [errorMessage, setErrorMessage] = useState('');
 
   function registerAccount(credentials) {
-    console.log('--------------- FrontEnd posting: --------------------');
-    console.log(credentials);
-    // const url = 'https://nusplorer.onrender.com/register';
-    const url = 'http://10.0.2.2:3000/register';
+    const url = 'https://nusplorer.onrender.com/register';
 
     axios
       .post(url, credentials)
