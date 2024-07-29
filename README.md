@@ -18,7 +18,7 @@ Click `Next` > `Finish`.
 
 ### Running the app
 Make sure you have the android emulator open.
-Download the [APK](https://drive.google.com/file/d/1zMpya4dwKzHNVIjhVnZWP97y4mDFMsjY/view?usp=sharing) .
+Download the [APK](https://drive.google.com/file/d/157WR48J419EFflozqUpZbktUlEPx1FAs/view?usp=sharing) .
 
 Locate the downloaded file (it's probably in your downloads folder), drag and drop it on the android emulator.
 This should enable the android emulator to start installing the apk.
